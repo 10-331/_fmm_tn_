@@ -8,75 +8,115 @@
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
-    width: 100%;
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
     background: linear-gradient(135deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
-    /* 背景画像を使う場合は下を有効化してね👇 */
-    /* background: url('your-image.jpg') no-repeat center center fixed;
-       background-size: cover; */
+    overflow-x: hidden;
+    color: #333;
+  }
+
+  /* 最初のメイン部分 */
+  section.intro {
+    height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    overflow-y: auto;
+    align-items: center;
   }
 
   .novel {
     writing-mode: vertical-rl;
     text-orientation: upright;
-    font-size: 0.8em; /* 小さめに */
-    line-height: 1.5; /* 行間を詰める */
-    color: #333;
-    padding: 5vh 5vw;
-    max-width: 90vw;
+    font-size: 0.8em;
+    line-height: 1.5;
+    text-align: center;
     opacity: 0;
-    animation: fadePage 2s ease forwards;
-    animation-delay: 0.3s;
+    animation: fadeIn 2s ease forwards;
+    animation-delay: 0.5s;
   }
 
   .novel p {
-    margin: 0 1em 0 0;
+    margin: 0 1em;
     opacity: 0;
-    animation: fadeUp 1.2s ease forwards;
+    animation: floatUp 1.2s ease forwards;
   }
 
   .novel p:nth-child(1) { animation-delay: 0.8s; }
   .novel p:nth-child(2) { animation-delay: 1.8s; }
   .novel p:nth-child(3) { animation-delay: 2.8s; }
 
-  @keyframes fadeUp {
+  @keyframes floatUp {
     0% { opacity: 0; filter: blur(2px); }
     100% { opacity: 1; filter: blur(0); }
   }
 
-  @keyframes fadePage {
+  @keyframes fadeIn {
     to { opacity: 1; }
   }
 
-  .next {
-    display: block;
-    margin: 2em auto;
-    color: #555;
-    font-size: 0.9em;
-    text-decoration: none;
-    opacity: 0;
-    text-align: center;
-    animation: fadeNext 1.5s ease 3.8s forwards;
+  /* 作品一覧セクション */
+  section.works {
+    min-height: 100vh;
+    padding: 5vh 10vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(6px);
   }
 
-  @keyframes fadeNext {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+  .works h2 {
+    font-size: 1em;
+    letter-spacing: 0.2em;
+    margin-bottom: 2em;
+  }
+
+  .work-item {
+    margin: 1.5em 0;
+    padding: 1em 1.5em;
+    border-left: 3px solid #ccc;
+    font-size: 0.9em;
+    text-decoration: none;
+    color: #333;
+    background: rgba(255,255,255,0.7);
+    width: 80%;
+    transition: all 0.3s ease;
+  }
+
+  .work-item:hover {
+    background: rgba(240,240,255,0.9);
+    border-left-color: #888;
+    transform: translateX(4px);
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.7em;
+    color: #777;
+    margin: 3em 0 1em;
   }
 </style>
 </head>
 <body>
-  <div class="novel">
-    <p>これは、迷子になった私を助けてくれた彼と</p>
-    <p>たくさん笑って、ふざけあって、恋人になった私たちが</p>
-    <p>また、他人に戻るまでのお話。</p>
-  </div>
+  <!-- 1画面目：縦書き -->
+  <section class="intro">
+    <div class="novel">
+      <p>これは、迷子になった私を助けてくれた彼と</p>
+      <p>たくさん笑って、ふざけあって、恋人になった私たちが</p>
+      <p>また、他人に戻るまでのお話。</p>
+    </div>
+  </section>
 
-  <a href="works.html" class="next">▶ 作品一覧へ</a>
+  <!-- 2画面目：作品一覧 -->
+  <section class="works">
+    <h2>作品一覧</h2>
+    <a href="story1.html" class="work-item">ひかりの直後</a>
+    <a href="story2.html" class="work-item">冷たい手のひら</a>
+    <a href="story3.html" class="work-item">夜に溶ける声</a>
+    <a href="story4.html" class="work-item">花の散る音</a>
+  </section>
+
+  <footer>
+    © 2025 彩音
+  </footer>
 </body>
 </html>
