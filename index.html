@@ -10,57 +10,58 @@
     padding: 0;
     height: 100%;
     width: 100%;
-    overflow: hidden;
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
     background: linear-gradient(135deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+    /* 背景画像を使う場合は下を有効化してね👇 */
+    /* background: url('your-image.jpg') no-repeat center center fixed;
+       background-size: cover; */
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    overflow-y: auto;
   }
 
-  /* 縦書き全体 */
   .novel {
     writing-mode: vertical-rl;
     text-orientation: upright;
-    font-size: 1.2em;
-    line-height: 2.2;
+    font-size: 0.8em; /* 小さめに */
+    line-height: 1.5; /* 行間を詰める */
     color: #333;
-    max-height: 80vh;
-    max-width: 80vw;
+    padding: 5vh 5vw;
+    max-width: 90vw;
     opacity: 0;
-    animation: fadeIn 2s ease forwards;
-    animation-delay: 0.5s;
+    animation: fadePage 2s ease forwards;
+    animation-delay: 0.3s;
   }
 
-  /* 各段落 */
   .novel p {
     margin: 0 1em 0 0;
     opacity: 0;
-    animation: fadeLine 1.2s ease forwards;
+    animation: fadeUp 1.2s ease forwards;
   }
 
-  .novel p:nth-child(1) { animation-delay: 1.0s; }
-  .novel p:nth-child(2) { animation-delay: 2.5s; }
-  .novel p:nth-child(3) { animation-delay: 4.0s; }
+  .novel p:nth-child(1) { animation-delay: 0.8s; }
+  .novel p:nth-child(2) { animation-delay: 1.8s; }
+  .novel p:nth-child(3) { animation-delay: 2.8s; }
 
-  @keyframes fadeLine {
-    0% { opacity: 0; transform: translateY(-1em); }
-    100% { opacity: 1; transform: translateY(0); }
+  @keyframes fadeUp {
+    0% { opacity: 0; filter: blur(2px); }
+    100% { opacity: 1; filter: blur(0); }
   }
 
-  @keyframes fadeIn {
+  @keyframes fadePage {
     to { opacity: 1; }
   }
 
   .next {
-    position: absolute;
-    bottom: 20px;
-    right: 40px;
+    display: block;
+    margin: 2em auto;
     color: #555;
     font-size: 0.9em;
     text-decoration: none;
     opacity: 0;
-    animation: fadeNext 2s ease 5s forwards;
+    text-align: center;
+    animation: fadeNext 1.5s ease 3.8s forwards;
   }
 
   @keyframes fadeNext {
