@@ -14,32 +14,41 @@
     overflow-x: hidden;
   }
 
-  /* 🌇 朝焼けの余韻を長く */
+  /* 🌅 朝焼け部分 */
   section.intro {
-    height: 200vh; /* ←空白を含めて長めに */
+    height: 200vh; /* 余韻を持たせる長さ */
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
   }
 
-  /* 📜 三行を同じ高さ・中央揃えに */
+  /* 📜 三行を“列”として横に並べる（右→左） */
   .novel {
     display: flex;
-    flex-direction: row;
+    flex-direction: row-reverse; /* ←右から左に並ぶ */
     justify-content: center;
-    align-items: flex-start; /* 各行の上端を揃える */
-    gap: 3em; /* 行間 */
+    align-items: flex-start;
+    gap: 4em; /* 各縦列の間隔 */
+    padding-top: 25vh;
+  }
+
+  /* 各縦列 */
+  .line {
     writing-mode: vertical-rl;
     text-orientation: upright;
     font-size: 0.8em;
     line-height: 1.6;
     opacity: 0;
-    animation: fadeAll 2s ease 0.3s forwards;
+    animation: softGlow 2.5s ease forwards;
   }
 
-  /* ✨ “ぽわ…”と柔らかく出てくる */
-  @keyframes fadeAll {
+  .line:nth-child(1) { animation-delay: 0.8s; }
+  .line:nth-child(2) { animation-delay: 1.6s; }
+  .line:nth-child(3) { animation-delay: 2.4s; }
+
+  /* 💫 “ぽわ…”と浮き出る演出 */
+  @keyframes softGlow {
     0% {
       opacity: 0;
       filter: blur(6px) brightness(1.2);
@@ -102,12 +111,12 @@
 </style>
 </head>
 <body>
-  <!-- 🌅 朝焼けの余韻＋三行 -->
+  <!-- 🌇 朝焼け＋三行縦書き -->
   <section class="intro">
     <div class="novel">
-      <p>これは、迷子になった私を助けてくれた彼と</p>
-      <p>たくさん笑って、ふざけあって、恋人になった私たちが</p>
-      <p>また、他人に戻るまでのお話。</p>
+      <div class="line">これは、迷子になった私を助けてくれた彼と</div>
+      <div class="line">たくさん笑って、ふざけあって、恋人になった私たちが</div>
+      <div class="line">また、他人に戻るまでのお話。</div>
     </div>
   </section>
 
