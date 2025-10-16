@@ -14,40 +14,39 @@
     overflow-x: hidden;
   }
 
-  /* 🌅 朝焼け部分 */
+  /* 🌅 冒頭（画面中央から始まる） */
   section.intro {
-    height: 200vh; /* 余韻を持たせる長さ */
+    height: 120vh; /* ←朝焼けと目次の間に余白 */
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center; /* 画面中央 */
     position: relative;
   }
 
-  /* 📜 三行を“列”として横に並べる（右→左） */
+  /* 📜 三行を右→左に横並びに配置 */
   .novel {
     display: flex;
-    flex-direction: row-reverse; /* ←右から左に並ぶ */
+    flex-direction: row-reverse; /* 右から左へ配置 */
     justify-content: center;
     align-items: flex-start;
-    gap: 4em; /* 各縦列の間隔 */
-    padding-top: 25vh;
+    gap: 3em;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
   }
 
   /* 各縦列 */
   .line {
-    writing-mode: vertical-rl;
-    text-orientation: upright;
     font-size: 0.8em;
-    line-height: 1.6;
+    line-height: 1.3; /* ←行間を狭く */
     opacity: 0;
     animation: softGlow 2.5s ease forwards;
   }
 
-  .line:nth-child(1) { animation-delay: 0.8s; }
-  .line:nth-child(2) { animation-delay: 1.6s; }
-  .line:nth-child(3) { animation-delay: 2.4s; }
+  .line:nth-child(1) { animation-delay: 0.6s; }
+  .line:nth-child(2) { animation-delay: 1.2s; }
+  .line:nth-child(3) { animation-delay: 1.8s; }
 
-  /* 💫 “ぽわ…”と浮き出る演出 */
+  /* 💫 “ぽわ…”と柔らかく出る */
   @keyframes softGlow {
     0% {
       opacity: 0;
@@ -69,7 +68,7 @@
   /* 📖 作品一覧 */
   section.works {
     min-height: 100vh;
-    padding: 10vh 10vw;
+    padding: 15vh 10vw;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -85,7 +84,7 @@
   }
 
   .work-item {
-    margin: 1.2em 0;
+    margin: 1em 0;
     padding: 1em 1.5em;
     border-left: 3px solid #ccc;
     font-size: 0.9em;
@@ -104,14 +103,14 @@
 
   footer {
     text-align: center;
-    font-size: 1.5em;
-    color: #777;
+    font-size: 1em; /* ←小さく控えめに */
+    color: #999;
     margin: 3em 0 1em;
   }
 </style>
 </head>
 <body>
-  <!-- 🌇 朝焼け＋三行縦書き -->
+  <!-- 🌇 冒頭（文字が最初から中央に） -->
   <section class="intro">
     <div class="novel">
       <div class="line">これは、迷子になった私を助けてくれた彼と</div>
