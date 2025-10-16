@@ -5,13 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ひかりの直後</title>
 <style>
-  body {
+  html, body {
     margin: 0;
     padding: 0;
-    height: 100vh;
+    height: 100%;
+    width: 100%;
     overflow: hidden;
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
     background: linear-gradient(135deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+    /* 背景画像を使う場合は下を有効化してね👇 */
+    /* background: url('your-image.jpg') no-repeat center center fixed;
+       background-size: cover; */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -21,33 +25,33 @@
     display: flex;
     writing-mode: vertical-rl;
     text-orientation: upright;
-    gap: 2em; /* 列の間隔 */
+    gap: 2em;
+    line-height: 2.2;
   }
 
   .line {
     opacity: 0;
-    animation: fadeIn 2s ease forwards;
+    animation: fadeIn 1.2s ease forwards;
   }
 
-  /* 1列目→2列目→3列目…の順に遅延 */
-  .line:nth-child(1) { animation-delay: 0.5s; }
-  .line:nth-child(2) { animation-delay: 2.5s; }
-  .line:nth-child(3) { animation-delay: 4.5s; }
+  .line:nth-child(1) { animation-delay: 0.2s; }
+  .line:nth-child(2) { animation-delay: 1.4s; }
+  .line:nth-child(3) { animation-delay: 2.6s; }
 
   @keyframes fadeIn {
-    0% { opacity: 0; transform: translateY(-1em); }
+    0% { opacity: 0; transform: translateY(-1.5em); }
     100% { opacity: 1; transform: translateY(0); }
   }
 
   .next {
     position: absolute;
-    bottom: 30px;
-    right: 40px;
-    font-size: 0.9em;
+    bottom: 20px;
+    right: 30px;
     color: #555;
+    font-size: 0.9em;
     text-decoration: none;
     opacity: 0;
-    animation: fadeNext 2s ease 7s forwards;
+    animation: fadeNext 1.5s ease 4s forwards;
   }
 
   @keyframes fadeNext {
