@@ -14,13 +14,14 @@
     color: #333;
   }
 
-  /* 最初のメイン部分（中央に固定） */
+  /* 最初のメイン部分（中央固定） */
   section.intro {
-    height: 100vh;
+    height: 130vh; /* 少し長めにして、スクロール距離を確保 */
     display: flex;
     justify-content: center;
-    align-items: center; /* ← これで完全に中央寄せ */
+    align-items: center;
     text-align: center;
+    position: relative;
   }
 
   .novel {
@@ -31,31 +32,51 @@
     opacity: 0;
     animation: fadeIn 2s ease forwards;
     animation-delay: 0.3s;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1em;
   }
 
+  /* 各行の高さを揃える */
   .novel p {
-    margin: 0 1em;
+    margin: 0;
+    padding: 0;
     opacity: 0;
-    animation: floatUp 1.2s ease forwards;
+    animation: ripple 1.2s ease forwards;
   }
 
   .novel p:nth-child(1) { animation-delay: 0.8s; }
-  .novel p:nth-child(2) { animation-delay: 1.8s; }
-  .novel p:nth-child(3) { animation-delay: 2.8s; }
-
-  @keyframes floatUp {
-    0% { opacity: 0; filter: blur(2px); }
-    100% { opacity: 1; filter: blur(0); }
-  }
+  .novel p:nth-child(2) { animation-delay: 2s; }
+  .novel p:nth-child(3) { animation-delay: 3.2s; }
 
   @keyframes fadeIn {
     to { opacity: 1; }
   }
 
+  /* 波紋エフェクト（中心から淡く光る） */
+  @keyframes ripple {
+    0% {
+      opacity: 0;
+      filter: brightness(1.2) blur(1px);
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+    30% {
+      opacity: 1;
+      filter: brightness(1.1) blur(0);
+      text-shadow: 0 0 5px rgba(255,255,255,0.3);
+    }
+    100% {
+      opacity: 1;
+      filter: brightness(1);
+      text-shadow: none;
+    }
+  }
+
   /* 作品一覧セクション */
   section.works {
     min-height: 100vh;
-    padding: 5vh 10vw;
+    padding: 10vh 10vw;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -90,7 +111,7 @@
 
   footer {
     text-align: center;
-    font-size: 0.7em;
+    font-size: 1.2em;
     color: #777;
     margin: 3em 0 1em;
   }
@@ -116,7 +137,7 @@
   </section>
 
   <footer>
-    © 2025 彩音
+    ☁️🍨
   </footer>
 </body>
 </html>
