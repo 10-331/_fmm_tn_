@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>笹井綾について</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+    color: #333;
+    overflow-x: hidden;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 5vh 0;
+  }
+
+  .profile-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    transition: filter 0.8s ease;
+    cursor: pointer;
+  }
+
+  /* ネガ反転 */
+  .profile-image.invert {
+    filter: invert(1) contrast(1.1);
+  }
+
+  h1 {
+    font-size: 1.3em;
+    letter-spacing: 0.15em;
+    margin: 1em 0 0.3em;
+  }
+
+  p {
+    font-size: 0.9em;
+    line-height: 1.8;
+    margin: 0.3em 0;
+    text-align: center;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.8em;
+    color: #999;
+    margin: 3em 0 1em;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <!-- 🖼 ここに彩音さんの画像を使う -->
+    <img src="F47E6238-3689-491A-9FA8-CBF3D26C43A1.jpeg" alt="笹井綾" class="profile-image" id="profile">
+
+    <h1>笹井 綾（ささい・あや）</h1>
+    <p>22歳 / 145cm / 黒髪ロング</p>
+    <p>静かで控えめな性格。けれど、その奥には確かな意志がある。</p>
+  </div>
+
+  <footer>☁️🍨</footer>
+
+  <script>
+    const img = document.getElementById('profile');
+    img.addEventListener('click', () => {
+      img.classList.add('invert'); // ネガ反転
+      setTimeout(() => {
+        window.location.href = 'ssi_hidden.html'; // 裏ページへ
+      }, 1000); // 1秒後に遷移
+    });
+  </script>
+</body>
+</html>
