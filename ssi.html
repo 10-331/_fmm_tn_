@@ -23,28 +23,36 @@
     padding: 5vh 0;
   }
 
+  .profile-box {
+    background: rgba(255, 252, 240, 0.75); /* 淡いクリーム色 */
+    border-radius: 12px;
+    padding: 30px 40px;
+    box-shadow: 0 0 15px rgba(255, 230, 180, 0.3);
+  }
+
   .profile-image {
-    width: 200px;
-    height: 200px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     object-fit: cover;
-    transition: filter 0.8s ease;
+    display: block;
+    margin: 0 auto;
   }
 
   h1 {
-    font-size: 1.3em;
-    letter-spacing: 0.15em;
+    font-size: 1.05em; /* 小さく調整 */
+    letter-spacing: 0.12em;
     margin: 1em 0 0.3em;
+    text-align: center;
   }
 
   p {
-    font-size: 0.9em;
-    line-height: 1.8;
+    font-size: 0.8em; /* 全体2段階くらい小さく */
+    line-height: 1.7;
     margin: 0.3em 0;
     text-align: center;
   }
 
-  /* この行だけクリックできるように */
   .memory-link {
     cursor: pointer;
     transition: color 0.3s ease;
@@ -61,31 +69,66 @@
     color: #999;
     margin: 3em 0 1em;
   }
+
+  /* クリック後のノイズ演出 */
+  .noise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.05) 0px,
+      rgba(0,0,0,0.05) 2px
+    );
+    animation: noiseMove 0.15s infinite;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  @keyframes noiseMove {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(-5px, 3px); }
+    50% { transform: translate(3px, -5px); }
+    75% { transform: translate(-3px, -2px); }
+    100% { transform: translate(0,0); }
+  }
 </style>
 </head>
 <body>
   <div class="container">
-    <img src="F47E6238-3689-491A-9FA8-CBF3D26C43A1.jpeg" alt="笹井綾" class="profile-image">
+    <div class="profile-box">
+      <img src="F47E6238-3689-491A-9FA8-CBF3D26C43A1.jpeg" alt="笹井綾" class="profile-image">
 
-    <h1>笹井 綾（ささい あや）</h1>
-    <p>22歳 / 145cm / A型</p>
-    <p>単純明快という言葉がよく似合う女の子。</p>
-    <p>現在はmahorova設立社に勤務。</p>
-    <p>主に基幹業務の設計･開発をしている。</p>
-    <p>よく外に出歩くものの、かなり方向音痴。</p>
-    <p class="memory-link">一部の記憶が曖昧だが、本人は気にしていないらしい……？</p>
+      <h1>笹井 綾（ささい あや）</h1>
+      <p>22歳 / 145cm / A型</p>
+      <p>単純明快という言葉がよく似合う女の子。</p>
+      <p>現在はmahorova設立社に勤務。</p>
+      <p>主に基幹業務の設計･開発をしている。</p>
+      <p>よく外に出歩くものの、かなり方向音痴。</p>
+      <p><span class="memory-link">一部の記憶が曖昧</span>だが、本人は気にしていないらしい……？</p>
+    </div>
   </div>
+
+  <div class="noise" id="noise"></div>
 
   <footer>☁️🍨</footer>
 
   <script>
     const memoryText = document.querySelector('.memory-link');
+    const noise = document.getElementById('noise');
+
     memoryText.addEventListener('click', () => {
-      memoryText.style.transition = 'opacity 1s ease';
-      memoryText.style.opacity = '0';
+      noise.style.opacity = '1'; // ノイズをフェードイン
+      setTimeout(() => {
+        noise.style.transition = 'opacity 0.1s ease';
+        noise.style.opacity = '0.8'; // 一瞬強く
+      }, 200);
       setTimeout(() => {
         window.location.href = 'ssi_hidden.html'; // 裏ページへ
-      }, 800);
+      }, 1200);
     });
   </script>
 </body>
