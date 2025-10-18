@@ -24,7 +24,7 @@
   }
 
   .profile-box {
-    background: rgba(255, 252, 240, 0.75); /* 淡いクリーム色 */
+    background: rgba(255, 252, 240, 0.75);
     border-radius: 12px;
     padding: 30px 40px;
     box-shadow: 0 0 15px rgba(255, 230, 180, 0.3);
@@ -40,14 +40,14 @@
   }
 
   h1 {
-    font-size: 1.05em; /* 小さめ */
+    font-size: 1.05em;
     letter-spacing: 0.12em;
     margin: 1em 0 0.3em;
     text-align: center;
   }
 
   p {
-    font-size: 0.8em; /* 全体小さめ */
+    font-size: 0.8em;
     line-height: 1.7;
     margin: 0.3em 0;
     text-align: center;
@@ -70,31 +70,43 @@
     margin: 3em 0 1em;
   }
 
-  /* 🔧 ノイズ演出 */
+  /* ⚡ホラー調ノイズ */
   .noise {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,0.15) 0px,
-      rgba(0,0,0,0.15) 2px
-    );
-    animation: noiseMove 0.15s infinite;
-    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.25) 0px, rgba(0,0,0,0.25) 1px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.2) 0px, rgba(0,0,0,0.2) 1px);
+    background-blend-mode: multiply;
+    animation: noiseFlash 0.08s infinite;
     opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 9999; /* ←これで前面に出る */
+    z-index: 9999;
+    pointer-events: none;
   }
 
-  @keyframes noiseMove {
-    0% { transform: translate(0,0); }
-    25% { transform: translate(-5px, 3px); }
-    50% { transform: translate(3px, -5px); }
-    75% { transform: translate(-3px, -2px); }
-    100% { transform: translate(0,0); }
+  @keyframes noiseFlash {
+    0% { opacity: 0.3; transform: translate(0, 0) scale(1); }
+    25% { opacity: 0.7; transform: translate(-3px, 2px) scale(1.02); }
+    50% { opacity: 0.5; transform: translate(2px, -3px) scale(1.03); }
+    75% { opacity: 0.9; transform: translate(-2px, -2px) scale(1.01); }
+    100% { opacity: 0.4; transform: translate(0, 0) scale(1); }
+  }
+
+  /* 一瞬暗転するエフェクト */
+  .flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 10000;
+    pointer-events: none;
   }
 </style>
 </head>
@@ -114,24 +126,23 @@
   </div>
 
   <div class="noise" id="noise"></div>
+  <div class="flash" id="flash"></div>
 
   <footer>☁️🍨</footer>
 
   <script>
     const memoryText = document.querySelector('.memory-link');
     const noise = document.getElementById('noise');
+    const flash = document.getElementById('flash');
 
     memoryText.addEventListener('click', () => {
-      // ノイズを出現
+      // ノイズフェードイン
       noise.style.opacity = '1';
-
-      // 少し濃くして動きを強調
+      // 一瞬暗転
       setTimeout(() => {
-        noise.style.transition = 'opacity 0.2s ease';
-        noise.style.opacity = '0.9';
-      }, 200);
-
-      // 1.8秒後に裏ページへ遷移
+        flash.style.opacity = '1';
+      }, 700);
+      // ページ遷移
       setTimeout(() => {
         window.location.href = 'ssi_hidden.html';
       }, 1800);
