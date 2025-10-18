@@ -40,14 +40,14 @@
   }
 
   h1 {
-    font-size: 1.05em; /* 小さく調整 */
+    font-size: 1.05em; /* 小さめ */
     letter-spacing: 0.12em;
     margin: 1em 0 0.3em;
     text-align: center;
   }
 
   p {
-    font-size: 0.8em; /* 全体2段階くらい小さく */
+    font-size: 0.8em; /* 全体小さめ */
     line-height: 1.7;
     margin: 0.3em 0;
     text-align: center;
@@ -70,7 +70,7 @@
     margin: 3em 0 1em;
   }
 
-  /* クリック後のノイズ演出 */
+  /* 🔧 ノイズ演出 */
   .noise {
     position: fixed;
     top: 0;
@@ -79,13 +79,14 @@
     height: 100%;
     background: repeating-linear-gradient(
       0deg,
-      rgba(255,255,255,0.05) 0px,
-      rgba(0,0,0,0.05) 2px
+      rgba(255,255,255,0.15) 0px,
+      rgba(0,0,0,0.15) 2px
     );
     animation: noiseMove 0.15s infinite;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
+    z-index: 9999; /* ←これで前面に出る */
   }
 
   @keyframes noiseMove {
@@ -121,14 +122,19 @@
     const noise = document.getElementById('noise');
 
     memoryText.addEventListener('click', () => {
-      noise.style.opacity = '1'; // ノイズをフェードイン
+      // ノイズを出現
+      noise.style.opacity = '1';
+
+      // 少し濃くして動きを強調
       setTimeout(() => {
-        noise.style.transition = 'opacity 0.1s ease';
-        noise.style.opacity = '0.8'; // 一瞬強く
+        noise.style.transition = 'opacity 0.2s ease';
+        noise.style.opacity = '0.9';
       }, 200);
+
+      // 1.8秒後に裏ページへ遷移
       setTimeout(() => {
-        window.location.href = 'ssi_hidden.html'; // 裏ページへ
-      }, 1200);
+        window.location.href = 'ssi_hidden.html';
+      }, 1800);
     });
   </script>
 </body>
