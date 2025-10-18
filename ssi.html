@@ -70,7 +70,7 @@
     margin: 3em 0 1em;
   }
 
-  /* ⚡ホラー調ノイズ */
+  /* ⚡ノイズ（強め・一瞬） */
   .noise {
     position: fixed;
     top: 0;
@@ -78,35 +78,20 @@
     width: 100%;
     height: 100%;
     background-image:
-      repeating-linear-gradient(0deg, rgba(255,255,255,0.25) 0px, rgba(0,0,0,0.25) 1px),
-      repeating-linear-gradient(90deg, rgba(255,255,255,0.2) 0px, rgba(0,0,0,0.2) 1px);
-    background-blend-mode: multiply;
-    animation: noiseFlash 0.08s infinite;
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.35) 0px, rgba(0,0,0,0.35) 1px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.25) 0px, rgba(0,0,0,0.25) 1px);
+    animation: noiseFlash 0.05s infinite;
     opacity: 0;
     z-index: 9999;
     pointer-events: none;
   }
 
   @keyframes noiseFlash {
-    0% { opacity: 0.3; transform: translate(0, 0) scale(1); }
-    25% { opacity: 0.7; transform: translate(-3px, 2px) scale(1.02); }
-    50% { opacity: 0.5; transform: translate(2px, -3px) scale(1.03); }
-    75% { opacity: 0.9; transform: translate(-2px, -2px) scale(1.01); }
-    100% { opacity: 0.4; transform: translate(0, 0) scale(1); }
-  }
-
-  /* 一瞬暗転するエフェクト */
-  .flash {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: black;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    z-index: 10000;
-    pointer-events: none;
+    0% { opacity: 0.3; transform: translate(0,0); }
+    25% { opacity: 0.9; transform: translate(-2px,1px); }
+    50% { opacity: 0.6; transform: translate(2px,-1px); }
+    75% { opacity: 1; transform: translate(-1px,-2px); }
+    100% { opacity: 0.4; transform: translate(0,0); }
   }
 </style>
 </head>
@@ -126,27 +111,24 @@
   </div>
 
   <div class="noise" id="noise"></div>
-  <div class="flash" id="flash"></div>
 
   <footer>☁️🍨</footer>
 
   <script>
-    const memoryText = document.querySelector('.memory-link');
-    const noise = document.getElementById('noise');
-    const flash = document.getElementById('flash');
+    // ノイズ発動を1回限りにするフラグ
+    if (!sessionStorage.getItem('visited')) {
+      const memoryText = document.querySelector('.memory-link');
+      const noise = document.getElementById('noise');
 
-    memoryText.addEventListener('click', () => {
-      // ノイズフェードイン
-      noise.style.opacity = '1';
-      // 一瞬暗転
-      setTimeout(() => {
-        flash.style.opacity = '1';
-      }, 700);
-      // ページ遷移
-      setTimeout(() => {
-        window.location.href = 'ssi_hidden.html';
-      }, 1800);
-    });
+      memoryText.addEventListener('click', () => {
+        noise.style.opacity = '1';
+        // 一瞬だけノイズ → すぐ切り替え
+        setTimeout(() => {
+          sessionStorage.setItem('visited', 'true');
+          window.location.href = 'ssi_hidden.html';
+        }, 400); // 0.4秒で切り替え
+      });
+    }
   </script>
 </body>
 </html>
