@@ -123,6 +123,64 @@
     50% { transform: scale(1.05) skewX(6deg); }
     100% { transform: none; opacity: 0; }
   }
+
+  /* 🍔 ハンバーガーメニュー */
+  .menu-button {
+    position: fixed;
+    top: 20px;
+    right: 25px;
+    font-size: 1.6em;
+    color: rgba(70,70,70,0.4);
+    cursor: pointer;
+    z-index: 1001;
+    transition: 0.3s ease;
+  }
+  .menu-button:hover {
+    color: rgba(70,70,70,0.8);
+    text-shadow: 0 0 8px rgba(255,255,255,0.6);
+  }
+
+  .menu-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(240,240,240,0.7);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .menu-content {
+    background: rgba(255,255,255,0.9);
+    border-radius: 12px;
+    padding: 30px 50px;
+    box-shadow: 0 0 25px rgba(180,180,180,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .menu-content a {
+    text-decoration: none;
+    color: #444;
+    font-size: 0.95em;
+    letter-spacing: 0.05em;
+    transition: 0.3s;
+  }
+
+  .menu-content a:hover {
+    color: #666;
+    text-shadow: 0 0 8px rgba(200,200,200,0.6);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
 </style>
 </head>
 <body>
@@ -144,25 +202,43 @@
 
   <footer>☁️🍨</footer>
 
+  <!-- 🍔 メニュー追加部分 -->
+  <div class="menu-button" id="menuButton">☰</div>
+
+  <div class="menu-overlay" id="menuOverlay">
+    <div class="menu-content">
+      <a href="index.html">🏠 ホーム</a>
+      <a href="ssi.html">🩵 笹井綾について</a>
+      <a href="works.html">📖 小説一覧</a>
+      <a href="contact.html">✉️ お問い合わせ</a>
+    </div>
+  </div>
+
   <script>
     const memoryText = document.querySelector('.memory-link');
     const glitch = document.getElementById('glitch');
 
-    // 前回の訪問状態を確認してリセット
-    if (sessionStorage.getItem('fromHidden') === 'true') {
-      sessionStorage.removeItem('fromHidden');
+    if (!sessionStorage.getItem('visited')) {
+      memoryText.addEventListener('click', () => {
+        glitch.style.animation = 'glitchEffect 0.25s ease';
+        glitch.style.opacity = '1';
+        setTimeout(() => {
+          sessionStorage.setItem('visited', 'true');
+          window.location.href = 'ssi_hidden.html';
+        }, 250);
+      });
     }
 
-    memoryText.addEventListener('click', () => {
-      // ノイズエフェクト発動
-      glitch.style.animation = 'glitchEffect 0.25s ease';
-      glitch.style.opacity = '1';
+    // 🍔 メニュー制御
+    const menuBtn = document.getElementById('menuButton');
+    const overlay = document.getElementById('menuOverlay');
 
-      // 遷移前に「裏から来た」フラグをセット
-      setTimeout(() => {
-        sessionStorage.setItem('fromHidden', 'true');
-        window.location.href = 'ssi_hidden.html';
-      }, 250);
+    menuBtn.addEventListener('click', () => {
+      overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.style.display = 'none';
     });
   </script>
 </body>
