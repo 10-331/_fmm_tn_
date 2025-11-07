@@ -1,1 +1,41 @@
-body{font-family:'Yu Mincho',serif;line-height:1.9;background:#faf8fc;color:#333;}
+body{font-family:"Yu Mincho",serif;line-height:1.9;background:#faf8fc;color:#333;}
+#menu-button {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  font-size: 1.4rem;
+  cursor: pointer;
+  z-index: 1000;
+  background: rgba(255,255,255,0.7);
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+#menu-button:hover { background: rgba(230,230,255,0.8); }
+#menu-panel {
+  position: fixed;
+  top: 0;
+  right: -200px;
+  width: 180px;
+  height: 100vh;
+  background: rgba(255,255,255,0.9);
+  box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  padding-top: 60px;
+  gap: 1em;
+  transition: right 0.4s ease;
+  z-index: 999;
+}
+#menu-panel a {
+  text-decoration: none;
+  color: #333;
+  padding: 0.6em 1em;
+  transition: background 0.3s;
+}
+#menu-panel a:hover {
+  background: rgba(230,230,255,0.8);
+}
+#menu-panel.open {
+  right: 0;
+}
