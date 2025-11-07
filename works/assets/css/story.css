@@ -1,0 +1,50 @@
+body {
+  background: linear-gradient(180deg, #faf8fc 0%, #f4f7fb 100%);
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  color: #444;
+  margin: 0;
+  padding: 0;
+}
+#novel-container {
+  max-width: 700px;
+  margin: 5vh auto;
+  padding: 20px 30px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+#chapter-title {
+  font-size: 1.2rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+  text-align: center;
+  opacity: 0.8;
+}
+#story-text {
+  line-height: 2.1;
+  font-size: 1rem;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  white-space: pre-line;
+}
+#nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+button {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+button:hover {
+  background: rgba(240,240,250,0.6);
+}
+button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
