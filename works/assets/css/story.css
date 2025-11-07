@@ -30,16 +30,17 @@ body {
 }
 
 .episode-text {
-  line-height: 2.1;
   font-size: 1rem;
   letter-spacing: 0.05em;
+  line-height: 2.2;
+  white-space: pre-line;
   word-break: keep-all;
-  white-space: pre-wrap; /* ← 改行そのまま反映！ */
+  text-align: left;
   padding: 1.5em 1em;
   background: rgba(255, 255, 255, 0.65);
   border-radius: 12px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  text-align: justify;
+  transition: opacity 0.3s ease;
 }
 
 #nav-buttons {
