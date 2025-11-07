@@ -2,7 +2,7 @@ let currentEpisode = 0;
 let storyData = {};
 
 async function loadStory() {
-  const res = await fetch("../data/story.json");
+  const res = await fetch("data/story.json");
   storyData = await res.json();
   document.getElementById("chapter-title").textContent = storyData.chapterTitle;
   showEpisode(0);
