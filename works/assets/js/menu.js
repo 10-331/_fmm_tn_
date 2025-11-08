@@ -1,6 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const pathDepth = window.location.pathname.split("/").length;
-  const prefix = pathDepth > 5 ? "../".repeat(pathDepth - 5) : "./";
+  let prefix = "";
+
+  const path = window.location.pathname;
+
+  if (path.includes("/works/main/")) {
+    prefix = "../";
+  }
+  else if (path.includes("/works/")) {
+    prefix = "./";
+  }
 
   fetch(`${prefix}main/common.html`)
     .then(res => res.text())
