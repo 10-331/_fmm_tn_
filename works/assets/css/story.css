@@ -1,11 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500&display=swap');
+
 /* ==============================
-   Story Page (Refined Soft Style)
+   Story Page (Soft Refined Style)
    ============================== */
 body {
   margin: 0;
   padding: 0;
-  font-family: "Hiragino Mincho ProN", "Yu Mincho", "游明朝", serif;
-  background: linear-gradient(180deg, #fefcfa 0%, #f7f9fb 100%);
+  font-family: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", "游明朝", serif;
+  background: linear-gradient(180deg, #fefaf8 0%, #f7f9fb 100%);
   color: #4a4a4a;
   line-height: 2.2;
   letter-spacing: 0.05em;
@@ -23,8 +25,8 @@ body {
   max-width: 720px;
   margin: 12vh auto;
   padding: 0 8vw;
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.03);
   white-space: pre-wrap;
@@ -48,7 +50,7 @@ p {
 
 #story-content {
   font-size: 15.5px;
-  color: #3f3f3f;
+  color: #4f4f4f;
   line-height: 2.3;
   word-break: keep-all;
 }
