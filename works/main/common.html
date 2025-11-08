@@ -1,10 +1,40 @@
-<header class="site-header">
-  <div class="menu-container">
-    <button class="menu-toggle" id="menu-btn">☰</button>
-    <nav class="menu" id="menu">
-      <a href="../../index.html">トップ</a>
-      <a href="../../ssi.html">キャラクター詳細</a>
-      <a href="story.html">小説一覧</a>
-    </nav>
-  </div>
-</header>
+<!-- works/main/common.html -->
+<div id="menu-container">
+  <button id="menu-btn" class="hamburger">☰</button>
+  <nav id="menu" class="hidden">
+    <a href="../select.html">作品選択に戻る</a>
+  </nav>
+</div>
+
+<style>
+#menu-container {
+  position: fixed;
+  top: 20px;
+  right: 25px;
+  z-index: 1000;
+}
+.hamburger {
+  font-size: 1.6rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+#menu {
+  display: none;
+  position: absolute;
+  top: 35px;
+  right: 0;
+  background: rgba(255,255,255,0.9);
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  padding: 0.5em 1em;
+}
+#menu.show {
+  display: block;
+}
+#menu a {
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+</style>
