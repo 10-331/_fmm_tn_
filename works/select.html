@@ -9,14 +9,19 @@
     body {
       background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
     }
-    .menu {
-      max-width: 720px;
-      margin: 10vh auto;
-      padding: 2em 3em;
-      background: rgba(255, 255, 255, 0.7);
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
-    }
+.menu {
+  max-width: 720px;
+  margin: 0 auto; /* ←上下0で中央揃え */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* ←ど真ん中寄せ */
+  padding: 2em 3em;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+}
+
     h1 {
       text-align: center;
       letter-spacing: 0.15em;
