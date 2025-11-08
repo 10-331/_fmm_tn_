@@ -1,55 +1,52 @@
-/* 📖 本文コンテナ（中央寄せをさらに自然に） */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Noto Serif JP", serif;
+  background: linear-gradient(180deg, #fefaf8 0%, #f7f9fb 100%);
+  color: #4a4a4a;
+  line-height: 2.2;
+  letter-spacing: 0.05em;
+}
+
 .container {
   max-width: 720px;
   margin: 12vh auto;
-  padding: 50px 15vw; /* ← 左右にもう少しゆとりを追加 */
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(12px);
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  padding: 0 8vw;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
   white-space: pre-wrap;
 }
 
-/* 🍔 メニュー（幅を広く＆中の文字を崩さない） */
-.menu-content {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 360px; /* ← 280px → 360px に拡張 */
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(16px);
-  box-shadow: -4px 0 14px rgba(0,0,0,0.06);
-  transform: translateX(100%);
-  transition: transform 0.45s ease;
-  padding: 90px 40px 60px;
+h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  color: #777;
+  margin: 2em 0 3em;
+}
+
+.nav-buttons {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1.8em;
-  z-index: 998;
+  justify-content: space-between;
+  margin: 4em auto 2em;
+  max-width: 400px;
+  font-size: 0.9rem;
 }
 
-/* 開いた時 */
-.menu-content.active {
-  transform: translateX(0);
+.nav-btn {
+  color: #777;
+  text-decoration: none;
+  padding: 0.6em 1.2em;
+  border: 1px solid rgba(200, 200, 200, 0.4);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.7);
+  transition: all 0.3s ease;
 }
 
-/* リンクテキストが縦に潰れないように */
-.menu-content a {
-  display: inline-block;
-  white-space: nowrap; /* ← これが超重要。文字折り防止 */
-  width: auto;
-}
-
-/* 📱 スマホ時（横幅が小さい時は少し戻す） */
-@media (max-width: 600px) {
-  .container {
-    padding: 30px 8vw;
-  }
-
-  .menu-content {
-    width: 280px; /* モバイルでは戻す */
-    padding: 70px 26px;
-  }
+.nav-btn:hover {
+  background: rgba(250,250,250,0.9);
+  border-color: rgba(180,180,180,0.7);
 }
