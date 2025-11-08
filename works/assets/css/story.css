@@ -1,186 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500&display=swap');
-
-/* ==============================
-   Story Page (Soft Refined Style)
-   ============================== */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", "游明朝", serif;
-  background: linear-gradient(180deg, #fefaf8 0%, #f7f9fb 100%);
-  color: #4a4a4a;
-  line-height: 2.2;
-  letter-spacing: 0.05em;
-  font-weight: 400;
-  -webkit-font-smoothing: antialiased;
-  animation: fadein 1.2s ease-out;
-}
-
-@keyframes fadein {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
+/* 📖 本文コンテナ（中央寄せをさらに自然に） */
 .container {
   max-width: 720px;
-  margin: 10vh auto;
-  padding: 40px 12vw;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  margin: 12vh auto;
+  padding: 50px 15vw; /* ← 左右にもう少しゆとりを追加 */
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
   white-space: pre-wrap;
 }
 
-/* ──────────────── Title ──────────────── */
-h1 {
-  color: #777;
-  font-weight: 500;
-  font-size: 1.6rem;
-  text-align: center;
-  margin: 2.5em 0 3em;
-  letter-spacing: 0.08em;
-}
-
-/* ──────────────── Text ──────────────── */
-p {
-  margin: 1.6em 0;
-  text-indent: 1em;
-}
-
-#story-content {
-  font-size: 15.5px;
-  color: #4f4f4f;
-  line-height: 2.3;
-  word-break: keep-all;
-}
-
-/* ──────────────── Navigation ──────────────── */
-.nav {
-  display: flex;
-  justify-content: center;
-  gap: 2.5em;
-  margin: 4em 0 2em;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.nav a {
-  color: #555;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: 0.3s;
-}
-
-.nav a:hover {
-  border-color: rgba(150,150,150,0.3);
-}
-
-/* ==============================
-   🍔 Hamburger Menu (Soft Minimal Style)
-   ============================== */
-
-/* ボタン */
-.hamburger {
-  position: fixed;
-  top: 28px;
-  right: 40px;
-  z-index: 999;
-  cursor: pointer;
-  background: rgba(255,255,255,0.7);
-  backdrop-filter: blur(8px);
-  border-radius: 6px;
-  padding: 6px 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-}
-.hamburger:hover {
-  background: rgba(255,255,255,0.9);
-}
-
-/* メニュー本体 */
+/* 🍔 メニュー（幅を広く＆中の文字を崩さない） */
 .menu-content {
   position: fixed;
   top: 0;
   right: 0;
-  width: 280px;
+  width: 360px; /* ← 280px → 360px に拡張 */
   height: 100vh;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(16px);
-  box-shadow: -4px 0 12px rgba(0,0,0,0.05);
+  box-shadow: -4px 0 14px rgba(0,0,0,0.06);
   transform: translateX(100%);
-  transition: transform 0.4s ease;
-  padding: 80px 24px 40px;
+  transition: transform 0.45s ease;
+  padding: 90px 40px 60px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.4em;
+  gap: 1.8em;
   z-index: 998;
 }
+
+/* 開いた時 */
 .menu-content.active {
   transform: translateX(0);
 }
 
-/* 閉じるボタン */
-.menu-close {
-  position: absolute;
-  top: 24px;
-  right: 28px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: #666;
-  transition: 0.3s;
-}
-.menu-close:hover {
-  color: #222;
-  transform: rotate(90deg);
-}
-
-/* メニュー内リンク */
+/* リンクテキストが縦に潰れないように */
 .menu-content a {
-  font-size: 0.95rem;
-  color: #444;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  padding-bottom: 4px;
-  transition: all 0.25s ease;
-  letter-spacing: 0.05em;
-}
-.menu-content a:hover {
-  color: #222;
-  border-bottom-color: rgba(100,100,100,0.2);
+  display: inline-block;
+  white-space: nowrap; /* ← これが超重要。文字折り防止 */
+  width: auto;
 }
 
-/* セクションタイトル */
-.menu-section h3 {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: #777;
-  letter-spacing: 0.1em;
-  margin-bottom: 0.6em;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  padding-bottom: 0.2em;
-}
-
-/* ──────────────── Responsive ──────────────── */
+/* 📱 スマホ時（横幅が小さい時は少し戻す） */
 @media (max-width: 600px) {
   .container {
-    margin: 8vh auto;
-    padding: 30px 6vw;
+    padding: 30px 8vw;
   }
 
-  .hamburger {
-    top: 20px;
-    right: 20px;
-  }
-
-  h1 {
-    font-size: 1.4rem;
-    margin-bottom: 2em;
-  }
-
-  #story-content {
-    font-size: 14.5px;
-    line-height: 2.4;
+  .menu-content {
+    width: 280px; /* モバイルでは戻す */
+    padding: 70px 26px;
   }
 }
