@@ -23,8 +23,8 @@ body {
 
 .container {
   max-width: 720px;
-  margin: 12vh auto;
-  padding: 0 8vw;
+  margin: 10vh auto;
+  padding: 40px 12vw;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   border-radius: 10px;
@@ -76,11 +76,102 @@ p {
   border-color: rgba(150,150,150,0.3);
 }
 
+/* ==============================
+   🍔 Hamburger Menu (Soft Minimal Style)
+   ============================== */
+
+/* ボタン */
+.hamburger {
+  position: fixed;
+  top: 28px;
+  right: 40px;
+  z-index: 999;
+  cursor: pointer;
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+.hamburger:hover {
+  background: rgba(255,255,255,0.9);
+}
+
+/* メニュー本体 */
+.menu-content {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 280px;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow: -4px 0 12px rgba(0,0,0,0.05);
+  transform: translateX(100%);
+  transition: transform 0.4s ease;
+  padding: 80px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.4em;
+  z-index: 998;
+}
+.menu-content.active {
+  transform: translateX(0);
+}
+
+/* 閉じるボタン */
+.menu-close {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #666;
+  transition: 0.3s;
+}
+.menu-close:hover {
+  color: #222;
+  transform: rotate(90deg);
+}
+
+/* メニュー内リンク */
+.menu-content a {
+  font-size: 0.95rem;
+  color: #444;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 4px;
+  transition: all 0.25s ease;
+  letter-spacing: 0.05em;
+}
+.menu-content a:hover {
+  color: #222;
+  border-bottom-color: rgba(100,100,100,0.2);
+}
+
+/* セクションタイトル */
+.menu-section h3 {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #777;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6em;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 0.2em;
+}
+
 /* ──────────────── Responsive ──────────────── */
 @media (max-width: 600px) {
   .container {
     margin: 8vh auto;
-    padding: 0 7vw;
+    padding: 30px 6vw;
+  }
+
+  .hamburger {
+    top: 20px;
+    right: 20px;
   }
 
   h1 {
