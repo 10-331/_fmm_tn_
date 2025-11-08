@@ -1,8 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("../main/common.html")
+  const pathDepth = window.location.pathname.split("/").length;
+  const prefix = pathDepth > 5 ? "../".repeat(pathDepth - 5) : "./";
+
+  fetch(`${prefix}main/common.html`)
     .then(res => res.text())
     .then(data => {
-      document.getElementById("common").innerHTML = data;
+      const commonEl = document.getElementById("common");
+      if (commonEl) {
+        commonEl.innerHTML = data;
+      }
+
       const menuBtn = document.getElementById("menu-btn");
       const menu = document.getElementById("menu");
       if (menuBtn && menu) {
@@ -10,5 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
           menu.classList.toggle("show");
         });
       }
-    });
+    })
+    .catch(err => console.error("menu.js error:", err));
 });
