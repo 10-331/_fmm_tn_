@@ -1,53 +1,93 @@
-<style>
-  body {
-    background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
-  }
-  .menu {
-    max-width: 720px;
-    margin: 10vh auto;
-    padding: 2em 3em;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 12px;
-    box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
-  }
-  h1 {
-    text-align: center;
-    letter-spacing: 0.15em;
-    font-size: 1.5rem;
-    margin-bottom: 2em;
-    opacity: 0.85;
-  }
-  .block { margin-bottom: 2.5em; }
-  h2 {
-    font-size: 1.1rem;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 0.3em;
-    margin-bottom: 0.8em;
-    opacity: 0.8;
-  }
-  .work-link {
-    display: block;
-    text-decoration: none;
-    color: #333;
-    padding: 0.8em 1.2em;
-    border-left: 3px solid #ccc;
-    margin: 0.5em 0;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 4px;
-    transition: all 0.4s ease;
-  }
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作品選択</title>
+  <link rel="stylesheet" href="assets/css/story.css">
 
-  /* ✨ hover時のふわっと光る動き */
-  .work-link:hover {
-    background: rgba(255, 255, 255, 0.9);
-    border-left-color: #888;
-    transform: translateY(-2px);
-    filter: brightness(1.1);
-    box-shadow: 0 0 12px rgba(255, 230, 200, 0.35);
-  }
+  <style>
+    body {
+      background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+    }
 
-  .if-link {
-    border-left-color: #7c8bdc;
-    color: #4b4e9d;
-  }
-</style>
+    .menu {
+      max-width: 720px;
+      margin: 10vh auto;
+      padding: 2em 3em;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      text-align: center;
+      letter-spacing: 0.15em;
+      font-size: 1.5rem;
+      margin-bottom: 2em;
+      opacity: 0.85;
+    }
+
+    .block {
+      margin-bottom: 2.5em;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.3em;
+      margin-bottom: 0.8em;
+      opacity: 0.8;
+    }
+
+    .work-link {
+      display: block;
+      text-decoration: none;
+      color: #333;
+      padding: 0.8em 1.2em;
+      border-left: 3px solid #ccc;
+      margin: 0.5em 0;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 4px;
+      transition: all 0.4s ease;
+    }
+
+    /* ✨ hover時のふわっと光る動き */
+    .work-link:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-left-color: #888;
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+      box-shadow: 0 0 12px rgba(255, 230, 200, 0.35);
+    }
+
+    .if-link {
+      border-left-color: #7c8bdc;
+      color: #4b4e9d;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="common"></div>
+
+  <div class="menu">
+    <h1>STORY SELECT</h1>
+
+    <div class="block">
+      <h2>短編／単発</h2>
+      <a href="one/story1.html" class="work-link">泡沫の記憶</a>
+      <a href="if/story.html" class="work-link if-link">IF ─ 夜明けのない街</a>
+      <a href="one/story2.html" class="work-link">午前0時の手紙</a>
+    </div>
+
+    <div class="block">
+      <h2>長編（コテノベ）</h2>
+      <a href="main/story.html" class="work-link">第1章　ひかりの直後（5話構成）</a>
+    </div>
+  </div>
+
+  <!-- 💡 menu.jsで404が出る場合は、いったんコメントアウトで確認 -->
+  <!-- <script src="assets/js/menu.js"></script> -->
+</body>
+</html>
