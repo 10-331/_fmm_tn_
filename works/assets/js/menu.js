@@ -1,21 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const path = window.location.pathname;
-
-  let commonPath = "";
-
-  if (path.includes("/works/main/")) {
-    commonPath = "common.html";
-  } else if (path.includes("/works/")) {
-    commonPath = "main/common.html";
-  }
-
-  fetch(commonPath)
-    .then(res => res.text())
+  fetch("data/common.html")
+    .then(res => {
+      if (!res.ok) throw new Error("common.html not found");
+      return res.text();
+    })
     .then(data => {
       const commonEl = document.getElementById("common");
-      if (commonEl) {
-        commonEl.innerHTML = data;
-      }
+      if (commonEl) commonEl.innerHTML = data;
 
       const menuBtn = document.getElementById("menu-btn");
       const menu = document.getElementById("menu");
