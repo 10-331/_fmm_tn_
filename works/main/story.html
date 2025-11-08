@@ -2,64 +2,23 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>メインストーリー</title>
-  <link rel="stylesheet" href="../../assets/css/story.css">
-  <style>
-    body {
-      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-      background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
-      margin: 0;
-      padding: 0;
-    }
-
-    #container {
-      max-width: 800px;
-      margin: 10vh auto;
-      background: rgba(255,255,255,0.75);
-      border-radius: 10px;
-      padding: 40px;
-      text-align: center;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-      font-size: 1.3em;
-      margin-bottom: 2em;
-      letter-spacing: 0.1em;
-    }
-
-    .chapter-link {
-      display: block;
-      text-decoration: none;
-      color: #333;
-      border: 1px solid #ddd;
-      padding: 1em;
-      margin: 1em auto;
-      width: 80%;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.8);
-      transition: 0.3s ease;
-    }
-
-    .chapter-link:hover {
-      background: rgba(240,240,255,0.9);
-      transform: translateY(-3px);
-    }
-  </style>
+  <link rel="stylesheet" href="../assets/css/story.css">
 </head>
 <body>
-  <div id="container">
-    <h1>メインストーリー（1〜5話）</h1>
+  <div id="common"></div>
 
-    <a href="story1.html" class="chapter-link">第1話　はじまりの祠</a>
-    <a href="story2.html" class="chapter-link">第2話　夜の音</a>
-    <a href="story3.html" class="chapter-link">第3話　消えた光</a>
-    <a href="story4.html" class="chapter-link">第4話　ひかりの直後</a>
-    <a href="story5.html" class="chapter-link">第5話　手のひらの残響</a>
-  </div>
+  <main class="container">
+    <div id="story-title">第1話</div>
+    <div id="story-content">読み込み中...</div>
 
-  <!-- 共通メニュー -->
-  <script src="../../assets/js/menu.js"></script>
+    <div class="nav-buttons">
+      <button id="prev-btn">← 戻る</button>
+      <button id="next-btn">次へ →</button>
+    </div>
+  </main>
+
+  <script src="../assets/js/menu.js"></script>
+  <script src="../assets/js/storyLoader.js"></script>
 </body>
 </html>
