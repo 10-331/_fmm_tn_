@@ -6,15 +6,20 @@
   <title>作品選択</title>
   <link rel="stylesheet" href="assets/css/story.css">
 
-  <style>
-body {
+ html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+  color: #333;
+  overflow-x: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  margin: 0;
 }
 
+/* 📦 メニュー全体（中央固定） */
 .menu {
   width: 100%;
   max-width: 720px;
@@ -22,11 +27,19 @@ body {
   background: rgba(255, 255, 255, 0.75);
   border-radius: 12px;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
-  text-align: left;
   box-sizing: border-box;
-  margin: 0 auto; /* ← ここで完全中央寄せ固定 */
+  margin: 0 auto;
+  text-align: left;
+  animation: fadeIn 1.2s ease forwards;
+  opacity: 0;
 }
 
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* タイトル */
 h1 {
   text-align: center;
   letter-spacing: 0.15em;
@@ -35,9 +48,8 @@ h1 {
   opacity: 0.85;
 }
 
-.block {
-  margin-bottom: 2.5em;
-}
+/* ブロック */
+.block { margin-bottom: 2.5em; }
 
 h2 {
   font-size: 1.1rem;
@@ -47,6 +59,7 @@ h2 {
   opacity: 0.8;
 }
 
+/* 🌸 各リンク */
 .work-link {
   display: block;
   text-decoration: none;
@@ -56,27 +69,29 @@ h2 {
   margin: 0.5em 0;
   background: rgba(255, 255, 255, 0.8);
   border-radius: 4px;
-  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1),
-              box-shadow 0.4s ease, 
-              background 0.3s ease, 
-              filter 0.4s ease;
-  will-change: transform;
+  transition:
+    transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+    box-shadow 0.4s ease,
+    filter 0.4s ease,
+    background 0.3s ease;
+  will-change: transform, box-shadow, filter;
+  transform-origin: center;
 }
 
+/* ✨ hover時の“ふわっ”効果 */
 .work-link:hover {
   background: rgba(255, 255, 255, 0.95);
   border-left-color: #888;
-  transform: translateY(-4px);
-  filter: brightness(1.05);
-  box-shadow: 0 6px 14px rgba(255, 230, 200, 0.35);
+  transform: translateY(-4px) scale(1.015);
+  filter: brightness(1.08);
+  box-shadow: 0 6px 20px rgba(255, 230, 200, 0.35);
 }
-
 
 .if-link {
   border-left-color: #7c8bdc;
   color: #4b4e9d;
 }
-  </style>
+
 </head>
 
 <body>
