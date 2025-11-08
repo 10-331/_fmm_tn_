@@ -8,63 +8,70 @@
 
   <style>
     body {
-      background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
-    }
+  background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
 
-    .menu {
-      max-width: 720px;
-      margin: 10vh auto;
-      padding: 2em 3em;
-      background: rgba(255, 255, 255, 0.7);
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
-    }
+.menu {
+  width: 90%;
+  max-width: 720px;
+  padding: 2em 3em;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  box-sizing: border-box;
+}
 
-    h1 {
-      text-align: center;
-      letter-spacing: 0.15em;
-      font-size: 1.5rem;
-      margin-bottom: 2em;
-      opacity: 0.85;
-    }
+h1 {
+  text-align: center;
+  letter-spacing: 0.15em;
+  font-size: 1.5rem;
+  margin-bottom: 2em;
+  opacity: 0.85;
+}
 
-    .block {
-      margin-bottom: 2.5em;
-    }
+.block {
+  margin-bottom: 2.5em;
+}
 
-    h2 {
-      font-size: 1.1rem;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 0.3em;
-      margin-bottom: 0.8em;
-      opacity: 0.8;
-    }
+h2 {
+  font-size: 1.1rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.8em;
+  opacity: 0.8;
+}
 
-    .work-link {
-      display: block;
-      text-decoration: none;
-      color: #333;
-      padding: 0.8em 1.2em;
-      border-left: 3px solid #ccc;
-      margin: 0.5em 0;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 4px;
-      transition: all 0.4s ease;
-    }
+.work-link {
+  display: block;
+  text-decoration: none;
+  color: #333;
+  padding: 0.8em 1.2em;
+  border-left: 3px solid #ccc;
+  margin: 0.5em 0;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, filter 0.4s ease;
+  will-change: transform, box-shadow, filter;
+}
 
-    /* ✨ hover時のふわっと光る動き */
-    .work-link:hover {
-      background: rgba(255, 255, 255, 0.9);
-      border-left-color: #888;
-      transform: translateY(-2px);
-      filter: brightness(1.1);
-      box-shadow: 0 0 12px rgba(255, 230, 200, 0.35);
-    }
+/* ✨ hover時のふわっと光る動き（位置ズレなし） */
+.work-link:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-left-color: #888;
+  transform: translateY(-3px);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(255, 230, 200, 0.35);
+}
 
-    .if-link {
-      border-left-color: #7c8bdc;
-      color: #4b4e9d;
-    }
+.if-link {
+  border-left-color: #7c8bdc;
+  color: #4b4e9d;
+}
   </style>
 </head>
 
