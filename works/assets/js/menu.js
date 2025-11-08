@@ -1,17 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
-  fetch("data/common.html")
-    .then(res => {
-      if (!res.ok) throw new Error("common.html not found");
-      return res.text();
-    })
+  fetch("common.html")
+    .then(res => res.text())
     .then(data => {
       const commonEl = document.getElementById("common");
       if (commonEl) commonEl.innerHTML = data;
 
-      const menuBtn = document.getElementById("menu-btn");
+      const btn = document.getElementById("menu-btn");
       const menu = document.getElementById("menu");
-      if (menuBtn && menu) {
-        menuBtn.addEventListener("click", () => {
+      if (btn && menu) {
+        btn.addEventListener("click", () => {
           menu.classList.toggle("show");
         });
       }
