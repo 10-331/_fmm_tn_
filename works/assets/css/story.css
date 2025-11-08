@@ -73,7 +73,7 @@ button:hover {
 }
 
 .menu {
-  display: none;
+  /* display: none; ← 削除！ */
   position: absolute;
   top: 2.8rem;
   right: 0;
