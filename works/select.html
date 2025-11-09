@@ -13,7 +13,10 @@
       font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
       background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
       color: #333;
-      overflow-x: hidden;
+      height: 100%; /* ← これを追加 */
+    }
+
+    body {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -28,7 +31,6 @@
       border-radius: 12px;
       box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
       box-sizing: border-box;
-      margin: 0 auto;
       text-align: left;
       animation: fadeIn 1.2s ease forwards;
       opacity: 0;
@@ -91,8 +93,6 @@
 </head>
 
 <body>
-  <div id="common"></div>
-
   <div class="menu">
     <h1>STORY SELECT</h1>
 
@@ -107,8 +107,5 @@
       <a href="one/story2.html" class="work-link">準備中</a>
     </div>
   </div>
-
-  <!-- menu.jsで404エラーが出るためコメントアウト -->
-  <!-- <script src="assets/js/menu.js"></script> -->
 </body>
 </html>
