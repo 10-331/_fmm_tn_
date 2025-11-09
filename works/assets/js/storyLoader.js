@@ -2,7 +2,7 @@ const totalStories = 5;
 let currentStory = 1;
 
 function loadStory(num) {
-  fetch(`../data/story${num}.txt`)   // ← texts → data に変更
+fetch("../../data/story${num}.txt")   // ← texts → data に変更
     .then(res => res.text())
     .then(text => {
       document.getElementById("story-title").textContent = `第${num}話`;
@@ -24,3 +24,4 @@ document.addEventListener("DOMContentLoaded", () => {
     if (currentStory < totalStories) loadStory(++currentStory);
   });
 });
+
