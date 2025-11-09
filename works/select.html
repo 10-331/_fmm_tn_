@@ -12,14 +12,7 @@
       font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
       background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
       color: #333;
-      /* ← flex配置を削除し、通常スクロールに戻す */
       min-height: 100vh;
-    }
-
-    body {
-      display: block;
-      padding: 4vh 0; /* ← スマホでも読みやすい上下余白 */
-      box-sizing: border-box;
       display: flex;
       justify-content: center;
     }
@@ -133,8 +126,6 @@
 </head>
 
 <body>
-  <div id="common"></div>
-
   <main class="container">
     <div id="story-title">第1話</div>
     <div id="story-content">読み込み中...</div>
@@ -145,8 +136,8 @@
     </div>
   </main>
 
-  <!-- ✅ 相対パスを正しく修正 -->
-<script src="../../assets/js/menu.js"></script>
-<script src="../../assets/js/storyLoader.js"></script>
+  <!-- ✅ 正しい階層パス -->
+  <script src="../assets/js/menu.js"></script>
+  <script src="../assets/js/storyLoader.js"></script>
 </body>
 </html>
