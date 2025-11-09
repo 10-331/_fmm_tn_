@@ -11,7 +11,7 @@
       padding: 0;
       font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
       background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
-      color: #555; /* ← 全体を柔らかいトーンに */
+      color: #333;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -29,7 +29,6 @@
       text-align: left;
       animation: fadeIn 1.2s ease forwards;
       opacity: 0;
-      color: #666; /* ← 本文も淡く */
     }
 
     @keyframes fadeIn {
@@ -43,8 +42,7 @@
       letter-spacing: 0.1em;
       text-align: center;
       margin-bottom: 2em;
-      opacity: 0.8;
-      color: #6b5e7a; /* ← 少し紫みのある淡グレー */
+      opacity: 0.85;
     }
 
     #story-content {
@@ -53,7 +51,6 @@
       margin-bottom: 2.5em;
       white-space: pre-line;
       animation: fadeIn 1.6s ease forwards;
-      color: #5d5664; /* ← 読みやすくやわらかい灰紫 */
     }
 
     .nav-buttons {
@@ -70,7 +67,7 @@
       border: none;
       border-radius: 8px;
       background: linear-gradient(180deg, #fdfbfb 0%, #f1ecf6 100%);
-      color: #555;
+      color: #444; /* ← ここを変更（黒→濃いめグレー） */
       box-shadow: 0 4px 10px rgba(150, 140, 160, 0.15);
       cursor: pointer;
       transition:
@@ -84,7 +81,7 @@
       background: linear-gradient(180deg, #ffffff 0%, #f6f2f8 100%);
       transform: translateY(-2px);
       box-shadow: 0 6px 14px rgba(120, 110, 150, 0.2);
-      color: #333;
+      color: #333; /* hover時だけ少し濃く */
     }
 
     .nav-buttons button:active {
