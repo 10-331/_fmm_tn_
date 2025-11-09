@@ -2,9 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ストーリー</title>
-  <link rel="stylesheet" href="assets/css/story.css">
+  <title>メインストーリー</title>
+  <link rel="stylesheet" href="../assets/css/story.css">
 
   <style>
     html, body {
@@ -13,18 +12,16 @@
       font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
       background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
       color: #333;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: 100vh;
     }
 
-    .menu {
-      width: 100%;
+    main.container {
       max-width: 720px;
-      padding: 2em 3em;
+      width: 90%;
+      padding: 3em 2.5em;
       background: rgba(255, 255, 255, 0.75);
       border-radius: 12px;
       box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
@@ -32,80 +29,118 @@
       text-align: left;
       animation: fadeIn 1.2s ease forwards;
       opacity: 0;
-      position: relative;
-      transform: translateX(0);
     }
 
     @keyframes fadeIn {
-      0% { opacity: 0; transform: translateY(20px); }
+      0% { opacity: 0; transform: translateY(10px); }
       100% { opacity: 1; transform: translateY(0); }
     }
 
-    h1 {
+    #story-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
       text-align: center;
-      letter-spacing: 0.15em;
-      font-size: 1.5rem;
       margin-bottom: 2em;
       opacity: 0.85;
     }
 
-    .block { margin-bottom: 2.5em; }
-
-    h2 {
-      font-size: 1.1rem;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 0.3em;
-      margin-bottom: 0.8em;
-      opacity: 0.8;
+    #story-content {
+      line-height: 1.9;
+      font-size: 1rem;
+      margin-bottom: 2.5em;
+      white-space: pre-line;
+      animation: fadeIn 1.6s ease forwards;
     }
 
-    .work-link {
-      display: block;
-      text-decoration: none;
-      color: #333;
-      padding: 0.8em 1.2em;
-      border-left: 3px solid #ccc;
-      margin: 0.5em 0;
-      background: rgba(255, 255, 255, 0.8);
-      border-radius: 4px;
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1.5em;
+      margin-top: 2em;
+    }
+
+    .nav-buttons button {
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      font-size: 1rem;
+      padding: 0.7em 2em;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fdfbfb 0%, #f1ecf6 100%);
+      color: #444;
+      box-shadow: 0 4px 10px rgba(150, 140, 160, 0.15);
+      cursor: pointer;
       transition:
-        transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
-        box-shadow 0.4s ease,
-        filter 0.4s ease,
-        background 0.3s ease;
-      will-change: transform, box-shadow, filter;
-      transform-origin: center;
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease,
+        color 0.25s ease;
     }
 
-    .work-link:hover {
-      background: rgba(255, 255, 255, 0.95);
-      border-left-color: #888;
-      transform: translateY(-4px) scale(1.015);
-      filter: brightness(1.08);
-      box-shadow: 0 6px 20px rgba(255, 230, 200, 0.35);
+    .nav-buttons button:hover {
+      background: linear-gradient(180deg, #ffffff 0%, #f6f2f8 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(120, 110, 150, 0.2);
+      color: #333;
     }
 
-    .if-link {
-      border-left-color: #7c8bdc;
-      color: #4b4e9d;
+    .nav-buttons button:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 6px rgba(120, 110, 150, 0.15);
+    }
+
+
+    @media (max-width: 768px) {
+      main.container {
+        width: 94%;
+        padding: 2em 1.5em;
+        border-radius: 10px;
+      }
+
+      #story-title {
+        font-size: 1.05rem;
+        margin-bottom: 1.5em;
+      }
+
+      #story-content {
+        font-size: 1.05rem; /* ← モバイルで少し大きく */
+        line-height: 1.95;
+      }
+
+      .nav-buttons {
+        gap: 1em;
+        margin-top: 1.8em;
+      }
+
+      .nav-buttons button {
+        font-size: 0.95rem;
+        padding: 0.6em 1.6em;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #story-content {
+        font-size: 1.1rem;
+        line-height: 2.0;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="menu">
-    <h1>STORY SELECT</h1>
+  <div id="common"></div>
 
-    <div class="block">
-      <h2>メインストーリー</h2>
-      <a href="one/story1.html" class="work-link">出会いとはじまり(準備中)</a>
-      <a href="main/story.html" class="work-link">キャラクターノベル</a>
-    </div>
+  <main class="container">
+    <div id="story-title">第1話</div>
+    <div id="story-content">読み込み中...</div>
 
-    <div class="block">
-      <h2>IFストーリー</h2>
-      <a href="one/story2.html" class="work-link">準備中</a>
+    <div class="nav-buttons">
+      <button id="prev-btn">← 戻る</button>
+      <button id="next-btn">次へ →</button>
     </div>
-  </div>
+  </main>
+
+  <script src="../assets/js/menu.js"></script>
+  <script src="../assets/js/storyLoader.js"></script>
 </body>
 </html>
