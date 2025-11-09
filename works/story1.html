@@ -5,18 +5,92 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>メインストーリー</title>
   <link rel="stylesheet" href="../assets/css/story.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    main.container {
+      max-width: 720px;
+      width: 90%;
+      padding: 3em 2.5em;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+      box-sizing: border-box;
+      text-align: left;
+      animation: fadeIn 1.2s ease forwards;
+      opacity: 0;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    #story-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-align: center;
+      margin-bottom: 2em;
+      opacity: 0.85;
+    }
+    #story-content {
+      line-height: 1.9;
+      font-size: 1rem;
+      margin-bottom: 2.5em;
+      white-space: pre-line;
+      animation: fadeIn 1.6s ease forwards;
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1.5em;
+      margin-top: 2em;
+    }
+    .nav-buttons button {
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+      font-size: 1rem;
+      padding: 0.7em 2em;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fdfbfb 0%, #f1ecf6 100%);
+      color: #444;
+      box-shadow: 0 4px 10px rgba(150, 140, 160, 0.15);
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+    }
+    .nav-buttons button:hover {
+      background: linear-gradient(180deg, #ffffff 0%, #f6f2f8 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(120, 110, 150, 0.2);
+      color: #333;
+    }
+    .nav-buttons button:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 6px rgba(120, 110, 150, 0.15);
+    }
+  </style>
 </head>
-<body>
-  <div id="novel-container">
-    <h1 id="story-title">第1話</h1>
-    <div id="story-content" class="novel-text">読み込み中...</div>
-    <div id="nav-buttons">
-      <button id="prev-btn">◀ 前の話</button>
-      <button id="next-btn">次の話 ▶</button>
-    </div>
-  </div>
 
-  <!-- ✅ JSのパスを正しい相対位置に -->
+<body>
+  <main class="container">
+    <div id="story-title">第1話</div>
+    <div id="story-content">読み込み中...</div>
+
+    <div class="nav-buttons">
+      <button id="prev-btn">← 戻る</button>
+      <button id="next-btn">次へ →</button>
+    </div>
+  </main>
+
+  <!-- ✅ 正しい相対パス -->
   <script src="../assets/js/storyLoader.js"></script>
   <script src="../assets/js/menu.js"></script>
 </body>
