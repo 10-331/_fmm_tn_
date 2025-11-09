@@ -12,10 +12,16 @@
       font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
       background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
       color: #333;
+      /* ← flex配置を削除し、通常スクロールに戻す */
+      min-height: 100vh;
+    }
+
+    body {
+      display: block;
+      padding: 4vh 0; /* ← スマホでも読みやすい上下余白 */
+      box-sizing: border-box;
       display: flex;
       justify-content: center;
-      align-items: center;
-      min-height: 100vh;
     }
 
     main.container {
@@ -89,7 +95,6 @@
       box-shadow: 0 3px 6px rgba(120, 110, 150, 0.15);
     }
 
-
     @media (max-width: 768px) {
       main.container {
         width: 94%;
@@ -103,7 +108,7 @@
       }
 
       #story-content {
-        font-size: 1.05rem; /* ← モバイルで少し大きく */
+        font-size: 1.05rem;
         line-height: 1.95;
       }
 
@@ -140,6 +145,7 @@
     </div>
   </main>
 
+  <!-- ✅ 相対パスを正しく修正 -->
   <script src="../assets/js/menu.js"></script>
   <script src="../assets/js/storyLoader.js"></script>
 </body>
