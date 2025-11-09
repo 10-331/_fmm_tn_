@@ -13,7 +13,7 @@
       font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
       background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
       color: #333;
-      height: 100%; /* ← これを追加 */
+      height: 100%;
     }
 
     body {
@@ -23,18 +23,24 @@
       min-height: 100vh;
     }
 
-    .menu {
-      width: 100%;
-      max-width: 720px;
-      padding: 2em 3em;
-      background: rgba(255, 255, 255, 0.75);
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
-      box-sizing: border-box;
-      text-align: left;
-      animation: fadeIn 1.2s ease forwards;
-      opacity: 0;
-    }
+.menu {
+  width: 100%;
+  max-width: 720px;
+  padding: 2em 3em;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  text-align: left;
+  animation: fadeIn 1.2s ease forwards;
+  opacity: 0;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(20px); }
