@@ -20,6 +20,53 @@
     justify-content: center;
     align-items: center;
     position: relative;
+    /* 波紋がはみ出してもスクロールバーが出ないようにする */
+    overflow: hidden; 
+  }
+
+  /* 波紋のコンテナ：画面右上に固定 */
+  .ripple-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    z-index: 1;
+  }
+
+  /* 波紋の層（共通設定） */
+  .ripple-layer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    /* 非常に大きな円を作り、右上の角を起点にする */
+    width: 200vw;
+    height: 200vw;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    transform: translate(50%, -50%) scale(0); /* 右上から広がるように配置 */
+    opacity: 0;
+    animation: rippleSpread 6s ease-out forwards;
+  }
+
+  /* 多層構造：時間差で広がる */
+  .layer1 { animation-delay: 0.6s; }
+  .layer2 { animation-delay: 1.0s; }
+  .layer3 { animation-delay: 1.4s; }
+
+  @keyframes rippleSpread {
+    0% {
+      transform: translate(50%, -50%) scale(0);
+      opacity: 0;
+    }
+    20% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translate(50%, -50%) scale(1);
+      opacity: 0;
+      border-width: 2px;
+    }
   }
 
   .novel {
@@ -28,13 +75,8 @@
     justify-content: center;
     align-items: flex-start;
     gap: 3em;
-  }
-
-  .line-container {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    z-index: 2; /* 文字を波紋より上に */
   }
 
   .line {
@@ -43,75 +85,21 @@
     font-size: 0.8em;
     line-height: 1.3;
     opacity: 0;
-    /* 滲む時間を短く(1.5s)、15%でほぼ見えるように設定 */
     animation: softGlow 1.5s ease forwards;
-    position: relative;
-    z-index: 2;
   }
 
-  /* 波紋のエフェクト */
-  .ripple {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
-    background: transparent;
-    border-radius: 50%;
-    opacity: 0;
-    z-index: 1;
-    /* 文字の出現に合わせて波紋を広げる */
-    animation: rippleEffect 2s ease-out forwards;
-  }
-
-  /* 1行目 */
-  .line-container:nth-child(1) .line { animation-delay: 0.6s; }
-  .line-container:nth-child(1) .ripple { animation-delay: 0.6s; }
-
-  /* 2行目 */
-  .line-container:nth-child(2) .line { animation-delay: 1.8s; }
-  .line-container:nth-child(2) .ripple { animation-delay: 1.8s; }
-
-  /* 3行目 */
-  .line-container:nth-child(3) .line { animation-delay: 3.0s; }
-  .line-container:nth-child(3) .ripple { animation-delay: 3.0s; }
+  /* 1行ずつ出す設定 */
+  .line:nth-child(1) { animation-delay: 0.6s; }
+  .line:nth-child(2) { animation-delay: 1.8s; }
+  .line:nth-child(3) { animation-delay: 3.0s; }
 
   @keyframes softGlow {
-    0% {
-      opacity: 0;
-      filter: blur(6px);
-    }
-    15% {
-      opacity: 0.8;
-      filter: blur(1px);
-    }
-    100% {
-      opacity: 1;
-      filter: blur(0);
-    }
+    0% { opacity: 0; filter: blur(6px); }
+    15% { opacity: 0.8; filter: blur(1px); }
+    100% { opacity: 1; filter: blur(0); }
   }
 
-  @keyframes rippleEffect {
-    0% {
-      width: 0;
-      height: 0;
-      opacity: 0;
-      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8);
-    }
-    20% {
-      opacity: 0.5;
-    }
-    100% {
-      width: 200px;
-      height: 200px;
-      opacity: 0;
-      box-shadow: 0 0 40px 20px rgba(255, 255, 255, 0);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-  }
-
-  /* 以下、works等のスタイルは変更なし */
+  /* 作品一覧などのスタイル（変更なし） */
   section.works {
     min-height: 100vh;
     padding: 15vh 10vw;
@@ -139,19 +127,16 @@
 </head>
 <body>
   <section class="intro">
+    <div class="ripple-container">
+      <div class="ripple-layer layer1"></div>
+      <div class="ripple-layer layer2"></div>
+      <div class="ripple-layer layer3"></div>
+    </div>
+
     <div class="novel">
-      <div class="line-container">
-        <div class="line">これは、迷子になった私を助けてくれた彼と</div>
-        <div class="ripple"></div>
-      </div>
-      <div class="line-container">
-        <div class="line">たくさん笑って、ふざけあって、恋人になった私たちが</div>
-        <div class="ripple"></div>
-      </div>
-      <div class="line-container">
-        <div class="line">また、他人に戻るまでのお話。</div>
-        <div class="ripple"></div>
-      </div>
+      <div class="line">これは、迷子になった私を助けてくれた彼と</div>
+      <div class="line">たくさん笑って、ふざけあって、恋人になった私たちが</div>
+      <div class="line">また、他人に戻るまでのお話。</div>
     </div>
   </section>
   
