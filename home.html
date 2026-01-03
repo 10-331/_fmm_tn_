@@ -61,40 +61,55 @@
     100% { transform: translate(50%, -50%) scale(1.4); opacity: 0; }
   }
 
-  /* 桜の花びらの設定 */
+  /* CSSで描く桜の花びら */
   .sakura {
     position: absolute;
-    font-size: 1.2rem;
+    width: 15px;
+    height: 20px;
+    background: linear-gradient(135deg, #fffafa 0%, #ffc0cb 100%);
+    border-radius: 100% 0% 100% 100% / 100% 0% 100% 100%; /* 花びらの形 */
     pointer-events: none;
     z-index: 1;
-    opacity: 0.6;
-    /* 初期位置からの揺らぎアニメーション */
-    animation: floatSakura 10s ease-in-out infinite;
+    opacity: 0.7;
+    box-shadow: 0 0 5px rgba(255, 192, 203, 0.3);
   }
 
-  /* 波紋に押される動きのアニメーション */
+  /* 花びらの先端の切れ込みを疑似要素で表現 */
+  .sakura::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: #f8e9e9; /* 背景のグラデーション開始色に近い色で削る */
+    border-radius: 50%;
+  }
+
+  /* アニメーション：波紋に押される動き */
   .sakura-move {
-    display: inline-block;
+    display: block;
+    width: 100%;
+    height: 100%;
     animation: ripplePush 8s cubic-bezier(0.15, 0, 0.2, 1) forwards;
   }
 
-  /* 花びらの配置例 */
-  .s1 { top: 15%; right: 20%; animation-delay: 0.6s; }
-  .s2 { top: 40%; right: 10%; animation-delay: 1.2s; }
-  .s3 { top: 25%; left: 30%; animation-delay: 2.0s; }
-  .s4 { bottom: 30%; right: 25%; animation-delay: 2.5s; }
+  /* 配置と個別のアニメーション開始時間 */
+  .s1 { top: 18%; right: 25%; transform: rotate(15deg); animation: float1 10s infinite; }
+  .s2 { top: 45%; right: 15%; transform: rotate(-20deg); animation: float2 12s infinite; }
+  .s3 { top: 30%; left: 35%; transform: rotate(45deg); animation: float1 11s infinite; }
+  .s4 { bottom: 35%; right: 30%; transform: rotate(-10deg); animation: float2 13s infinite; }
 
+  /* 波紋で左下へ流れる動き */
   @keyframes ripplePush {
-    0% { transform: translate(0, 0) rotate(0); }
-    /* 波紋が通るタイミングで左下へ少し移動し、回転する */
-    30% { transform: translate(-40px, 40px) rotate(45deg); }
-    100% { transform: translate(-20px, 20px) rotate(20deg); }
+    0% { transform: translate(0, 0) rotate(0deg); }
+    35% { transform: translate(-50px, 50px) rotate(60deg); }
+    100% { transform: translate(-30px, 30px) rotate(40deg); }
   }
 
-  @keyframes floatSakura {
-    0%, 100% { transform: translateY(0) rotate(0); }
-    50% { transform: translateY(-10px) rotate(10deg); }
-  }
+  /* 浮遊感 */
+  @keyframes float1 { 0%, 100% { margin-top: 0; } 50% { margin-top: -15px; } }
+  @keyframes float2 { 0%, 100% { margin-top: 0; } 50% { margin-top: -10px; } }
 
   .novel {
     display: flex;
@@ -154,10 +169,10 @@
       <div class="ripple-layer layer3"></div>
     </div>
 
-    <div class="sakura s1"><span class="sakura-move">🌸</span></div>
-    <div class="sakura s2"><span class="sakura-move">🌸</span></div>
-    <div class="sakura s3"><span class="sakura-move">🌸</span></div>
-    <div class="sakura s4"><span class="sakura-move">🌸</span></div>
+    <div class="sakura s1"><span class="sakura-move"></span></div>
+    <div class="sakura s2"><span class="sakura-move"></span></div>
+    <div class="sakura s3"><span class="sakura-move"></span></div>
+    <div class="sakura s4"><span class="sakura-move"></span></div>
 
     <div class="novel">
       <div class="line">これは、迷子になった私を助けてくれた彼と</div>
