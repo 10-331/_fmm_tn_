@@ -91,13 +91,18 @@
 
   section.works {
     min-height: 100vh;
-    padding: 15vh 10vw;
+    padding: 15vh 10vw 5vh; /* 下部の余白を調整 */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    /* 境界線を馴染ませるため、上部を透明にしたグラデーションに変更 */
-    background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.6) 20%);
+    /* 上部と下部の両方を透明にするグラデーションに変更 */
+    background: linear-gradient(180deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.6) 20%, 
+      rgba(255, 255, 255, 0.6) 80%, 
+      transparent 100%
+    );
     backdrop-filter: blur(6px);
   }
 
@@ -129,7 +134,10 @@
     text-align: center;
     font-size: 0.8em;
     color: #999;
-    margin: 3em 0 1em;
+    margin: 0;
+    padding: 3em 0 2em;
+    /* フッター自体の背景も透明にして、worksのグラデーションを活かす */
+    background: transparent;
   }
 </style>
 </head>
