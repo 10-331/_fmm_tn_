@@ -23,7 +23,7 @@
     overflow: hidden; 
   }
 
-  /* 波紋の設定 */
+  /* 波紋の設定：背景と同系色の立体感（ハイライトと影） */
   .ripple-container {
     position: absolute;
     top: 0;
@@ -42,74 +42,36 @@
     height: 160vmax;
     border-radius: 50%;
     transform: translate(50%, -50%) scale(0);
+    
+    /* 背景色に近い淡い色。縁に白い光と、外側にうっすらとした影を付けて立体感を出す */
     border: 2px solid rgba(255, 255, 255, 0.4); 
     box-shadow: 
-      -5px 5px 15px rgba(0, 0, 0, 0.05),
-      inset -2px 2px 10px rgba(255, 255, 255, 0.8),
-      inset 2px -2px 10px rgba(0, 0, 0, 0.03);
+      -5px 5px 15px rgba(0, 0, 0, 0.05),   /* 外側の柔らかな影 */
+      inset -2px 2px 10px rgba(255, 255, 255, 0.8), /* 内側のハイライト（光） */
+      inset 2px -2px 10px rgba(0, 0, 0, 0.03);    /* 内側のわずかな影 */
+    
     opacity: 0;
     animation: rippleSpread 8s cubic-bezier(0.15, 0, 0.2, 1) forwards;
   }
 
+  /* 多層構造 */
   .layer1 { animation-delay: 0.6s; }
   .layer2 { animation-delay: 1.6s; }
   .layer3 { animation-delay: 2.6s; }
 
   @keyframes rippleSpread {
-    0% { transform: translate(50%, -50%) scale(0); opacity: 0; }
-    10% { opacity: 1; }
-    100% { transform: translate(50%, -50%) scale(1.4); opacity: 0; }
+    0% {
+      transform: translate(50%, -50%) scale(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate(50%, -50%) scale(1.4);
+      opacity: 0;
+    }
   }
-
-  /* CSSで描く桜の花びら */
-  .sakura {
-    position: absolute;
-    width: 15px;
-    height: 20px;
-    background: linear-gradient(135deg, #fffafa 0%, #ffc0cb 100%);
-    border-radius: 100% 0% 100% 100% / 100% 0% 100% 100%; /* 花びらの形 */
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.7;
-    box-shadow: 0 0 5px rgba(255, 192, 203, 0.3);
-  }
-
-  /* 花びらの先端の切れ込みを疑似要素で表現 */
-  .sakura::after {
-    content: "";
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 8px;
-    height: 8px;
-    background: #f8e9e9; /* 背景のグラデーション開始色に近い色で削る */
-    border-radius: 50%;
-  }
-
-  /* アニメーション：波紋に押される動き */
-  .sakura-move {
-    display: block;
-    width: 100%;
-    height: 100%;
-    animation: ripplePush 8s cubic-bezier(0.15, 0, 0.2, 1) forwards;
-  }
-
-  /* 配置と個別のアニメーション開始時間 */
-  .s1 { top: 18%; right: 25%; transform: rotate(15deg); animation: float1 10s infinite; }
-  .s2 { top: 45%; right: 15%; transform: rotate(-20deg); animation: float2 12s infinite; }
-  .s3 { top: 30%; left: 35%; transform: rotate(45deg); animation: float1 11s infinite; }
-  .s4 { bottom: 35%; right: 30%; transform: rotate(-10deg); animation: float2 13s infinite; }
-
-  /* 波紋で左下へ流れる動き */
-  @keyframes ripplePush {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    35% { transform: translate(-50px, 50px) rotate(60deg); }
-    100% { transform: translate(-30px, 30px) rotate(40deg); }
-  }
-
-  /* 浮遊感 */
-  @keyframes float1 { 0%, 100% { margin-top: 0; } 50% { margin-top: -15px; } }
-  @keyframes float2 { 0%, 100% { margin-top: 0; } 50% { margin-top: -10px; } }
 
   .novel {
     display: flex;
@@ -130,16 +92,27 @@
     animation: softGlow 1.5s ease forwards;
   }
 
+  /* 1行ずつ表示 */
   .line:nth-child(1) { animation-delay: 0.6s; }
   .line:nth-child(2) { animation-delay: 2.4s; }
   .line:nth-child(3) { animation-delay: 4.2s; }
 
   @keyframes softGlow {
-    0% { opacity: 0; filter: blur(6px); }
-    15% { opacity: 0.8; filter: blur(1px); }
-    100% { opacity: 1; filter: blur(0); }
+    0% {
+      opacity: 0;
+      filter: blur(6px);
+    }
+    15% {
+      opacity: 0.8;
+      filter: blur(1px);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0);
+    }
   }
 
+  /* 作品一覧セクション */
   section.works {
     min-height: 100vh;
     padding: 15vh 10vw;
@@ -151,14 +124,36 @@
     backdrop-filter: blur(6px);
   }
 
-  .works h2 { font-size: 1em; letter-spacing: 0.2em; margin-bottom: 2em; }
-  .work-item {
-    margin: 1em 0; padding: 1em 1.5em; border-left: 3px solid #ccc;
-    font-size: 0.9em; text-decoration: none; color: #333;
-    background: rgba(255,255,255,0.7); width: 80%; transition: all 0.3s ease;
+  .works h2 {
+    font-size: 1em;
+    letter-spacing: 0.2em;
+    margin-bottom: 2em;
   }
-  .work-item:hover { background: rgba(240,240,255,0.9); border-left-color: #888; transform: translateX(4px); }
-  footer { text-align: center; font-size: 0.8em; color: #999; margin: 3em 0 1em; }
+
+  .work-item {
+    margin: 1em 0;
+    padding: 1em 1.5em;
+    border-left: 3px solid #ccc;
+    font-size: 0.9em;
+    text-decoration: none;
+    color: #333;
+    background: rgba(255,255,255,0.7);
+    width: 80%;
+    transition: all 0.3s ease;
+  }
+
+  .work-item:hover {
+    background: rgba(240,240,255,0.9);
+    border-left-color: #888;
+    transform: translateX(4px);
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.8em;
+    color: #999;
+    margin: 3em 0 1em;
+  }
 </style>
 </head>
 <body>
@@ -168,11 +163,6 @@
       <div class="ripple-layer layer2"></div>
       <div class="ripple-layer layer3"></div>
     </div>
-
-    <div class="sakura s1"><span class="sakura-move"></span></div>
-    <div class="sakura s2"><span class="sakura-move"></span></div>
-    <div class="sakura s3"><span class="sakura-move"></span></div>
-    <div class="sakura s4"><span class="sakura-move"></span></div>
 
     <div class="novel">
       <div class="line">これは、迷子になった私を助けてくれた彼と</div>
