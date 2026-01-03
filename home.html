@@ -30,37 +30,88 @@
     gap: 3em;
   }
 
+  .line-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .line {
     writing-mode: vertical-rl;
     text-orientation: upright;
     font-size: 0.8em;
     line-height: 1.3;
     opacity: 0;
-    /* 全ての行を同時に表示させるため、delayをなくし開始タイミングを揃えました */
-    animation: softGlow 2.5s ease forwards;
-    animation-delay: 0.6s; /* ページ読み込みから少し置いて一斉に開始 */
+    /* 滲む時間を短く(1.5s)、15%でほぼ見えるように設定 */
+    animation: softGlow 1.5s ease forwards;
+    position: relative;
+    z-index: 2;
   }
 
-  /* 個別の遅延設定（animation-delay）を削除しました */
+  /* 波紋のエフェクト */
+  .ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border-radius: 50%;
+    opacity: 0;
+    z-index: 1;
+    /* 文字の出現に合わせて波紋を広げる */
+    animation: rippleEffect 2s ease-out forwards;
+  }
+
+  /* 1行目 */
+  .line-container:nth-child(1) .line { animation-delay: 0.6s; }
+  .line-container:nth-child(1) .ripple { animation-delay: 0.6s; }
+
+  /* 2行目 */
+  .line-container:nth-child(2) .line { animation-delay: 1.8s; }
+  .line-container:nth-child(2) .ripple { animation-delay: 1.8s; }
+
+  /* 3行目 */
+  .line-container:nth-child(3) .line { animation-delay: 3.0s; }
+  .line-container:nth-child(3) .ripple { animation-delay: 3.0s; }
 
   @keyframes softGlow {
     0% {
       opacity: 0;
-      filter: blur(6px) brightness(1.2);
-      text-shadow: 0 0 10px rgba(255, 230, 200, 0.4);
+      filter: blur(6px);
     }
-    20% {
-      opacity: 0.6;
-      filter: blur(3px);
-      text-shadow: 0 0 6px rgba(255, 230, 200, 0.3);
+    15% {
+      opacity: 0.8;
+      filter: blur(1px);
     }
     100% {
       opacity: 1;
       filter: blur(0);
-      text-shadow: none;
     }
   }
 
+  @keyframes rippleEffect {
+    0% {
+      width: 0;
+      height: 0;
+      opacity: 0;
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.8);
+    }
+    20% {
+      opacity: 0.5;
+    }
+    100% {
+      width: 200px;
+      height: 200px;
+      opacity: 0;
+      box-shadow: 0 0 40px 20px rgba(255, 255, 255, 0);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  /* 以下、works等のスタイルは変更なし */
   section.works {
     min-height: 100vh;
     padding: 15vh 10vw;
@@ -71,13 +122,7 @@
     background: rgba(255,255,255,0.6);
     backdrop-filter: blur(6px);
   }
-
-  .works h2 {
-    font-size: 1em;
-    letter-spacing: 0.2em;
-    margin-bottom: 2em;
-  }
-
+  .works h2 { font-size: 1em; letter-spacing: 0.2em; margin-bottom: 2em; }
   .work-item {
     margin: 1em 0;
     padding: 1em 1.5em;
@@ -89,38 +134,34 @@
     width: 80%;
     transition: all 0.3s ease;
   }
-
-  .work-item:hover {
-    background: rgba(240,240,255,0.9);
-    border-left-color: #888;
-    transform: translateX(4px);
-  }
-
-  footer {
-    text-align: center;
-    font-size: 0.8em;
-    color: #999;
-    margin: 3em 0 1em;
-  }
+  footer { text-align: center; font-size: 0.8em; color: #999; margin: 3em 0 1em; }
 </style>
 </head>
 <body>
   <section class="intro">
     <div class="novel">
-      <div class="line">これは、迷子になった私を助けてくれた彼と</div>
-      <div class="line">たくさん笑って、ふざけあって、恋人になった私たちが</div>
-      <div class="line">また、他人に戻るまでのお話。</div>
+      <div class="line-container">
+        <div class="line">これは、迷子になった私を助けてくれた彼と</div>
+        <div class="ripple"></div>
+      </div>
+      <div class="line-container">
+        <div class="line">たくさん笑って、ふざけあって、恋人になった私たちが</div>
+        <div class="ripple"></div>
+      </div>
+      <div class="line-container">
+        <div class="line">また、他人に戻るまでのお話。</div>
+        <div class="ripple"></div>
+      </div>
     </div>
   </section>
   
-<section class="works">
-  <h2>一覧</h2>
-  <a href="ssi.html" class="work-item">笹井綾について</a>
-  <a href="works/select.html" class="work-item">story</a>
-  <a href="story3.html" class="work-item">夜に溶ける声</a>
-  <a href="story4.html" class="work-item">花の散る音</a>
-</section>
-<script src="assets/js/menu.js"></script>
+  <section class="works">
+    <h2>一覧</h2>
+    <a href="ssi.html" class="work-item">笹井綾について</a>
+    <a href="works/select.html" class="work-item">story</a>
+    <a href="story3.html" class="work-item">夜に溶ける声</a>
+    <a href="story4.html" class="work-item">花の散る音</a>
+  </section>
   <footer>☁️🍨</footer>
 </body>
 </html>
