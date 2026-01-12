@@ -295,19 +295,37 @@
   }
 
 @media (max-width: 860px){
+  /* まず1カラムに戻す（これがないと詰む） */
   .wrap{ grid-template-columns: 1fr; }
   .visual-card{ min-height: 620px; }
-  .profile-dl{ grid-template-columns: 8.2em 1fr; }
 
-  .char-img{
-    transform: translateX(-50%) translateY(620px) scale(3.5);
+  /* 見出しとPROFILEの間に余白を作る（かぶり対策） */
+  .sheet{ margin-top: 14px; }
+
+  /* dt/dd がはみ出さないように調整 */
+  .profile-dl{ grid-template-columns: 7.6em 1fr; }
+  .profile-dl dt{
+    white-space: normal;          /* nowrap を解除 */
+    font-size: .86rem;
+  }
+  .profile-dl dd{
+    overflow-wrap: anywhere;      /* 長い文字でも折り返す */
+    word-break: break-word;
+    font-size: .90rem;
   }
 
+  /* スマホ：ズーム（初期アップ側） */
+  .char-img{
+    transform: translateX(-50%) translateY(680px) scale(3.5);
+  }
+
+  /* スマホ：全身（is-full側） */
   .visual-card.is-full .char-img{
     transform: translateX(-50%) translateY(10px) scale(1);
     object-position: 50% 18%;
   }
 }
+
 
 </style>
 </head>
@@ -432,6 +450,7 @@
   </script>
 </body>
 </html>
+
 
 
 
