@@ -64,13 +64,13 @@
   }
 
   /* 18tripっぽい：縦長にキャラを置いて、最初は寄り */
-  .char-viewport{
-    position:absolute;
-    inset:0;
-    display:grid;
-    place-items:center;
-    isolation:isolate;
-  }
+.char-viewport{
+  position:absolute;
+  inset:0;
+  overflow:hidden;        /* クロップはここで制御 */
+  display:block;
+  isolation:isolate;
+}
 
 .char-img{
   width:120%;
@@ -342,6 +342,7 @@
   </script>
 </body>
 </html>
+
 
 
 
