@@ -299,11 +299,12 @@
     .visual-card{ min-height: 620px; }
     .profile-dl{ grid-template-columns: 8.2em 1fr; }
 
-    .visual-card.is-full .char-img{
-      transform: translateX(10%) translateY(-14px) scale(1);
-      object-position: 50% 18%;
-    }
+@media (max-width: 860px){
+  .visual-card.is-full .char-img{
+    transform: translateX(-50%) translateY(-14px) scale(1.6);
+    object-position: 50% 18%;
   }
+}
 </style>
 </head>
 
