@@ -136,12 +136,93 @@
     color: #999;
     margin: 0;
     padding: 3em 0 2em;
-    
     background: transparent;
   }
+
+  /* ===== ここから：右上メニュー（Characterと合わせる） ===== */
+  .menu-button{
+    position:fixed;
+    top:18px;
+    right:22px;
+    width:30px;
+    height:22px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    cursor:pointer;
+    z-index:1001;
+  }
+  .menu-button span{
+    height:3px;
+    width:100%;
+    background: rgba(70,70,70,0.6);
+    border-radius:2px;
+    transition: all .3s ease;
+  }
+  .menu-button:hover span{
+    background: rgba(70,70,70,0.9);
+  }
+
+  .menu-overlay{
+    position:fixed;
+    inset:0;
+    background: rgba(240,240,240,0.4);
+    backdrop-filter: blur(10px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+  }
+
+  .menu-content{
+    background: rgba(255,255,255,0.85);
+    border-radius: 12px;
+    padding: 30px 50px;
+    box-shadow: 0 0 25px rgba(180,180,180,0.3);
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap: 1em;
+    animation: fadeIn .3s ease;
+  }
+
+  .menu-content a{
+    text-decoration:none;
+    color:#444;
+    font-size:.95em;
+    letter-spacing:.05em;
+    transition:.3s;
+  }
+  .menu-content a:hover{
+    color:#666;
+    text-shadow: 0 0 8px rgba(200,200,200,0.6);
+  }
+
+  @keyframes fadeIn{
+    from { opacity:0; transform:scale(.95); }
+    to   { opacity:1; transform:scale(1); }
+  }
+  /* ===== ここまで：右上メニュー ===== */
 </style>
 </head>
+
 <body>
+  <!-- 右上メニュー -->
+  <div class="menu-button" id="menuButton" aria-label="menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="menu-overlay" id="menuOverlay">
+    <div class="menu-content">
+      <a href="home.html">home</a>
+      <a href="Character.html">Character</a>
+      <a href="works/select.html">Story</a>
+      <a href="Media.html">Media</a>
+    </div>
+  </div>
+
   <section class="intro">
     <div class="ripple-container">
       <div class="ripple-layer layer1"></div>
@@ -165,5 +246,19 @@
   </section>
 
   <footer>#溶けて、そのまま雲隠れ</footer>
+
+  <script>
+    const menuBtn = document.getElementById('menuButton');
+    const overlay = document.getElementById('menuOverlay');
+
+    menuBtn.addEventListener('click', () => {
+      overlay.style.display = (overlay.style.display === 'flex') ? 'none' : 'flex';
+      if (overlay.style.display !== 'none') overlay.style.display = 'flex';
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.style.display = 'none';
+    });
+  </script>
 </body>
 </html>
