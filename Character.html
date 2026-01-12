@@ -314,12 +314,16 @@
     const zoomBtn = document.getElementById('zoomBtn');
 
     function setZoom(isFull){
-      visualCard.classList.toggle('is-full', isFull);
-      zoomBtn.textContent = isFull ? 'アップを見る' : '全身を見る';
-    }
+    visualCard.classList.toggle('is-full', isFull);
+
+  
+    zoomBtn.textContent = isFull ? 'アップを見る' : '全身を見る';
+}
+
 
     // 初期はアップ（is-full ではない）
     let isFull = false;
+    setZoom(isFull);
 
     visualCard.addEventListener('click', () => {
       isFull = !isFull;
@@ -356,6 +360,7 @@
   </script>
 </body>
 </html>
+
 
 
 
