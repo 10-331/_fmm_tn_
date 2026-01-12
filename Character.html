@@ -64,35 +64,27 @@
   }
 
   /* 18tripっぽい：縦長にキャラを置いて、最初は寄り */
-.char-img{
-  width:120%;
-  max-width:none;
-  height:auto;
-  transform-origin: 50% 18%;
-  /* ← 顔〜胸アップ（参考画像と同程度） */
-  transform: scale(1.85) translateY(12px);
-  filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
-  transition: transform 520ms cubic-bezier(.2,.8,.2,1);
-  user-select:none;
-  -webkit-user-drag:none;
-  pointer-events:none;
-}
+  .char-viewport{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    isolation:isolate;
+  }
 
-
-.char-img{
-  width:120%;
-  max-width:none;
-  height:auto;
-  transform-origin: 50% 18%;
-  /* ← 顔〜胸アップ（参考画像と同程度） */
-  transform: scale(1.85) translateY(12px);
-  filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
-  transition: transform 520ms cubic-bezier(.2,.8,.2,1);
-  user-select:none;
-  -webkit-user-drag:none;
-  pointer-events:none;
-}
-
+  .char-img{
+    width:120%;
+    max-width:none;
+    height:auto;
+    transform-origin: 50% 20%;
+    /* 初期：寄り（アップ気味） */
+    transform: scale(1.55) translateY(40px);
+    filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
+    transition: transform 520ms cubic-bezier(.2,.8,.2,1);
+    user-select:none;
+    -webkit-user-drag:none;
+    pointer-events:none;
+  }
 
   /* ✅ 全身表示（足先が入るように「引いて」＋少し下へ） */
   .visual-card.is-full .char-img{
@@ -258,7 +250,7 @@
         <div class="visual-frame">
           <div class="char-viewport">
             <img
-              src="assets/profile/aya2.PNG"
+              src="assets/profile/aya1.PNG"
               alt="笹井 綾 全身"
               class="char-img"
               id="charImg"
@@ -349,8 +341,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
