@@ -71,33 +71,33 @@
     isolation:isolate;
   }
 
-  /* ✅ 初期：全身 */
-  .char-img{
-    position:absolute;
-    left:50%;
-    top:0;
+/* ✅ 初期：アップ（顔〜胸） */
+.char-img{
+  position:absolute;
+  left:50%;
+  top:0;
 
-    transform: translateX(-50%) scale(0.88) translateY(22px);
+  transform: translateX(-50%) scale(2.2) translateY(-18px);
 
-    width:110%;
-    height:auto;
-    max-width:none;
+  width:110%;
+  height:auto;
+  max-width:none;
 
-    object-fit:cover;
-    object-position: 50% 6%;
+  object-fit:cover;
+  object-position: 50% 18%;
 
-    filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
-    transition: transform 520ms cubic-bezier(.2,.8,.2,1);
-    user-select:none;
-    -webkit-user-drag:none;
-    pointer-events:none;
-  }
+  filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
+  transition: transform 520ms cubic-bezier(.2,.8,.2,1);
+  user-select:none;
+  -webkit-user-drag:none;
+  pointer-events:none;
+}
 
-  /* ✅ クリック後：かなりアップ（顔〜胸） */
-  .visual-card.is-full .char-img{
-    transform: translateX(-50%) scale(3.5) translateY(200px);
-    object-position: 50% 18%;
-  }
+/* ✅ クリック後：全身 */
+.visual-card.is-full .char-img{
+  transform: translateX(-50%) scale(0.88) translateY(22px);
+  object-position: 50% 6%;
+}
 
   /* UI */
   .zoom-ui{
@@ -355,6 +355,7 @@
   </script>
 </body>
 </html>
+
 
 
 
