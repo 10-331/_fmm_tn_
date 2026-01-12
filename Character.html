@@ -50,7 +50,7 @@
     background:
       radial-gradient(1200px 420px at 40% 20%, rgba(255,255,255,.8), rgba(255,255,255,0)),
       linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0));
-    min-height: 560px;
+    min-height: 640px; /* ✅ 足先対策で少し縦を増やす */
   }
 
   /* “フレーム”っぽい内枠 */
@@ -86,9 +86,9 @@
     pointer-events:none;
   }
 
-  /* 全身表示（ズームアウト） */
+  /* ✅ 全身表示（足先が入るように「引いて」＋少し下へ） */
   .visual-card.is-full .char-img{
-    transform: scale(1.02) translateY(10px);
+    transform: scale(0.88) translateY(22px);
   }
 
   /* 操作UI */
@@ -178,7 +178,7 @@
     letter-spacing:.1em;
   }
 
-  /* メニュー（あなたの既存構造） */
+  /* メニュー */
   .menu-button{
     position:fixed;
     top:18px; right:22px;
@@ -236,7 +236,7 @@
   /* スマホは縦並び */
   @media (max-width: 860px){
     .wrap{ grid-template-columns: 1fr; }
-    .visual-card{ min-height: 520px; }
+    .visual-card{ min-height: 620px; } /* ✅ スマホでも足先が入りやすい */
     .info-card{ text-align:left; }
   }
 </style>
@@ -282,7 +282,7 @@
     <footer>#溶けて、そのまま雲隠れ</footer>
   </div>
 
-  <!-- あなたのメニューUI -->
+  <!-- メニューUI -->
   <div class="menu-button" id="menuButton" aria-label="menu">
     <span></span><span></span><span></span>
   </div>
@@ -317,7 +317,7 @@
       setFull(isFull);
     });
 
-    // メニュー開閉（menu.jsが無くても動くように同梱）
+    // メニュー開閉
     const menuBtn = document.getElementById('menuButton');
     const overlay = document.getElementById('menuOverlay');
 
@@ -330,12 +330,11 @@
       if (e.target === overlay) overlay.style.display = 'none';
     });
 
-    // memoryリンク（必要ならここで遷移）
+    // memoryリンク
     const memoryLink = document.getElementById('memoryLink');
     if (memoryLink) {
       memoryLink.addEventListener('click', (e) => {
         e.stopPropagation();
-        // 例：hiddenページへ
         window.location.href = 'ssi_hidden.html';
       });
     }
