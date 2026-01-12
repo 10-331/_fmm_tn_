@@ -50,10 +50,10 @@
     background:
       radial-gradient(1200px 420px at 40% 20%, rgba(255,255,255,.8), rgba(255,255,255,0)),
       linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0));
-    min-height: 640px; /* ✅ 足先対策で少し縦を増やす */
+    min-height: 640px; /* 足先対策 */
   }
 
-  /* “フレーム”っぽい内枠 */
+  /* フレーム */
   .visual-frame{
     position:absolute;
     inset:14px;
@@ -63,39 +63,43 @@
     overflow:hidden;
   }
 
-  /* 18tripっぽい：縦長にキャラを置いて、最初は寄り */
-.char-viewport{
-  position:absolute;
-  inset:0;
-  overflow:hidden;        /* クロップはここで制御 */
-  display:block;
-  isolation:isolate;
-}
+  .char-viewport{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    display:block;
+    isolation:isolate;
+  }
 
-.char-img{
-  position:absolute;
-  left:50%;
-  top:0;
+  /* ✅ 初期：全身 */
+  .char-img{
+    position:absolute;
+    left:50%;
+    top:0;
 
-  /* ✅ 初期＝全身（足先が入る） */
-  transform: translateX(-50%) scale(0.88) translateY(22px);
+    transform: translateX(-50%) scale(0.88) translateY(22px);
 
-  width: 110%;
-  height: auto;
-  max-width:none;
+    width:110%;
+    height:auto;
+    max-width:none;
 
-  object-fit: cover;
-  object-position: 50% 6%;
+    object-fit:cover;
+    object-position: 50% 6%;
 
-  filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
-  transition: transform 520ms cubic-bezier(.2,.8,.2,1);
-  user-select:none;
-  -webkit-user-drag:none;
-  pointer-events:none;
-}
+    filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
+    transition: transform 520ms cubic-bezier(.2,.8,.2,1);
+    user-select:none;
+    -webkit-user-drag:none;
+    pointer-events:none;
+  }
 
+  /* ✅ クリック後：かなりアップ（顔〜胸） */
+  .visual-card.is-full .char-img{
+    transform: translateX(-50%) scale(2.2) translateY(-18px);
+    object-position: 50% 18%;
+  }
 
-  /* 操作UI */
+  /* UI */
   .zoom-ui{
     position:absolute;
     left:18px; right:18px; bottom:16px;
@@ -237,22 +241,25 @@
     to   { opacity:1; transform:scale(1); }
   }
 
-  /* スマホは縦並び */
+  /* スマホ */
   @media (max-width: 860px){
     .wrap{ grid-template-columns: 1fr; }
-    /* ✅ クリック後＝かなりアップ（顔〜胸） */
-.visual-card.is-full .char-img{
-  transform: translateX(-50%) scale(1.9) translateY(-12px);
-  object-position: 50% 18%;
-}
+    .visual-card{ min-height: 620px; }
+    .info-card{ text-align:left; }
 
+    /* スマホは少し弱めアップ（必要なら） */
+    .visual-card.is-full .char-img{
+      transform: translateX(-50%) scale(1.85) translateY(-14px);
+      object-position: 50% 18%;
+    }
+  }
 </style>
 </head>
 
 <body>
   <div class="page">
     <div class="wrap">
-      <!-- 左：ビジュアル（クリックで全身⇔寄り切替） -->
+      <!-- 左：ビジュアル -->
       <section class="visual-card" id="visualCard" aria-label="character visual">
         <div class="visual-frame">
           <div class="char-viewport">
@@ -266,8 +273,8 @@
         </div>
 
         <div class="zoom-ui">
-          <div class="hint">クリックで「寄り ⇄ 全身」</div>
-          <button class="btn" id="zoomBtn" type="button">全身を見る</button>
+          <div class="hint">クリックで「全身 ⇄ アップ」</div>
+          <button class="btn" id="zoomBtn" type="button">アップを見る</button>
         </div>
       </section>
 
@@ -304,24 +311,24 @@
   </div>
 
   <script>
-    // ズーム切替
+    // ズーム切替（初期=全身 / クリック=アップ）
     const visualCard = document.getElementById('visualCard');
     const zoomBtn = document.getElementById('zoomBtn');
 
-    function setFull(isFull){
-      visualCard.classList.toggle('is-full', isFull);
-      zoomBtn.textContent = isFull ? '寄りに戻す' : '全身を見る';
+    function setZoom(isZoom){
+      visualCard.classList.toggle('is-full', isZoom);
+      zoomBtn.textContent = isZoom ? '全身を見る' : 'アップを見る';
     }
 
-    let isFull = false;
+    let isZoom = false;
     visualCard.addEventListener('click', () => {
-      isFull = !isFull;
-      setFull(isFull);
+      isZoom = !isZoom;
+      setZoom(isZoom);
     });
     zoomBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      isFull = !isFull;
-      setFull(isFull);
+      isZoom = !isZoom;
+      setZoom(isZoom);
     });
 
     // メニュー開閉
@@ -348,5 +355,3 @@
   </script>
 </body>
 </html>
-
-
