@@ -168,4 +168,91 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap
+    gap: 1em;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .menu-content a {
+    text-decoration: none;
+    color: #444;
+    font-size: 0.95em;
+    letter-spacing: 0.05em;
+    transition: 0.3s;
+  }
+
+  .menu-content a:hover {
+    color: #666;
+    text-shadow: 0 0 8px rgba(200,200,200,0.6);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="profile-box">
+      <img src="assets/images/profile/aya.jpg" class="profile-image" alt="笹井 綾">
+
+      <h1>笹井 綾（ささい あや）</h1>
+      <p>22歳 / 145cm / A型</p>
+      <p>単純明快という言葉がよく似合う女の子。</p>
+      <p>現在はmahorova設立社に勤務。</p>
+      <p>主に基幹業務の設計･開発をしている。</p>
+      <p>よく外に出歩くものの、かなり方向音痴。</p>
+      <p><span class="memory-link">一部の記憶が曖昧</span>だが、本人は気にしていないらしい……？</p>
+    </div>
+  </div>
+
+  <div class="glitch" id="glitch"></div>
+
+  <footer>#溶けて、そのまま雲隠れ</footer>
+
+  <div class="menu-button" id="menuButton">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="menu-overlay" id="menuOverlay">
+    <div class="menu-content">
+      <a href="home.html">home</a>
+      <a href="Character.html">Character</a>
+      <a href="works.html">Story</a>
+      <a href="Media.html">Media</a>
+    </div>
+  </div>
+
+  <script>
+    const memoryText = document.querySelector('.memory-link');
+    const glitch = document.getElementById('glitch');
+
+    if (!sessionStorage.getItem('visited')) {
+      memoryText.addEventListener('click', () => {
+        glitch.style.animation = 'glitchEffect 0.25s ease';
+        glitch.style.opacity = '1';
+        setTimeout(() => {
+          sessionStorage.setItem('visited', 'true');
+          window.location.href = 'ssi_hidden.html';
+        }, 250);
+      });
+    }
+
+    const menuBtn = document.getElementById('menuButton');
+    const overlay = document.getElementById('menuOverlay');
+
+    menuBtn.addEventListener('click', () => {
+      overlay.style.display = overlay.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.style.display = 'none';
+    });
+  </script>
+
+  <script src="assets/js/menu.js"></script>
+</body>
+</html>
