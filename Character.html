@@ -93,36 +93,46 @@
   }
 
   .visual-card.is-full .char-img{
-    transform: translateX(-50%) translateY(25px) scale(1);
+    transform: translateX(-50%) translateY(20px) scale(1);
     object-position: 50% 6%;
   }
 
   /* UI */
-  .zoom-ui{
-    position:absolute;
-    left:18px; right:18px; bottom:16px;
-    display:flex;
-    gap:10px;
-    align-items:center;
-    justify-content:space-between;
-    z-index:5;
-  }
+.zoom-ui{
+  position:absolute;
+  left:18px; right:18px; bottom:16px;
+  display:flex;
+  justify-content:flex-end;
+  z-index:5;
+}
 
 
-  .btn{
-    font-family:inherit;
-    border:none;
-    cursor:pointer;
-    border-radius:999px;
-    padding:10px 14px;
-    letter-spacing:.08em;
-    background:rgba(255,255,255,.78);
-    border:1px solid rgba(120,110,150,.2);
-    box-shadow:0 10px 22px rgba(60,40,80,.12);
-    transition: transform .2s ease, background .2s ease;
-  }
-  .btn:hover{ transform: translateY(-1px); background:rgba(255,255,255,.92); }
-  .btn:active{ transform: translateY(0); }
+
+.btn{
+  font-family:inherit;
+  border:none;
+  cursor:pointer;
+  border-radius:999px;
+  padding:10px 14px;
+  letter-spacing:.08em;
+
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(120,110,150,.16);
+  box-shadow: 0 6px 16px rgba(60,40,80,.08);
+  backdrop-filter: blur(10px);
+
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+.btn:hover{
+  transform: translateY(-1px);
+  background:rgba(255,255,255,.70);
+  box-shadow: 0 8px 18px rgba(60,40,80,.10);
+}
+.btn:active{
+  transform: translateY(0);
+  box-shadow: 0 6px 16px rgba(60,40,80,.08);
+}
+
 
   /* 右：プロフィール */
   .info-card{
@@ -346,6 +356,7 @@
   </script>
 </body>
 </html>
+
 
 
 
