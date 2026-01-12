@@ -5,200 +5,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Character</title>
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  html, body { margin:0; padding:0; font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
     background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
-    color: #333;
-    overflow-x: hidden;
+    color:#333; overflow-x:hidden; }
+  .container{ display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:5vh 0; }
+  .profile-box{ background: rgba(255, 252, 240, 0.75); border-radius:12px; padding:30px 40px;
+    box-shadow:0 0 15px rgba(255,230,180,0.3); position:relative; z-index:1; }
+  .profile-image{ width:180px; height:180px; border-radius:50%; object-fit:cover; display:block; margin:0 auto; }
+  h1{ font-size:1.05em; letter-spacing:0.12em; margin:1em 0 0.3em; text-align:center; }
+  p{ font-size:0.8em; line-height:1.7; margin:0.3em 0; text-align:center; }
+  .memory-link{ cursor:pointer; transition:color 0.3s ease; }
+  .memory-link:hover{ color:#666; text-decoration:underline; }
+  footer{ text-align:center; font-size:0.8em; color:#999; margin:3em 0 1em; }
+  .glitch{ position:fixed; top:0; left:0; width:100%; height:100%; background:#000; mix-blend-mode:screen;
+    z-index:9999; pointer-events:none; opacity:0; }
+  .glitch::before,.glitch::after{ content:""; position:absolute; top:0; left:0; width:100%; height:100%;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.3) 0px, rgba(0,0,0,0.3) 2px);
+    mix-blend-mode: lighten; opacity:0.8; }
+  .glitch::before{ transform:translate(3px,0); filter:hue-rotate(40deg); }
+  .glitch::after{ transform:translate(-3px,0); filter:hue-rotate(-40deg); }
+  @keyframes glitchEffect{
+    0%{transform:none;opacity:0;} 10%{transform:skewX(10deg) scale(1.02);opacity:1;}
+    20%{transform:skewX(-8deg);} 30%{transform:translate(5px,-3px);}
+    40%{transform:translate(-4px,2px);} 50%{transform:scale(1.05) skewX(6deg);}
+    100%{transform:none;opacity:0;}
   }
-
-  .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 5vh 0;
-  }
-
-  .profile-box {
-    background: rgba(255, 252, 240, 0.75);
-    border-radius: 12px;
-    padding: 30px 40px;
-    box-shadow: 0 0 15px rgba(255, 230, 180, 0.3);
-    position: relative;
-    z-index: 1;
-  }
-
-  .profile-image {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-    margin: 0 auto;
-  }
-
-  h1 {
-    font-size: 1.05em;
-    letter-spacing: 0.12em;
-    margin: 1em 0 0.3em;
-    text-align: center;
-  }
-
-  p {
-    font-size: 0.8em;
-    line-height: 1.7;
-    margin: 0.3em 0;
-    text-align: center;
-  }
-
-  .memory-link {
-    cursor: pointer;
-    transition: color 0.3s ease;
-  }
-
-  .memory-link:hover {
-    color: #666;
-    text-decoration: underline;
-  }
-
-  footer {
-    text-align: center;
-    font-size: 0.8em;
-    color: #999;
-    margin: 3em 0 1em;
-  }
-
-  .glitch {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    mix-blend-mode: screen;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0;
-  }
-
-  .glitch::before,
-  .glitch::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: inherit;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,0.3) 0px,
-      rgba(0,0,0,0.3) 2px
-    );
-    mix-blend-mode: lighten;
-    opacity: 0.8;
-  }
-
-  .glitch::before {
-    transform: translate(3px, 0);
-    filter: hue-rotate(40deg);
-  }
-
-  .glitch::after {
-    transform: translate(-3px, 0);
-    filter: hue-rotate(-40deg);
-  }
-
-  @keyframes glitchEffect {
-    0% { transform: none; opacity: 0; }
-    10% { transform: skewX(10deg) scale(1.02); opacity: 1; }
-    20% { transform: skewX(-8deg); }
-    30% { transform: translate(5px, -3px); }
-    40% { transform: translate(-4px, 2px); }
-    50% { transform: scale(1.05) skewX(6deg); }
-    100% { transform: none; opacity: 0; }
-  }
-
-  .menu-button {
-    position: fixed;
-    top: 20px;
-    right: 25px;
-    width: 30px;
-    height: 22px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    cursor: pointer;
-    z-index: 1001;
-  }
-
-  .menu-button span {
-    height: 3px;
-    width: 100%;
-    background: rgba(70,70,70,0.6);
-    border-radius: 2px;
-    transition: all 0.3s ease;
-  }
-
-  .menu-button:hover span {
-    background: rgba(70,70,70,0.9);
-  }
-
-  .menu-overlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(240,240,240,0.4);
-    backdrop-filter: blur(10px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-
-  .menu-content {
-    background: rgba(255,255,255,0.85);
-    border-radius: 12px;
-    padding: 30px 50px;
-    box-shadow: 0 0 25px rgba(180,180,180,0.3);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1em;
-    animation: fadeIn 0.3s ease;
-  }
-
-  .menu-content a {
-    text-decoration: none;
-    color: #444;
-    font-size: 0.95em;
-    letter-spacing: 0.05em;
-    transition: 0.3s;
-  }
-
-  .menu-content a:hover {
-    color: #666;
-    text-shadow: 0 0 8px rgba(200,200,200,0.6);
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
+  .menu-button{ position:fixed; top:20px; right:25px; width:30px; height:22px; display:flex;
+    flex-direction:column; justify-content:space-between; cursor:pointer; z-index:1001; }
+  .menu-button span{ height:3px; width:100%; background:rgba(70,70,70,0.6); border-radius:2px; transition:all 0.3s ease; }
+  .menu-button:hover span{ background:rgba(70,70,70,0.9); }
+  .menu-overlay{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(240,240,240,0.4);
+    backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; z-index:1000; }
+  .menu-content{ background:rgba(255,255,255,0.85); border-radius:12px; padding:30px 50px;
+    box-shadow:0 0 25px rgba(180,180,180,0.3); display:flex; flex-direction:column; align-items:flex-start;
+    gap:1em; animation:fadeIn 0.3s ease; }
+  .menu-content a{ text-decoration:none; color:#444; font-size:0.95em; letter-spacing:0.05em; transition:0.3s; }
+  .menu-content a:hover{ color:#666; text-shadow:0 0 8px rgba(200,200,200,0.6); }
+  @keyframes fadeIn{ from{opacity:0; transform:scale(0.95);} to{opacity:1; transform:scale(1);} }
 </style>
 </head>
 
 <body>
   <div class="container">
     <div class="profile-box">
-      <!-- 画像のファイル名(大文字小文字)が実物と完全一致してるかだけ注意 -->
-      <img src="assets/images/profile/aya1.PNG" class="profile-image" alt="笹井 綾">
-      <script src="assets/js/menu.js"></script>
-
+      <!-- ✅ ここが正しい -->
+      <img src="assets/profile/aya1.PNG" class="profile-image" alt="笹井 綾">
 
       <h1>笹井 綾（ささい あや）</h1>
       <p>22歳 / 145cm / A型</p>
@@ -215,16 +66,15 @@
   <footer>#溶けて、そのまま雲隠れ</footer>
 
   <div class="menu-button" id="menuButton">
-    <span></span>
-    <span></span>
-    <span></span>
+    <span></span><span></span><span></span>
   </div>
 
   <div class="menu-overlay" id="menuOverlay">
     <div class="menu-content">
       <a href="home.html">home</a>
       <a href="Character.html">Character</a>
-      <a href="works.html">Story</a>
+      <!-- Storyがworks/select.htmlならここに直す -->
+      <a href="works/select.html">Story</a>
       <a href="Media.html">Media</a>
     </div>
   </div>
@@ -256,6 +106,7 @@
     });
   </script>
 
+  <!-- ✅ menu.js は最後に1回だけ -->
   <script src="assets/js/menu.js"></script>
 </body>
 </html>
