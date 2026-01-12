@@ -295,6 +295,11 @@
   }
 
 @media (max-width: 860px){
+  /* ここが無いと右カラムが画面外に行く */
+  .wrap{ grid-template-columns: 1fr; }
+  .visual-card{ min-height: 620px; }
+  .profile-dl{ grid-template-columns: 8.2em 1fr; }
+
   /* スマホ：ズーム（初期アップ側 / is-fullじゃない） */
   .char-img{
     transform: translateX(-50%) translateY(680px) scale(3.5);
@@ -430,6 +435,7 @@
   </script>
 </body>
 </html>
+
 
 
 
