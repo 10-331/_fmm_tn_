@@ -71,14 +71,12 @@
     isolation:isolate;
   }
 
-  /* ✅ 初期：アップ（顔〜胸）
-     ★数値はそのまま、順番だけ変更（translateY → scale） */
   .char-img{
     position:absolute;
     left:50%;
     top:0;
 
-    transform: translateX(-50%) translateY(200px) scale(3.5);
+    transform: translateX(-50%) translateY(300px) scale(3.5);
 
     width:110%;
     height:auto;
@@ -94,8 +92,6 @@
     pointer-events:none;
   }
 
-  /* ✅ クリック後：全身
-     ★数値はそのまま、順番だけ変更（translateY → scale） */
   .visual-card.is-full .char-img{
     transform: translateX(-50%) translateY(22px) scale(0.88);
     object-position: 50% 6%;
@@ -361,3 +357,4 @@
   </script>
 </body>
 </html>
+
