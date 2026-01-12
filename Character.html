@@ -294,17 +294,19 @@
     to   { opacity:1; transform:scale(1); }
   }
 
-  @media (max-width: 860px){
-    .wrap{ grid-template-columns: 1fr; }
-    .visual-card{ min-height: 620px; }
-    .profile-dl{ grid-template-columns: 8.2em 1fr; }
-
 @media (max-width: 860px){
+  /* スマホ：ズーム（初期アップ側 / is-fullじゃない） */
+  .char-img{
+    transform: translateX(-50%) translateY(680px) scale(3.5);
+  }
+
+  /* スマホ：全身（is-full側） */
   .visual-card.is-full .char-img{
-    transform: translateX(-50%) translateY(0px) scale(1.2);
+    transform: translateX(-50%) translateY(0px) scale(1);
     object-position: 50% 18%;
   }
 }
+
 </style>
 </head>
 
@@ -428,6 +430,7 @@
   </script>
 </body>
 </html>
+
 
 
 
