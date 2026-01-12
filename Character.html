@@ -33,7 +33,35 @@
     padding:72px 16px 60px;
   }
 
-.wrap{ width:min(980px, 92vw); display:grid; grid-template-columns: 420px 1fr; gap:28px; align-items:stretch; } /* 左：ビジュアル */ .visual-card{ position:relative; border-radius:18px; overflow:hidden; box-shadow:var(--shadow); border:1px solid var(--line); background: radial-gradient(1200px 420px at 40% 20%, rgba(255,255,255,.8), rgba(255,255,255,0)), linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0)); min-height: 640px; /* 足先対策 */ } /* フレーム */ .visual-frame{ position:absolute; inset:14px; border-radius:14px; border:1px solid rgba(120,110,150,.22); background:rgba(255,255,255,.18); overflow:hidden; }
+  .wrap{
+    width:min(980px, 92vw);
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:28px;
+    align-items:stretch;
+  }
+
+  /* 左：ビジュアル（枠サイズ変更なし） */
+  .visual-card{
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    background:
+      radial-gradient(1200px 420px at 40% 20%, rgba(255,255,255,.8), rgba(255,255,255,0)),
+      linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0));
+    min-height: 640px; /* 足先対策 */
+  }
+
+  .visual-frame{
+    position:absolute;
+    inset:14px;
+    border-radius:14px;
+    border:1px solid rgba(120,110,150,.22);
+    background:rgba(255,255,255,.18);
+    overflow:hidden;
+  }
 
   .char-viewport{
     position:absolute;
@@ -48,7 +76,6 @@
     position:absolute;
     left:50%;
     top:0;
-
     transform: translateX(-50%) translateY(700px) scale(3.5);
 
     width:110%;
@@ -116,9 +143,7 @@
     gap:14px;
   }
 
-  .info-head{
-    padding:6px 6px 2px;
-  }
+  .info-head{ padding:6px 6px 2px; }
 
   .name{
     font-size:1.15rem;
@@ -133,15 +158,13 @@
     margin:0;
   }
 
-  /* 帳票ブロック */
   .sheet{
     border:1px solid var(--line2);
     border-radius:14px;
     overflow:hidden;
     background:rgba(255,255,255,.28);
+    margin-top:10px;
   }
-
-  .sheet { margin-top:10px; }
 
   .sheet-title{
     margin:0;
@@ -153,7 +176,6 @@
     border-bottom:1px solid var(--line2);
   }
 
-  /* dl を “ラベル列 / 値列” に */
   .profile-dl{
     margin:0;
     padding:0;
@@ -183,13 +205,11 @@
     letter-spacing:.04em;
   }
 
-  /* 最終行の罫線を消す */
   .profile-dl dt:last-of-type,
   .profile-dl dd:last-of-type{
     border-bottom:none;
   }
 
-  /* 長文枠（説明やメモ） */
   .note{
     padding:12px 12px 14px;
     border-top:1px solid var(--line2);
@@ -274,14 +294,10 @@
     to   { opacity:1; transform:scale(1); }
   }
 
-  /* スマホ */
   @media (max-width: 860px){
     .wrap{ grid-template-columns: 1fr; }
     .visual-card{ min-height: 620px; }
-
-    .profile-dl{
-      grid-template-columns: 8.2em 1fr;
-    }
+    .profile-dl{ grid-template-columns: 8.2em 1fr; }
 
     .visual-card.is-full .char-img{
       transform: translateX(-50%) translateY(-14px) scale(1.85);
@@ -294,6 +310,7 @@
 <body>
   <div class="page">
     <div class="wrap">
+
       <!-- 左：ビジュアル -->
       <section class="visual-card" id="visualCard" aria-label="character visual">
         <div class="visual-frame">
@@ -319,11 +336,9 @@
           <p class="meta">22歳 / 145cm / A型</p>
         </div>
 
-        <!-- ===== プロフィール帳：基本 ===== -->
         <div class="sheet">
           <h2 class="sheet-title">PROFILE</h2>
 
-          <!-- ★ここだけ編集：プロフィール項目（dt/dd を増やすだけ） -->
           <dl class="profile-dl">
             <dt>DATE OF BIRTH</dt><dd>22歳</dd>
             <dt>AGE</dt><dd>145cm</dd>
@@ -332,16 +347,28 @@
             <dt>特徴</dt><dd>かなり方向音痴</dd>
           </dl>
 
+          <!-- ★ここが長文BIO（常に表示される） -->
           <div class="note">
-            <div>
-単純明快という言葉がよく似合う女の子。
-よく外に出歩くものの、かなり方向音痴。
-<span class="memory-link" id="memoryLink">一部の記憶が曖昧</span>だが、本人は気にしていないらしい……？
-            </div>
+            <p>
+転職に伴い、2055年の冬が終わる頃にHAMAにやってきた女性。
+とあるメタバースサービスが有名な企業に勤めているが、別の部署のため、
+あまり詳細はわかっていない。
+
+極度の方向音痴で、よく街中で眉をハの字にしている。
+箱入り娘で一般常識も怪しいが、なぜかAIについては博識で、
+ペットロボに対しても少し冷たい様子。交友関係が広く、
+休日は大抵外出をしている。
+<span class="memory-link" id="memoryLink">一部の記憶が曖昧</span>だが、本人は気にしていないらしい。
+            </p>
           </div>
         </div>
+      </section>
+
+    </div>
+
+    <footer>#溶けて、そのまま雲隠れ</footer>
   </div>
-<footer>#溶けて、そのまま雲隠れ</footer>
+
   <!-- メニューUI -->
   <div class="menu-button" id="menuButton" aria-label="menu">
     <span></span><span></span><span></span>
@@ -354,21 +381,6 @@
       <a href="works/select.html">Story</a>
       <a href="Media.html">Media</a>
     </div>
-    <div class="note">
-  <p>
-転職に伴い、2055年の冬が終わる頃にHAMAにやってきた女性。<br>
-とあるメタバースサービスが有名な企業に勤めているが、別の部署のため、<br>
-あまり詳細はわかっていない。<br><br>
-
-極度の方向音痴で、よく街中で眉をハの字にしている。<br>
-箱入り娘で一般常識も怪しいが、なぜかAIについては博識で、<br>
-ペットロボに対しても少し冷たい様子。<br><br>
-
-交友関係が広く、休日は大抵外出をしている。<br>
-<span class="memory-link" id="memoryLink">一部の記憶が曖昧</span>だが、本人は気にしていないらしい。
-  </p>
-</div>
-
   </div>
 
   <script>
@@ -421,5 +433,3 @@
   </script>
 </body>
 </html>
-
-
