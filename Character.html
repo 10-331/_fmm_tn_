@@ -13,6 +13,7 @@
     --card:rgba(255,252,240,.78);
     --shadow:0 14px 40px rgba(60,40,80,.12);
     --line:rgba(120,110,150,.18);
+    --line2:rgba(120,110,150,.26);
     --text:#2f2f2f;
     --muted:#6a6a6a;
   }
@@ -53,7 +54,6 @@
     min-height: 640px; /* 足先対策 */
   }
 
-  /* フレーム */
   .visual-frame{
     position:absolute;
     inset:14px;
@@ -71,6 +71,7 @@
     isolation:isolate;
   }
 
+  /* 初期=アップ */
   .char-img{
     position:absolute;
     left:50%;
@@ -92,75 +93,137 @@
     pointer-events:none;
   }
 
+  /* クリック後=全身 */
   .visual-card.is-full .char-img{
     transform: translateX(-50%) translateY(10px) scale(1);
     object-position: 50% 6%;
   }
 
-  /* UI */
-.zoom-ui{
-  position:absolute;
-  left:18px; right:18px; bottom:22px;
-  display:flex;
-  justify-content:flex-end;
-  z-index:5;
-}
+  /* UI（右寄せで馴染ませ） */
+  .zoom-ui{
+    position:absolute;
+    left:18px; right:18px; bottom:22px;
+    display:flex;
+    justify-content:flex-end;
+    z-index:5;
+  }
 
+  .btn{
+    font-family:inherit;
+    border:none;
+    cursor:pointer;
+    border-radius:999px;
+    padding:10px 14px;
+    letter-spacing:.08em;
+    background:rgba(255,255,255,.58);
+    border:1px solid rgba(120,110,150,.16);
+    box-shadow: 0 6px 16px rgba(60,40,80,.08);
+    backdrop-filter: blur(10px);
+    transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .btn:hover{
+    transform: translateY(-1px);
+    background:rgba(255,255,255,.70);
+    box-shadow: 0 8px 18px rgba(60,40,80,.10);
+  }
+  .btn:active{
+    transform: translateY(0);
+    box-shadow: 0 6px 16px rgba(60,40,80,.08);
+  }
 
-
-.btn{
-  font-family:inherit;
-  border:none;
-  cursor:pointer;
-  border-radius:999px;
-  padding:10px 14px;
-  letter-spacing:.08em;
-
-  background:rgba(255,255,255,.58);
-  border:1px solid rgba(120,110,150,.16);
-  box-shadow: 0 6px 16px rgba(60,40,80,.08);
-  backdrop-filter: blur(10px);
-
-  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
-}
-.btn:hover{
-  transform: translateY(-1px);
-  background:rgba(255,255,255,.70);
-  box-shadow: 0 8px 18px rgba(60,40,80,.10);
-}
-.btn:active{
-  transform: translateY(0);
-  box-shadow: 0 6px 16px rgba(60,40,80,.08);
-}
-
-
-  /* 右：プロフィール */
+  /* 右：プロフィール帳 */
   .info-card{
     background:var(--card);
     border:1px solid var(--line);
     border-radius:18px;
     box-shadow:var(--shadow);
-    padding:26px 28px;
+    padding:22px 22px;
     display:flex;
     flex-direction:column;
-    justify-content:center;
+    justify-content:flex-start;
+    gap:14px;
+  }
+
+  .info-head{
+    padding:6px 6px 2px;
   }
 
   .name{
     font-size:1.15rem;
     letter-spacing:.14em;
     text-align:left;
-    margin:0 0 10px;
+    margin:0 0 6px;
   }
-
   .meta{
     color:var(--muted);
     font-size:.9rem;
     letter-spacing:.08em;
-    margin:0 0 18px;
+    margin:0;
   }
 
-  .desc{
+  /* 帳票ブロック */
+  .sheet{
+    border:1px solid var(--line2);
+    border-radius:14px;
+    overflow:hidden;
+    background:rgba(255,255,255,.28);
+  }
+
+  .sheet + .sheet{ margin-top:10px; }
+
+  .sheet-title{
+    margin:0;
+    padding:10px 12px;
+    font-size:.86rem;
+    letter-spacing:.14em;
+    color:rgba(60,60,60,.82);
+    background:rgba(255,255,255,.45);
+    border-bottom:1px solid var(--line2);
+  }
+
+  /* dl を “ラベル列 / 値列” に */
+  .profile-dl{
+    margin:0;
+    padding:0;
+    display:grid;
+    grid-template-columns: 9.8em 1fr; /* ラベル列幅 */
+  }
+
+  .profile-dl dt,
+  .profile-dl dd{
+    margin:0;
+    padding:10px 12px;
+    border-bottom:1px solid rgba(120,110,150,.14);
+    line-height:1.7;
+    font-size:.92rem;
+  }
+
+  .profile-dl dt{
+    color:rgba(70,70,70,.78);
+    letter-spacing:.10em;
+    border-right:1px solid rgba(120,110,150,.14);
+    background:rgba(255,255,255,.22);
+    white-space:nowrap;
+  }
+
+  .profile-dl dd{
+    color:rgba(35,35,35,.95);
+    letter-spacing:.04em;
+  }
+
+  /* 最終行の罫線を消す */
+  .profile-dl dt:last-of-type,
+  .profile-dl dd:last-of-type{
+    border-bottom:none;
+  }
+
+  /* 長文枠（説明やメモ） */
+  .note{
+    padding:12px 12px 14px;
+    border-top:1px solid var(--line2);
+    background:rgba(255,255,255,.18);
+  }
+  .note p{
     margin:0;
     font-size:.95rem;
     line-height:2;
@@ -243,10 +306,11 @@
   @media (max-width: 860px){
     .wrap{ grid-template-columns: 1fr; }
     .visual-card{ min-height: 620px; }
-    .info-card{ text-align:left; }
 
-    /* スマホは少し弱めアップ（必要なら）
-       ★数値そのまま、順番だけ変更 */
+    .profile-dl{
+      grid-template-columns: 8.2em 1fr;
+    }
+
     .visual-card.is-full .char-img{
       transform: translateX(-50%) translateY(-14px) scale(1.85);
       object-position: 50% 18%;
@@ -272,22 +336,53 @@
         </div>
 
         <div class="zoom-ui">
-          <button class="btn" id="zoomBtn" type="button">アップを見る</button>
+          <button class="btn" id="zoomBtn" type="button">全身を見る</button>
         </div>
       </section>
 
-      <!-- 右：プロフィール -->
+      <!-- 右：プロフィール帳 -->
       <section class="info-card">
-        <h1 class="name">笹井 綾（ささい あや）</h1>
-        <p class="meta">22歳 / 145cm / A型</p>
+        <div class="info-head">
+          <h1 class="name">笹井 綾（ささい あや）</h1>
+          <p class="meta">22歳 / 145cm / A型</p>
+        </div>
 
-        <p class="desc">
+        <!-- ===== プロフィール帳：基本 ===== -->
+        <div class="sheet">
+          <h2 class="sheet-title">PROFILE</h2>
+
+          <!-- ★ここだけ編集：プロフィール項目（dt/dd を増やすだけ） -->
+          <dl class="profile-dl">
+            <dt>年齢</dt><dd>22歳</dd>
+            <dt>身長</dt><dd>145cm</dd>
+            <dt>血液型</dt><dd>A型</dd>
+            <dt>所属</dt><dd>mahorova設立社</dd>
+            <dt>職種</dt><dd>基幹業務の設計・開発</dd>
+            <dt>性格</dt><dd>単純明快</dd>
+            <dt>特徴</dt><dd>かなり方向音痴</dd>
+          </dl>
+
+          <div class="note">
+            <p>
 単純明快という言葉がよく似合う女の子。
-現在はmahorova設立社に勤務。
-主に基幹業務の設計･開発をしている。
 よく外に出歩くものの、かなり方向音痴。
 <span class="memory-link" id="memoryLink">一部の記憶が曖昧</span>だが、本人は気にしていないらしい……？
-        </p>
+            </p>
+          </div>
+        </div>
+
+        <!-- ===== プロフィール帳：好き/苦手 など（任意で増やせる） ===== -->
+        <div class="sheet">
+          <h2 class="sheet-title">TASTES</h2>
+
+          <!-- ★ここだけ編集：項目を増やすだけ -->
+          <dl class="profile-dl">
+            <dt>好き</dt><dd>（ここに入力）</dd>
+            <dt>苦手</dt><dd>（ここに入力）</dd>
+            <dt>癖</dt><dd>（ここに入力）</dd>
+            <dt>備考</dt><dd>（ここに入力）</dd>
+          </dl>
+        </div>
       </section>
     </div>
 
@@ -314,12 +409,10 @@
     const zoomBtn = document.getElementById('zoomBtn');
 
     function setZoom(isFull){
-    visualCard.classList.toggle('is-full', isFull);
-
-  
-    zoomBtn.textContent = isFull ? 'アップを見る' : '全身を見る';
-}
-
+      visualCard.classList.toggle('is-full', isFull);
+      // ボタンは「次にできる動作」を表示
+      zoomBtn.textContent = isFull ? 'アップを見る' : '全身を見る';
+    }
 
     // 初期はアップ（is-full ではない）
     let isFull = false;
@@ -360,21 +453,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
