@@ -71,33 +71,35 @@
     isolation:isolate;
   }
 
-/* ✅ 初期：アップ（顔〜胸） */
-.char-img{
-  position:absolute;
-  left:50%;
-  top:0;
+  /* ✅ 初期：アップ（顔〜胸）
+     ★数値はそのまま、順番だけ変更（translateY → scale） */
+  .char-img{
+    position:absolute;
+    left:50%;
+    top:0;
 
-  transform: translateX(-50%) scale(3.5) translateY(200px);
+    transform: translateX(-50%) translateY(200px) scale(3.5);
 
-  width:110%;
-  height:auto;
-  max-width:none;
+    width:110%;
+    height:auto;
+    max-width:none;
 
-  object-fit:cover;
-  object-position: 50% 18%;
+    object-fit:cover;
+    object-position: 50% 18%;
 
-  filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
-  transition: transform 520ms cubic-bezier(.2,.8,.2,1);
-  user-select:none;
-  -webkit-user-drag:none;
-  pointer-events:none;
-}
+    filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
+    transition: transform 520ms cubic-bezier(.2,.8,.2,1);
+    user-select:none;
+    -webkit-user-drag:none;
+    pointer-events:none;
+  }
 
-/* ✅ クリック後：全身 */
-.visual-card.is-full .char-img{
-  transform: translateX(-50%) scale(0.88) translateY(22px);
-  object-position: 50% 6%;
-}
+  /* ✅ クリック後：全身
+     ★数値はそのまま、順番だけ変更（translateY → scale） */
+  .visual-card.is-full .char-img{
+    transform: translateX(-50%) translateY(22px) scale(0.88);
+    object-position: 50% 6%;
+  }
 
   /* UI */
   .zoom-ui{
@@ -247,9 +249,10 @@
     .visual-card{ min-height: 620px; }
     .info-card{ text-align:left; }
 
-    /* スマホは少し弱めアップ（必要なら） */
+    /* スマホは少し弱めアップ（必要なら）
+       ★数値そのまま、順番だけ変更 */
     .visual-card.is-full .char-img{
-      transform: translateX(-50%) scale(1.85) translateY(-14px);
+      transform: translateX(-50%) translateY(-14px) scale(1.85);
       object-position: 50% 18%;
     }
   }
@@ -311,24 +314,27 @@
   </div>
 
   <script>
-    // ズーム切替（初期=全身 / クリック=アップ）
+    // ズーム切替（初期=アップ / クリック=全身）
     const visualCard = document.getElementById('visualCard');
     const zoomBtn = document.getElementById('zoomBtn');
 
-    function setZoom(isZoom){
-      visualCard.classList.toggle('is-full', isZoom);
-      zoomBtn.textContent = isZoom ? '全身を見る' : 'アップを見る';
+    function setZoom(isFull){
+      visualCard.classList.toggle('is-full', isFull);
+      zoomBtn.textContent = isFull ? 'アップを見る' : '全身を見る';
     }
 
-    let isZoom = false;
+    // 初期はアップ（is-full ではない）
+    let isFull = false;
+
     visualCard.addEventListener('click', () => {
-      isZoom = !isZoom;
-      setZoom(isZoom);
+      isFull = !isFull;
+      setZoom(isFull);
     });
+
     zoomBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      isZoom = !isZoom;
-      setZoom(isZoom);
+      isFull = !isFull;
+      setZoom(isFull);
     });
 
     // メニュー開閉
@@ -355,15 +361,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
