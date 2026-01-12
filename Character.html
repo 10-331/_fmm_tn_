@@ -33,35 +33,7 @@
     padding:72px 16px 60px;
   }
 
-.wrap{
-  width:min(980px, 92vw);
-  display:grid;
-  grid-template-columns: 420px 1fr; /* ←ここ固定 */
-  gap:28px;
-  align-items:stretch;
-}
-
-.visual-card{
-  position:relative;
-  border-radius:18px;
-  overflow:hidden;
-  box-shadow:var(--shadow);
-  border:1px solid var(--line);
-  background:
-    radial-gradient(1200px 420px at 40% 20%, rgba(255,255,255,.8), rgba(255,255,255,0)),
-    linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0));
-  min-height: 640px; /* ←ここ固定 */
-}
-
-.visual-frame{
-  position:absolute;
-  inset:14px; /* ←ここ固定 */
-  border-radius:14px;
-  border:1px solid rgba(120,110,150,.22);
-  background:rgba(255,255,255,.18);
-  overflow:hidden;
-}
-
+.wrap{ width:min(980px, 92vw); display:grid; grid-template-columns: 420px 1fr; gap:28px; align-items:stretch; } /* 左：ビジュアル */ .visual-card{ position:relative; border-radius:18px; overflow:hidden; box-shadow:var(--shadow); border:1px solid var(--line); background: radial-gradient(1200px 420px at 40% 20%, rgba(255,255,255,.8), rgba(255,255,255,0)), linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,0)); min-height: 640px; /* 足先対策 */ } /* フレーム */ .visual-frame{ position:absolute; inset:14px; border-radius:14px; border:1px solid rgba(120,110,150,.22); background:rgba(255,255,255,.18); overflow:hidden; }
 
   .char-viewport{
     position:absolute;
@@ -453,4 +425,5 @@
   </script>
 </body>
 </html>
+
 
