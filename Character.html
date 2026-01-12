@@ -76,14 +76,16 @@
   position:absolute;
   left:50%;
   top:0;
-  transform: translateX(-50%);
+
+  /* ✅ 初期＝全身（足先が入る） */
+  transform: translateX(-50%) scale(0.88) translateY(22px);
+
   width: 110%;
   height: auto;
   max-width:none;
 
-  /* ✅ アップ（見切れない距離感） */
   object-fit: cover;
-  object-position: 50% 18%;
+  object-position: 50% 6%;
 
   filter: drop-shadow(0 20px 22px rgba(40,30,70,.18));
   transition: transform 520ms cubic-bezier(.2,.8,.2,1);
@@ -92,11 +94,6 @@
   pointer-events:none;
 }
 
-/* ✅ 全身（足先まで入る） */
-.visual-card.is-full .char-img{
-  transform: translateX(-50%) scale(0.88) translateY(22px);
-  object-position: 50% 6%;
-}
 
   /* 操作UI */
   .zoom-ui{
@@ -243,9 +240,12 @@
   /* スマホは縦並び */
   @media (max-width: 860px){
     .wrap{ grid-template-columns: 1fr; }
-    .visual-card{ min-height: 620px; } /* ✅ スマホでも足先が入りやすい */
-    .info-card{ text-align:left; }
-  }
+    /* ✅ クリック後＝かなりアップ（顔〜胸） */
+.visual-card.is-full .char-img{
+  transform: translateX(-50%) scale(1.9) translateY(-12px);
+  object-position: 50% 18%;
+}
+
 </style>
 </head>
 
@@ -348,4 +348,5 @@
   </script>
 </body>
 </html>
+
 
