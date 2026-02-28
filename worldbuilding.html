@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Worldbuilding</title>
+  <link rel="stylesheet" href="./css/worldbuilding.css" />
+</head>
+<body class="skin-village">
+  <header class="topbar">
+    <nav class="tabs" aria-label="Worldbuilding Tabs">
+      <button class="tab is-active" data-world="village">因習村</button>
+      <button class="tab" data-world="s">S局</button>
+      <button class="tab" data-world="hama">HAMA</button>
+    </nav>
+
+    <div class="meta">
+      <span id="metaLine"></span>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="scene" id="scene" role="application" aria-label="Interactive Scene">
+      <!-- 背景はCSSで差し替え -->
+      <div class="hotspots" id="hotspots"></div>
+    </div>
+
+    <aside class="panel" id="panel" aria-live="polite">
+      <div class="panel-head">
+        <div>
+          <div class="panel-kicker" id="panelKicker"></div>
+          <h2 class="panel-title" id="panelTitle">断片</h2>
+        </div>
+        <button class="panel-close" id="panelClose" aria-label="Close">×</button>
+      </div>
+      <div class="panel-body" id="panelBody">
+        <p class="muted">ホットスポットを選択すると、ここに断片が表示されます。</p>
+      </div>
+      <div class="panel-foot" id="panelFoot"></div>
+    </aside>
+  </main>
+
+  <script src="./js/worldbuilding.js"></script>
+</body>
+</html>

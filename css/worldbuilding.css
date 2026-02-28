@@ -1,0 +1,210 @@
+/* worldbuilding.css */
+
+:root{
+  --panel-w: 360px;
+  --radius: 18px;
+  --gap: 14px;
+
+  /* 共通 */
+  --text: rgba(255,255,255,.9);
+  --muted: rgba(255,255,255,.65);
+  --panel-bg: rgba(20,20,24,.78);
+  --border: rgba(255,255,255,.18);
+}
+
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--text);
+  background: #0b0c10;
+  min-height: 100vh;
+}
+
+.topbar{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 12px 16px;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.tabs{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.tab{
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  cursor:pointer;
+}
+.tab.is-active{
+  background: rgba(255,255,255,.16);
+  border-color: rgba(255,255,255,.32);
+}
+
+.meta{
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.stage{
+  display:grid;
+  grid-template-columns: 1fr var(--panel-w);
+  gap: var(--gap);
+  padding: 16px;
+}
+
+.scene{
+  position: relative;
+  border-radius: var(--radius);
+  overflow:hidden;
+  border: 1px solid var(--border);
+  min-height: calc(100vh - 110px);
+  background-image: var(--bg-url);
+  background-size: cover;
+  background-position: center;
+}
+
+/* ホットスポット */
+.hotspots{
+  position:absolute;
+  inset:0;
+}
+.hotspot{
+  position:absolute;
+  transform: translate(-50%, -50%);
+  width: calc(var(--r) * 2);
+  height: calc(var(--r) * 2);
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.02);
+  cursor:pointer;
+}
+.hotspot:hover{
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.35);
+}
+.hotspot.is-read{
+  opacity: .55;
+}
+
+/* パネル */
+.panel{
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  padding: 14px;
+  position: sticky;
+  top: 90px;
+  height: calc(100vh - 120px);
+  overflow:auto;
+  opacity: .92;
+}
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  gap: 10px;
+  align-items:flex-start;
+  margin-bottom: 10px;
+}
+.panel-kicker{
+  font-size: 12px;
+  color: var(--muted);
+}
+.panel-title{
+  font-size: 18px;
+  margin: 4px 0 0 0;
+}
+.panel-close{
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor:pointer;
+}
+.panel-body p{
+  margin: 10px 0;
+  line-height: 1.8;
+}
+.muted{ color: var(--muted); }
+
+.panel-foot{
+  margin-top: 14px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  padding-top: 10px;
+}
+.tags{
+  font-size: 12px;
+  color: var(--muted);
+}
+.note{
+  margin-top: 8px;
+  font-size: 12px;
+  color: rgba(255,255,255,.72);
+}
+
+/* ========== スキン ==========
+   重要：レイアウトは同じ、見た目だけ変える
+*/
+
+/* 因習村：白む・低彩度・ぼやけ */
+body.skin-village{
+  --text: rgba(30,30,30,.92);
+  --muted: rgba(30,30,30,.65);
+  --panel-bg: rgba(250,250,250,.86);
+  --border: rgba(0,0,0,.12);
+  background: #f2f2f0;
+}
+body.skin-village .topbar{ border-bottom-color: rgba(0,0,0,.12); }
+body.skin-village .tab{ background: rgba(0,0,0,.03); color: var(--text); }
+body.skin-village .tab.is-active{ background: rgba(0,0,0,.08); }
+body.skin-village .scene{
+  filter: saturate(.45) brightness(1.08) contrast(.92);
+}
+
+/* S局：青白い無機質 */
+body.skin-s{
+  --panel-bg: rgba(245,248,252,.86);
+  --border: rgba(0,0,0,.12);
+  --text: rgba(18,22,28,.92);
+  --muted: rgba(18,22,28,.62);
+  background: #eef3f8;
+}
+body.skin-s .scene{
+  filter: saturate(.55) brightness(1.02) contrast(1.05);
+}
+
+/* HAMA：ネオン近未来（18TRIP寄り） */
+body.skin-hama{
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.65);
+  --panel-bg: rgba(12,12,18,.72);
+  --border: rgba(255,255,255,.16);
+  background: radial-gradient(circle at 30% 20%, rgba(140,80,255,.22), transparent 55%),
+              radial-gradient(circle at 70% 80%, rgba(80,255,210,.18), transparent 60%),
+              #070812;
+}
+body.skin-hama .scene{
+  filter: saturate(1.08) brightness(1.02) contrast(1.02);
+}
+
+/* モバイル */
+@media (max-width: 980px){
+  .stage{ grid-template-columns: 1fr; }
+  .panel{
+    position: relative;
+    top: auto;
+    height: auto;
+  }
+  .scene{ min-height: 58vh; }
+}
