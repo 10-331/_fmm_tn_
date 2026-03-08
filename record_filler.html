@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Archive Record</title>
+
+<style>
+  :root{
+    --bg1:#eceef2;
+    --bg2:#e4e7ed;
+    --bg3:#dfe5ec;
+    --card:rgba(252,252,250,.84);
+    --shadow:0 14px 40px rgba(30,36,48,.10);
+    --line:rgba(90,100,120,.18);
+    --line2:rgba(90,100,120,.28);
+    --text:#262a30;
+    --muted:#6b7380;
+    --mask:#bcbfc6;
+  }
+
+  html,body{
+    margin:0; padding:0;
+    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
+    color:var(--text);
+    background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 42%,var(--bg3) 100%);
+    overflow-x:hidden;
+  }
+
+  .page{
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    padding:72px 16px 60px;
+  }
+
+  .wrap{
+    width:min(980px, 92vw);
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:28px;
+    align-items:stretch;
+  }
+
+  /* 左：ビジュアル */
+  .visual-card{
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,.06)),
+      radial-gradient(900px 380px at 50% 15%, rgba(255,255,255,.42), rgba(255,255,255,0));
+    min-height:640px;
+  }
+
+  .visual-frame{
+    position:absolute;
+    inset:14px;
+    border-radius:14px;
+    border:1px solid rgba(90,100,120,.22);
+    background:rgba(255,255,255,.14);
+    overflow:hidden;
+  }
+
+  .char-viewport{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    display:block;
+    isolation:isolate;
+  }
+
+  .char-img{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform: translateX(-50%) translateY(700px) scale(3.5);
+    width:110%;
+    height:auto;
+    max-width:none;
+    object-fit:cover;
+    object-position:50% 0%;
+    filter: grayscale(.12) contrast(1.02) drop-shadow(0 20px 22px rgba(20,24,30,.15));
+    transition: transform 520ms cubic-bezier(.2,.8,.2,1);
+    user-select:none;
+    -webkit-user-drag:none;
+    pointer-events:none;
+  }
+
+  .visual-card.is-full .char-img{
+    transform: translateX(-50%) translateY(10px) scale(1);
+    object-position:50% 6%;
+  }
+
+  .zoom-ui{
+    position:absolute;
+    left:18px; right:18px; bottom:22px;
+    display:flex;
+    justify-content:flex-end;
+    z-index:5;
+  }
+
+  .btn{
+    font-family:inherit;
+    border:none;
+    cursor:pointer;
+    border-radius:999px;
+    padding:10px 14px;
+    letter-spacing:.08em;
+    background:rgba(255,255,255,.58);
+    border:1px solid rgba(90,100,120,.16);
+    box-shadow:0 6px 16px rgba(30,36,48,.08);
+    backdrop-filter:blur(10px);
+    transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .btn:hover{
+    transform:translateY(-1px);
+    background:rgba(255,255,255,.70);
+    box-shadow:0 8px 18px rgba(30,36,48,.10);
+  }
+  .btn:active{
+    transform:translateY(0);
+    box-shadow:0 6px 16px rgba(30,36,48,.08);
+  }
+
+  /* 右：記録カード */
+  .info-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    padding:22px 22px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .info-head{
+    padding:6px 6px 2px;
+    border-bottom:1px solid rgba(90,100,120,.14);
+  }
+
+  .name{
+    font-size:1.08rem;
+    letter-spacing:.18em;
+    text-align:left;
+    margin:0 0 6px;
+  }
+
+  .meta{
+    color:var(--muted);
+    font-size:.84rem;
+    letter-spacing:.12em;
+    margin:0;
+  }
+
+  .sheet{
+    border:1px solid var(--line2);
+    border-radius:14px;
+    overflow:hidden;
+    background:rgba(255,255,255,.24);
+    margin-top:10px;
+  }
+
+  .sheet-title{
+    margin:0;
+    padding:10px 12px;
+    font-size:.82rem;
+    letter-spacing:.18em;
+    color:rgba(50,56,66,.82);
+    background:rgba(255,255,255,.42);
+    border-bottom:1px solid var(--line2);
+  }
+
+  .profile-dl{
+    margin:0;
+    padding:0;
+    display:grid;
+    grid-template-columns: 10.2em 1fr;
+  }
+
+  .profile-dl dt,
+  .profile-dl dd{
+    margin:0;
+    padding:10px 12px;
+    border-bottom:1px solid rgba(90,100,120,.14);
+    line-height:1.7;
+    font-size:.9rem;
+  }
+
+  .profile-dl dt{
+    color:rgba(66,72,84,.76);
+    letter-spacing:.11em;
+    border-right:1px solid rgba(90,100,120,.14);
+    background:rgba(255,255,255,.18);
+    white-space:nowrap;
+  }
+
+  .profile-dl dd{
+    color:rgba(30,34,40,.95);
+    letter-spacing:.05em;
+  }
+
+  .profile-dl dt:last-of-type,
+  .profile-dl dd:last-of-type{
+    border-bottom:none;
+  }
+
+  /* 黒塗り */
+  del{
+    background:var(--mask);
+    color:transparent;
+    text-shadow:0 0 4px #000;
+    padding:0.06em 0.24em;
+    border-radius:2px;
+    text-decoration:none;
+  }
+
+  body.unlocked del{
+    background:transparent;
+    color:#171a1f;
+    text-shadow:none;
+    box-shadow: inset 0 -0.42em 0 rgba(0,0,0,.06);
+  }
+
+  .note{
+    padding:0 12px 14px;
+    border-top:1px solid var(--line2);
+    background:rgba(255,255,255,.14);
+  }
+
+  .note p{
+    margin:0;
+    font-size:.82rem;
+    line-height:2;
+    letter-spacing:.04em;
+    white-space:pre-line;
+  }
+
+  .record-frag{
+    color:#3d4652;
+  }
+
+  /* 認証UI */
+  .auth{
+    margin-top:14px;
+    padding:11px 12px 12px;
+    border:1px dashed rgba(90,100,120,.28);
+    background:rgba(255,255,255,.34);
+    border-radius:10px;
+  }
+
+  .auth p{
+    margin:0 0 .7em;
+    font-size:.76rem;
+    line-height:1.8;
+    color:#5f6672;
+    white-space:normal;
+  }
+
+  .auth .row{
+    display:flex;
+    gap:.55em;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+
+  .auth input{
+    font-family:"Source Han Code JP","Courier New",monospace;
+    padding:.62em .72em;
+    border:1px solid rgba(90,100,120,.22);
+    background:#fff;
+    color:#222;
+  }
+
+  .auth input[readonly]{
+    width:150px;
+    background:#f4f5f7;
+    color:#666;
+  }
+
+  .auth input[type="password"]{
+    width:180px;
+  }
+
+  .auth button{
+    font-family:inherit;
+    padding:.62em .95em;
+    border:1px solid rgba(90,100,120,.22);
+    background:#fff;
+    cursor:pointer;
+  }
+
+  .auth button:hover{
+    background:#f2f4f7;
+  }
+
+  .status{
+    margin-top:.75em;
+    font-size:.74rem;
+    color:#666;
+  }
+
+  .status.bad{ color:#8a3b3b; }
+  .status.good{ color:#3b6a3b; }
+
+  footer{
+    text-align:center;
+    font-size:.78rem;
+    color:#7d8692;
+    margin:22px 0 10px;
+    letter-spacing:.12em;
+  }
+
+  /* メニュー */
+  .menu-button{
+    position:fixed;
+    top:18px; right:22px;
+    width:30px; height:22px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    cursor:pointer;
+    z-index:1001;
+  }
+
+  .menu-button span{
+    height:3px; width:100%;
+    background: rgba(70,70,70,0.6);
+    border-radius:2px;
+    transition: all .3s ease;
+  }
+
+  .menu-button:hover span{
+    background: rgba(70,70,70,0.9);
+  }
+
+  .menu-overlay{
+    position:fixed; inset:0;
+    background: rgba(240,240,240,0.4);
+    backdrop-filter: blur(10px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+  }
+
+  .menu-content{
+    background: rgba(255,255,255,0.85);
+    border-radius:12px;
+    padding:30px 50px;
+    box-shadow:0 0 25px rgba(180,180,180,0.3);
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:1em;
+    animation:fadeIn .3s ease;
+  }
+
+  .menu-content a{
+    text-decoration:none;
+    color:#444;
+    font-size:.95em;
+    letter-spacing:.05em;
+    transition:.3s;
+  }
+
+  .menu-content a:hover{
+    color:#666;
+    text-shadow:0 0 8px rgba(200,200,200,0.6);
+  }
+
+  @keyframes fadeIn{
+    from { opacity:0; transform:scale(.95); }
+    to   { opacity:1; transform:scale(1); }
+  }
+
+  @media (max-width: 860px){
+    .wrap{ grid-template-columns:1fr; }
+    .visual-card{ min-height:620px; }
+
+    .profile-dl{ grid-template-columns: 8em 1fr; }
+
+    .profile-dl dt{
+      white-space:normal;
+      font-size:.84rem;
+    }
+
+    .profile-dl dd{
+      overflow-wrap:anywhere;
+      word-break:break-word;
+      font-size:.89rem;
+    }
+
+    .char-img{
+      transform: translateX(-50%) translateY(600px) scale(3.5);
+    }
+
+    .visual-card.is-full .char-img{
+      transform: translateX(-50%) translateY(40px) scale(1.1);
+      object-position:50% 18%;
+    }
+  }
+</style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="wrap">
+
+      <!-- 左：ビジュアル -->
+      <section class="visual-card" id="visualCard" aria-label="archive visual">
+        <div class="visual-frame">
+          <div class="char-viewport">
+            <img
+              src="assets/profile/filler.png"
+              alt="対象記録 全身"
+              class="char-img"
+              id="charImg"
+            />
+          </div>
+        </div>
+
+        <div class="zoom-ui">
+          <button class="btn" id="zoomBtn" type="button">全身を見る</button>
+        </div>
+      </section>
+
+      <!-- 右：記録 -->
+      <section class="info-card">
+        <div class="info-head">
+          <h1 class="name">ARCHIVE RECORD / FILLER</h1>
+          <p class="meta">閲覧権限：制限付き / 一部記録欠損</p>
+        </div>
+
+        <div class="sheet">
+          <h2 class="sheet-title">PERSONNEL DATA</h2>
+          <dl class="profile-dl">
+            <dt>NAME</dt><dd>フィラー</dd>
+            <dt>AFFILIATION</dt><dd>S局</dd>
+            <dt>AGE</dt><dd>20</dd>
+            <dt>HEIGHT</dt><dd>145cm</dd>
+            <dt>ROLE</dt><dd><del>機密指定により閲覧不可</del></dd>
+            <dt>STATUS</dt><dd><del>記録制限中</del></dd>
+            <dt>ORIGIN</dt><dd><del>照合権限不足</del></dd>
+          </dl>
+
+          <div class="note">
+            <p class="record-frag">記録断片：
+当該人物に関する履歴は一部消失、または意図的に改変された可能性あり。
+複数資料間に矛盾を確認。
+現行データのみ閲覧可能。</p>
+
+            <div class="auth">
+              <p>内部照合画面 / IDは自動入力済みです。<br>そのまま照合した場合は制限付き情報のみ表示されます。</p>
+              <div class="row">
+                <input type="text" value="F12-5101" readonly>
+                <input id="key" type="password" placeholder="PASSWORD" autocomplete="off">
+                <button id="unlock" type="button">ENTER</button>
+              </div>
+              <div class="status" id="status"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <footer>#ARCHIVE / PARTIALLY RESTRICTED</footer>
+  </div>
+
+  <!-- メニューUI -->
+  <div class="menu-button" id="menuButton" aria-label="menu">
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="menu-overlay" id="menuOverlay">
+    <div class="menu-content">
+      <a href="home.html">home</a>
+      <a href="Character.html">Character</a>
+      <a href="works/select.html">Story</a>
+      <a href="Media.html">Media</a>
+    </div>
+  </div>
+
+  <script>
+    // ズーム切替
+    const visualCard = document.getElementById('visualCard');
+    const zoomBtn = document.getElementById('zoomBtn');
+
+    function setZoom(isFull){
+      visualCard.classList.toggle('is-full', isFull);
+      zoomBtn.textContent = isFull ? 'アップを見る' : '全身を見る';
+    }
+
+    let isFull = false;
+    setZoom(isFull);
+
+    visualCard.addEventListener('click', () => {
+      isFull = !isFull;
+      setZoom(isFull);
+    });
+
+    zoomBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      isFull = !isFull;
+      setZoom(isFull);
+    });
+
+    // メニュー開閉
+    const menuBtn = document.getElementById('menuButton');
+    const overlay = document.getElementById('menuOverlay');
+
+    menuBtn.addEventListener('click', () => {
+      overlay.style.display = (overlay.style.display === 'flex') ? 'none' : 'flex';
+      if (overlay.style.display !== 'none') overlay.style.display = 'flex';
+    });
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.style.display = 'none';
+    });
+
+    // 認証
+    const ACCESS_KEY = "SASAI";
+    const key = document.getElementById("key");
+    const btn = document.getElementById("unlock");
+    const status = document.getElementById("status");
+
+    function setStatus(msg, type){
+      status.textContent = msg;
+      status.className = "status " + (type || "");
+    }
+
+    function unlock(){
+      document.body.classList.add("unlocked");
+      setStatus("照合成功：追加情報を表示", "good");
+      key.disabled = true;
+      btn.disabled = true;
+      btn.textContent = "OPEN";
+    }
+
+    btn.addEventListener("click", ()=>{
+      const v = (key.value || "").trim();
+      if(v === ""){
+        setStatus("照合完了：制限付き閲覧モード", "");
+        return;
+      }
+      if(v === ACCESS_KEY){
+        unlock();
+      }else{
+        setStatus("照合失敗：権限不足", "bad");
+      }
+    });
+
+    key.addEventListener("keydown", e=>{
+      if(e.key === "Enter") btn.click();
+    });
+  </script>
+</body>
+</html>
