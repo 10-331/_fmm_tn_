@@ -306,6 +306,28 @@
   .status.bad{ color:#8a3b3b; }
   .status.good{ color:#3b6a3b; }
 
+  /* 参照元へ戻る */
+  .record-nav{
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px dashed rgba(90,100,120,.20);
+    font-size:.76rem;
+    line-height:1.9;
+    color:#5f6672;
+  }
+
+  .record-nav a{
+    color:#444;
+    text-decoration:none;
+    border-bottom:1px solid #999;
+    padding-bottom:1px;
+  }
+
+  .record-nav a:hover{
+    color:#000;
+    border-bottom-color:#000;
+  }
+
   footer{
     text-align:center;
     font-size:.78rem;
@@ -410,7 +432,6 @@
   <div class="page">
     <div class="wrap">
 
-      <!-- 左：ビジュアル -->
       <section class="visual-card" id="visualCard" aria-label="archive visual">
         <div class="visual-frame">
           <div class="char-viewport">
@@ -428,7 +449,6 @@
         </div>
       </section>
 
-      <!-- 右：記録 -->
       <section class="info-card">
         <div class="info-head">
           <h1 class="name">ARCHIVE RECORD / FILLER</h1>
@@ -438,6 +458,7 @@
         <div class="sheet">
           <h2 class="sheet-title">PERSONNEL DATA</h2>
           <dl class="profile-dl">
+            <dt>RECORD ID</dt><dd>F12-5101</dd>
             <dt>NAME</dt><dd>フィラー</dd>
             <dt>AFFILIATION</dt><dd>S局</dd>
             <dt>AGE</dt><dd>20</dd>
@@ -462,6 +483,11 @@
               </div>
               <div class="status" id="status"></div>
             </div>
+
+            <div class="record-nav">
+              参照元記録：<br>
+              ◀ <a href="Secret.html">CLASSIFIED REPORT / SUBJECT FILE</a>
+            </div>
           </div>
         </div>
       </section>
@@ -471,7 +497,6 @@
     <footer>#ARCHIVE / PARTIALLY RESTRICTED</footer>
   </div>
 
-  <!-- メニューUI -->
   <div class="menu-button" id="menuButton" aria-label="menu">
     <span></span><span></span><span></span>
   </div>
@@ -486,7 +511,6 @@
   </div>
 
   <script>
-    // ズーム切替
     const visualCard = document.getElementById('visualCard');
     const zoomBtn = document.getElementById('zoomBtn');
 
@@ -509,7 +533,6 @@
       setZoom(isFull);
     });
 
-    // メニュー開閉
     const menuBtn = document.getElementById('menuButton');
     const overlay = document.getElementById('menuOverlay');
 
@@ -522,7 +545,6 @@
       if (e.target === overlay) overlay.style.display = 'none';
     });
 
-    // 認証
     const ACCESS_KEY = "SASAI";
     const key = document.getElementById("key");
     const btn = document.getElementById("unlock");
