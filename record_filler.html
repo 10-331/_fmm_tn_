@@ -260,78 +260,52 @@
     white-space:normal;
   }
 
-  /* 一直線UI */
   .auth-row{
     display:flex;
     align-items:center;
-    gap:12px;
+    gap:10px;
     margin-bottom:14px;
     flex-wrap:nowrap;
   }
 
+  .auth input{
+    height:40px;
+    padding:0 10px;
+    border:1px solid #cfd4dc;
+    background:#fff;
+    font-family:"Source Han Code JP","Courier New",monospace;
+    font-size:.85rem;
+    box-sizing:border-box;
+    color:#222;
+  }
+
   .id-field{
     width:110px;
-    height:40px;
-    font-family:"Source Han Code JP","Courier New",monospace;
-    background:#f3f4f6;
-    border:1px solid #cfd4dc;
-    color:#4b5563;
-    padding:0 10px;
-    box-sizing:border-box;
+    background:#f3f5f8;
+    color:#666;
   }
 
   .divider{
     width:1px;
-    height:40px;
-    background:#d8dde6;
+    height:28px;
+    background:#d6dbe3;
     flex:0 0 auto;
   }
 
   .pw-field{
     width:190px;
-    height:40px;
-    font-family:"Source Han Code JP","Courier New",monospace;
-    border:1px solid #cfd4dc;
-    padding:0 12px;
-    box-sizing:border-box;
-    background:#fff;
-    color:#222;
-  }
-
-  .auth-indicator{
-    width:40px;
-    height:40px;
-    border:1px solid #cfd4dc;
-    background:#eef1f5;
-    border-radius:4px;
-    position:relative;
-    box-sizing:border-box;
-    flex:0 0 auto;
-  }
-
-  .auth-indicator::after{
-    content:"";
-    position:absolute;
-    top:50%;
-    left:50%;
-    width:10px;
-    height:10px;
-    background:#9ca3af;
-    border-radius:50%;
-    transform:translate(-50%,-50%);
-  }
-
-  body.unlocked .auth-indicator::after{
-    background:#4ade80;
-    box-shadow:0 0 8px rgba(74,222,128,.9);
   }
 
   .enter-btn{
-    padding:8px 20px;
+    width:72px;
+    height:40px;
+    padding:0;
     border:1px solid #cfd4dc;
     background:#f7f8fa;
     cursor:pointer;
     font-family:inherit;
+    box-sizing:border-box;
+    flex:0 0 auto;
   }
 
   .enter-btn:hover{
@@ -480,9 +454,9 @@
       font-size:.78rem;
     }
 
-    .auth-indicator{
-      width:36px;
-      height:40px;
+    .enter-btn{
+      width:64px;
+      font-size:.78rem;
     }
   }
 </style>
@@ -533,10 +507,8 @@
                 <input type="text" value="F12-5101" readonly class="id-field">
                 <div class="divider"></div>
                 <input id="key" type="password" placeholder="PASSWORD" autocomplete="off" class="pw-field">
-                <div class="auth-indicator" id="indicator"></div>
+                <button id="unlock" class="enter-btn" type="button">ENTER</button>
               </div>
-
-              <button id="unlock" class="enter-btn" type="button">ENTER</button>
 
               <div class="status" id="status"></div>
             </div>
