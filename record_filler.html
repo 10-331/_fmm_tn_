@@ -260,41 +260,82 @@
     white-space:normal;
   }
 
-  .auth .row{
+  /* 一直線UI */
+  .auth-row{
     display:flex;
-    gap:.55em;
     align-items:center;
-    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:14px;
+    flex-wrap:nowrap;
   }
 
-  .auth input{
+  .id-field{
+    width:110px;
+    height:40px;
     font-family:"Source Han Code JP","Courier New",monospace;
-    padding:.62em .72em;
-    border:1px solid rgba(90,100,120,.22);
+    background:#f3f4f6;
+    border:1px solid #cfd4dc;
+    color:#4b5563;
+    padding:0 10px;
+    box-sizing:border-box;
+  }
+
+  .divider{
+    width:1px;
+    height:40px;
+    background:#d8dde6;
+    flex:0 0 auto;
+  }
+
+  .pw-field{
+    width:190px;
+    height:40px;
+    font-family:"Source Han Code JP","Courier New",monospace;
+    border:1px solid #cfd4dc;
+    padding:0 12px;
+    box-sizing:border-box;
     background:#fff;
     color:#222;
   }
 
-  .auth input[readonly]{
-    width:150px;
-    background:#f4f5f7;
-    color:#666;
+  .auth-indicator{
+    width:40px;
+    height:40px;
+    border:1px solid #cfd4dc;
+    background:#eef1f5;
+    border-radius:4px;
+    position:relative;
+    box-sizing:border-box;
+    flex:0 0 auto;
   }
 
-  .auth input[type="password"]{
-    width:180px;
+  .auth-indicator::after{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:10px;
+    height:10px;
+    background:#9ca3af;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
   }
 
-  .auth button{
-    font-family:inherit;
-    padding:.62em .95em;
-    border:1px solid rgba(90,100,120,.22);
-    background:#fff;
+  body.unlocked .auth-indicator::after{
+    background:#4ade80;
+    box-shadow:0 0 8px rgba(74,222,128,.9);
+  }
+
+  .enter-btn{
+    padding:8px 20px;
+    border:1px solid #cfd4dc;
+    background:#f7f8fa;
     cursor:pointer;
+    font-family:inherit;
   }
 
-  .auth button:hover{
-    background:#f2f4f7;
+  .enter-btn:hover{
+    background:#eef1f5;
   }
 
   .status{
@@ -424,6 +465,25 @@
       transform: translateX(-50%) translateY(40px) scale(1.1);
       object-position:50% 18%;
     }
+
+    .auth-row{
+      gap:8px;
+    }
+
+    .id-field{
+      width:96px;
+      font-size:.78rem;
+    }
+
+    .pw-field{
+      width:150px;
+      font-size:.78rem;
+    }
+
+    .auth-indicator{
+      width:36px;
+      height:40px;
+    }
   }
 </style>
 </head>
@@ -466,14 +526,18 @@
           </dl>
 
           <div class="note">
-
             <div class="auth">
               <p>制限付き情報を参照する場合はパスワードが必要です。</p>
-              <div class="row">
-                <input type="text" value="F12-5101" readonly>
-                <input id="key" type="password" placeholder="PASSWORD" autocomplete="off">
-                <button id="unlock" type="button">ENTER</button>
+
+              <div class="auth-row">
+                <input type="text" value="F12-5101" readonly class="id-field">
+                <div class="divider"></div>
+                <input id="key" type="password" placeholder="PASSWORD" autocomplete="off" class="pw-field">
+                <div class="auth-indicator" id="indicator"></div>
               </div>
+
+              <button id="unlock" class="enter-btn" type="button">ENTER</button>
+
               <div class="status" id="status"></div>
             </div>
 
