@@ -106,21 +106,20 @@ button:hover {
   }
 
   .container{
-  width: calc(100% - 56px);
-  margin: 72px 28px 32px;
-    margin: 72px 12px 32px;
+    width: calc(100% - 56px);
+    margin: 72px 28px 32px;
     padding: 2em 1.2em;
     box-sizing: border-box;
   }
 
-#story-title{
-  font-size: 16px;
-}
+  #story-title{
+    font-size: 16px;
+  }
 
-#story-content{
-  font-size: 10px;
-  line-height: 2.1;
-}
+  #story-content{
+    font-size: 14px;
+    line-height: 2.1;
+  }
 
   .nav-buttons{
     gap: 0.8em;
