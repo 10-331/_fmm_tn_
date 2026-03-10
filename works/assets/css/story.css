@@ -113,13 +113,13 @@ button:hover {
     box-sizing: border-box;
   }
 
-#story-title {
-  font-size: 1.05rem;
+#story-title{
+  font-size: 16px;
 }
 
-#story-content {
-  font-size: 0.70rem;
-  line-height: 2.05;
+#story-content{
+  font-size: 15px;
+  line-height: 2.1;
 }
 
   .nav-buttons{
