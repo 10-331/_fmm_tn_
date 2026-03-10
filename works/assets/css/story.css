@@ -24,8 +24,7 @@ body {
 
 /* --- コンテナ --- */
 .container {
-  max-width: min(1100px, 92vw);
-  width: 100%;
+  width: min(1100px, 92vw);
   margin: 14vh auto;
   padding: 4vh 8vw;
   background: rgba(255,255,255,0.85);
@@ -46,7 +45,7 @@ body {
 
 /* --- タイトル --- */
 #story-title {
-  font-size: 1.0rem;
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-align: center;
@@ -154,9 +153,8 @@ button:active {
   }
 
   .container{
-    width: calc(100% - 40px);
-    max-width: 100%;
-    margin: 72px 30px 32px;
+    width: calc(100% - 32px);
+    margin: 72px 16px 32px;
     padding: 1.8em 1em;
     border-radius: 10px;
   }
