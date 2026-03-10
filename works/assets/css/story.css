@@ -8,9 +8,16 @@ html, body {
 }
 
 body {
+  margin: 0;
   font-family: "Noto Serif JP", "Hiragino Mincho ProN", serif;
-  background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
-  color: #333;
+  background:
+    linear-gradient(
+      180deg,
+      #f6dede 0%,
+      #efe7f6 45%,
+      #e2ecf7 100%
+    );
+  color: #3f3f3f;
   line-height: 2.2;
   letter-spacing: 0.05em;
   -webkit-font-smoothing: antialiased;
@@ -43,7 +50,7 @@ body {
 
 /* --- タイトル --- */
 #story-title {
-  font-size: 1.2rem;
+  font-size: 1.0rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-align: center;
