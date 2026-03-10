@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>メインストーリー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../assets/css/story.css">
 
   <style>
@@ -87,7 +88,46 @@
     .nav-buttons button:active {
       transform: translateY(0);
       box-shadow: 0 3px 6px rgba(120, 110, 150, 0.15);
-    }    
+    }
+
+    @media (max-width: 860px) {
+      html, body {
+        align-items: flex-start;
+        min-height: 100vh;
+      }
+
+      main.container {
+        width: 100%;
+        max-width: 100%;
+        margin: 72px 12px 32px;
+        padding: 2em 1.2em;
+        border-radius: 10px;
+      }
+
+      #story-title {
+        font-size: 1.18rem;
+        margin-bottom: 1.6em;
+        line-height: 1.7;
+      }
+
+      #story-content {
+        font-size: 1.18rem;
+        line-height: 2.15;
+        margin-bottom: 2em;
+      }
+
+      .nav-buttons {
+        gap: 0.8em;
+        margin-top: 1.5em;
+      }
+
+      .nav-buttons button {
+        font-size: 0.95rem;
+        padding: 0.8em 1.2em;
+        flex: 1 1 0;
+        min-width: 0;
+      }
+    }
   </style>
 </head>
 
