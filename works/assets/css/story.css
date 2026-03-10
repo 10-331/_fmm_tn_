@@ -1,19 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500&display=swap');
 
 /* --- ベース --- */
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
   font-family: "Noto Serif JP", "Hiragino Mincho ProN", serif;
   background: linear-gradient(180deg, #fefaf8 0%, #f7f9fb 100%);
-  color: #3f3f3f;
+  color: #333;
   line-height: 2.2;
   letter-spacing: 0.05em;
   -webkit-font-smoothing: antialiased;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* --- コンテナ --- */
 .container {
   max-width: 720px;
+  width: 100%;
   margin: 14vh auto;
   padding: 4vh 8vw;
   background: rgba(255,255,255,0.85);
@@ -21,40 +30,76 @@ body {
   box-shadow: 0 3px 12px rgba(0,0,0,0.05);
   backdrop-filter: blur(10px);
   white-space: pre-wrap;
+  box-sizing: border-box;
+  text-align: left;
+  animation: fadeIn 1.2s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 /* --- タイトル --- */
 #story-title {
-  font-size: 1.3rem;
-  color: #777;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-align: center;
   margin-bottom: 2em;
+  opacity: 0.85;
+  color: #777;
 }
 
 /* --- テキスト --- */
 #story-content {
-  font-size: 15.5px;
-  line-height: 2.3;
-  color: #4a4a4a;
+  font-size: 15px;
+  line-height: 2.1;
+  color: #333;
+  margin-bottom: 2.5em;
+  white-space: pre-line;
+  animation: fadeIn 1.6s ease forwards;
 }
 
 /* --- ナビゲーション --- */
 .nav-buttons {
   display: flex;
-  justify-content: space-between;
-  margin-top: 3em;
+  justify-content: center;
+  gap: 1.5em;
+  margin-top: 2em;
 }
 
+.nav-buttons button,
 button {
-  padding: 0.5em 1.5em;
-  border: 1px solid #ccc;
-  background: rgba(255,255,255,0.8);
-  border-radius: 6px;
+  font-family: "Noto Serif JP", "Hiragino Mincho ProN", serif;
+  font-size: 1rem;
+  padding: 0.7em 2em;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fdfbfb 0%, #f1ecf6 100%);
+  color: #555;
+  box-shadow: 0 4px 10px rgba(150, 140, 160, 0.15);
   cursor: pointer;
-  transition: 0.3s;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
 }
+
+.nav-buttons button:hover,
 button:hover {
-  background: rgba(250,250,250,1);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f2f8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(120, 110, 150, 0.2);
+  color: #333;
+}
+
+.nav-buttons button:active,
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 6px rgba(120, 110, 150, 0.15);
 }
 
 /* --- ハンバーガーメニュー --- */
@@ -73,7 +118,6 @@ button:hover {
 }
 
 .menu {
-  /* display: none; ← 削除！ */
   position: absolute;
   top: 2.8rem;
   right: 0;
@@ -100,32 +144,40 @@ button:hover {
   background: rgba(240,240,240,0.8);
 }
 
+/* --- スマホ --- */
 @media (max-width: 860px){
   body{
     align-items: flex-start;
   }
 
-main.container {
-  width: calc(100% - 32px);
-  margin: 72px 16px 32px;
-  padding: 2em 1.2em;
-}
+  .container{
+    width: calc(100% - 20px);
+    max-width: 100%;
+    margin: 72px 10px 32px;
+    padding: 1.8em 1em;
+    border-radius: 10px;
+  }
 
   #story-title{
     font-size: 16px;
+    margin-bottom: 1.4em;
+    line-height: 1.7;
   }
 
-#story-content {
-  font-size: 12px;
-  line-height: 2.05;
-}
+  #story-content{
+    font-size: 13px;
+    line-height: 2.05;
+    margin-bottom: 2em;
+    color: #333;
+  }
 
   .nav-buttons{
     gap: 0.8em;
     margin-top: 1.5em;
   }
 
-  .nav-buttons button{
+  .nav-buttons button,
+  button{
     font-size: 0.95rem;
     padding: 0.8em 1.2em;
     flex: 1 1 0;
