@@ -10,14 +10,8 @@ html, body {
 body {
   margin: 0;
   font-family: "Noto Serif JP", "Hiragino Mincho ProN", serif;
-background:
-  linear-gradient(
-    180deg,
-    #f4d2d2 0%,
-    #e9def3 40%,
-    #dfe9f6 100%
-  );
-  color: #3f3f3f;
+  background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+  color: #333;
   line-height: 2.2;
   letter-spacing: 0.05em;
   -webkit-font-smoothing: antialiased;
