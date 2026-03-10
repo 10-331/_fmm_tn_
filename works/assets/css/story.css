@@ -106,8 +106,8 @@ button:hover {
   }
 
   .container{
-    width: calc(100% - 24px);
-    max-width: none;
+  width: calc(100% - 56px);
+  margin: 72px 28px 32px;
     margin: 72px 12px 32px;
     padding: 2em 1.2em;
     box-sizing: border-box;
@@ -118,7 +118,7 @@ button:hover {
 }
 
 #story-content{
-  font-size: 12px;
+  font-size: 10px;
   line-height: 2.1;
 }
 
