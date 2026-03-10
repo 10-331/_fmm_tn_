@@ -113,17 +113,14 @@ button:hover {
     box-sizing: border-box;
   }
 
-  #story-title{
-    font-size: 1.15rem;
-    margin-bottom: 1.6em;
-    line-height: 1.7;
-  }
+#story-title {
+  font-size: 1.05rem;
+}
 
-  #story-content{
-    font-size: 1.18rem;
-    line-height: 2.15;
-    margin-bottom: 2em;
-  }
+#story-content {
+  font-size: 1.02rem;
+  line-height: 2.05;
+}
 
   .nav-buttons{
     gap: 0.8em;
