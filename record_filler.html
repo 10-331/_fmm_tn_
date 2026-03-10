@@ -263,6 +263,7 @@
   .auth-row{
     display:flex;
     align-items:center;
+    justify-content:center;
     gap:10px;
     margin-bottom:14px;
     flex-wrap:nowrap;
@@ -316,6 +317,7 @@
     margin-top:.75em;
     font-size:.74rem;
     color:#666;
+    text-align:center;
   }
 
   .status.bad{ color:#8a3b3b; }
@@ -415,10 +417,23 @@
   }
 
   @media (max-width: 860px){
-    .wrap{ grid-template-columns:1fr; }
-    .visual-card{ min-height:620px; }
+    .wrap{
+      grid-template-columns:1fr;
+      justify-items:center;
+    }
 
-    .profile-dl{ grid-template-columns: 8em 1fr; }
+    .visual-card{
+      min-height:620px;
+      width:min(420px, 92vw);
+    }
+
+    .info-card{
+      width:min(520px, 92vw);
+    }
+
+    .profile-dl{
+      grid-template-columns: 8em 1fr;
+    }
 
     .profile-dl dt{
       white-space:normal;
@@ -440,7 +455,13 @@
       object-position:50% 18%;
     }
 
+    .auth{
+      text-align:center;
+    }
+
     .auth-row{
+      justify-content:center;
+      flex-wrap:wrap;
       gap:8px;
     }
 
