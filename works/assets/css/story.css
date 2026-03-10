@@ -10,13 +10,13 @@ html, body {
 body {
   margin: 0;
   font-family: "Noto Serif JP", "Hiragino Mincho ProN", serif;
-  background:
-    linear-gradient(
-      180deg,
-      #f6dede 0%,
-      #efe7f6 45%,
-      #e2ecf7 100%
-    );
+background:
+  linear-gradient(
+    180deg,
+    #f4d2d2 0%,
+    #e9def3 40%,
+    #dfe9f6 100%
+  );
   color: #3f3f3f;
   line-height: 2.2;
   letter-spacing: 0.05em;
