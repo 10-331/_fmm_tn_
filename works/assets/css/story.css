@@ -9,8 +9,10 @@ html, body {
 
 body {
   margin: 0;
-  font-family: "Noto Serif JP", "Hiragino Mincho ProN", serif;
-  background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  background:
+    linear-gradient(rgba(255,255,255,0.45), rgba(255,255,255,0.45)),
+    linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
   color: #333;
   line-height: 2.2;
   letter-spacing: 0.05em;
@@ -22,7 +24,7 @@ body {
 
 /* --- コンテナ --- */
 .container {
-  max-width: 720px;
+  max-width: min(1100px, 92vw);
   width: 100%;
   margin: 14vh auto;
   padding: 4vh 8vw;
