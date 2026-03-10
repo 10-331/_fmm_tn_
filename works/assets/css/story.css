@@ -9,7 +9,7 @@ html, body {
 
 body {
   font-family: "Noto Serif JP", "Hiragino Mincho ProN", serif;
-  background: linear-gradient(180deg, #fefaf8 0%, #f7f9fb 100%);
+  background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
   color: #333;
   line-height: 2.2;
   letter-spacing: 0.05em;
@@ -151,9 +151,9 @@ button:active {
   }
 
   .container{
-    width: calc(100% - 20px);
+    width: calc(100% - 30px);
     max-width: 100%;
-    margin: 72px 10px 32px;
+    margin: 72px 20px 32px;
     padding: 1.8em 1em;
     border-radius: 10px;
   }
