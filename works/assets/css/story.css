@@ -151,9 +151,9 @@ button:active {
   }
 
   .container{
-    width: calc(100% - 30px);
+    width: calc(100% - 40px);
     max-width: 100%;
-    margin: 72px 20px 32px;
+    margin: 72px 30px 32px;
     padding: 1.8em 1em;
     border-radius: 10px;
   }
