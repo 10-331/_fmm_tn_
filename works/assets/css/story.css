@@ -99,3 +99,41 @@ button:hover {
 .menu a:hover {
   background: rgba(240,240,240,0.8);
 }
+
+@media (max-width: 860px){
+  body{
+    align-items: flex-start;
+  }
+
+  .container{
+    width: calc(100% - 24px);
+    max-width: none;
+    margin: 72px 12px 32px;
+    padding: 2em 1.2em;
+    box-sizing: border-box;
+  }
+
+  #story-title{
+    font-size: 1.15rem;
+    margin-bottom: 1.6em;
+    line-height: 1.7;
+  }
+
+  #story-content{
+    font-size: 1.08rem;
+    line-height: 2.15;
+    margin-bottom: 2em;
+  }
+
+  .nav-buttons{
+    gap: 0.8em;
+    margin-top: 1.5em;
+  }
+
+  .nav-buttons button{
+    font-size: 0.95rem;
+    padding: 0.8em 1.2em;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
