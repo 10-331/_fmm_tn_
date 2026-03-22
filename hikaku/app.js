@@ -1,6 +1,12 @@
-const STORAGE_KEY = "height-comparison-tool-v4";
+const DB_NAME = "height-comparison-db";
+const DB_VERSION = 1;
+const STORE_NAME = "appState";
+
+const APP_STATE_KEY = "main";
 const PX_PER_CM = 4;
 const BASE_CHARACTER_WIDTH = 136;
+const IMAGE_MAX_DIMENSION = 1200;
+const IMAGE_OUTPUT_QUALITY = 0.92;
 
 const state = {
   characters: [],
@@ -24,10 +30,18 @@ const el = {
   countBadge: document.getElementById("countBadge")
 };
 
+let dbPromise = null;
+
 init();
 
-function init() {
-  loadState();
+async function init() {
+  try {
+    await loadState();
+  } catch (error) {
+    console.error("初期化エラー:", error);
+    alert(`保存データの読み込みに失敗しました: ${error?.message || error}`);
+  }
+
   bindEvents();
   renderAll();
 }
@@ -38,9 +52,9 @@ function bindEvents() {
   el.exportButton.addEventListener("click", exportJson);
   el.importInput.addEventListener("change", importJson);
   el.clearButton.addEventListener("click", clearAll);
-  el.maxCmSelect.addEventListener("change", () => {
+  el.maxCmSelect.addEventListener("change", async () => {
     state.maxCm = Number(el.maxCmSelect.value);
-    saveState();
+    await saveState();
     renderStage();
   });
 }
@@ -92,7 +106,7 @@ async function handleAddCharacter() {
 
     state.characters.push(character);
     sortCharacters(insertMode);
-    saveState();
+    await saveState();
     renderAll();
     resetForm();
   } catch (error) {
@@ -280,7 +294,7 @@ function createEditPanel(character) {
     <input type="text" value="${escapeAttribute(character.name)}" />
   `;
   const nameInput = nameField.querySelector("input");
-  nameInput.addEventListener("change", () => {
+  nameInput.addEventListener("change", async () => {
     updateCharacter(character.id, { name: nameInput.value.trim() || character.name });
   });
 
@@ -291,7 +305,7 @@ function createEditPanel(character) {
     <input type="number" min="1" max="300" value="${escapeAttribute(character.height)}" />
   `;
   const heightInput = heightField.querySelector("input");
-  heightInput.addEventListener("change", () => {
+  heightInput.addEventListener("change", async () => {
     const value = Number(heightInput.value);
     if (!value || value <= 0) {
       heightInput.value = String(character.height);
@@ -307,7 +321,7 @@ function createEditPanel(character) {
     <input type="color" value="${escapeAttribute(character.labelColor || "#f2df9b")}" />
   `;
   const colorInput = colorField.querySelector("input");
-  colorInput.addEventListener("input", () => {
+  colorInput.addEventListener("input", async () => {
     updateCharacter(character.id, { labelColor: colorInput.value });
   });
 
@@ -332,7 +346,7 @@ function createEditPanel(character) {
 
     try {
       const prepared = await prepareImageFile(file);
-      updateCharacter(character.id, {
+      await updateCharacter(character.id, {
         imageData: prepared.dataUrl,
         imageMeta: {
           width: prepared.width,
@@ -353,8 +367,8 @@ function createEditPanel(character) {
   const removeImageBtn = document.createElement("button");
   removeImageBtn.className = "mini-btn";
   removeImageBtn.textContent = "画像を削除";
-  removeImageBtn.addEventListener("click", () => {
-    updateCharacter(character.id, {
+  removeImageBtn.addEventListener("click", async () => {
+    await updateCharacter(character.id, {
       imageData: "",
       imageMeta: { width: 0, height: 0 }
     });
@@ -373,9 +387,9 @@ function createEditPanel(character) {
     1.3,
     0.01,
     Number(scaleValue),
-    (valueEl, input) => {
+    async (valueEl, input) => {
       valueEl.textContent = Number(input.value).toFixed(2);
-      updateCharacterCorrection(character.id, { scale: Number(input.value) });
+      await updateCharacterCorrection(character.id, { scale: Number(input.value) });
     }
   );
 
@@ -385,9 +399,9 @@ function createEditPanel(character) {
     120,
     1,
     offsetYValue,
-    (valueEl, input) => {
+    async (valueEl, input) => {
       valueEl.textContent = `${input.value}px`;
-      updateCharacterCorrection(character.id, { offsetY: Number(input.value) });
+      await updateCharacterCorrection(character.id, { offsetY: Number(input.value) });
     },
     "px"
   );
@@ -398,9 +412,9 @@ function createEditPanel(character) {
     80,
     1,
     offsetXValue,
-    (valueEl, input) => {
+    async (valueEl, input) => {
       valueEl.textContent = `${input.value}px`;
-      updateCharacterCorrection(character.id, { offsetX: Number(input.value) });
+      await updateCharacterCorrection(character.id, { offsetX: Number(input.value) });
     },
     "px"
   );
@@ -408,8 +422,8 @@ function createEditPanel(character) {
   const resetBtn = document.createElement("button");
   resetBtn.className = "mini-btn";
   resetBtn.textContent = "補正をリセット";
-  resetBtn.addEventListener("click", () => {
-    updateCharacterCorrection(character.id, {
+  resetBtn.addEventListener("click", async () => {
+    await updateCharacterCorrection(character.id, {
       scale: 1,
       offsetY: 0,
       offsetX: 0
@@ -419,7 +433,7 @@ function createEditPanel(character) {
 
   const note = document.createElement("div");
   note.className = "note";
-  note.textContent = "画像なしでも登録できます。スケールは見た目補正なので、基本は自動トリミングと足元補正を優先するのがおすすめです。";
+  note.textContent = "画像は自動で軽量化して保存されます。スケールは見た目補正なので、基本は自動トリミングと足元補正を優先するのがおすすめです。";
 
   editGrid.append(nameField, heightField, colorField);
   panel.append(editGrid, imageRow, scaleRow, offsetYRow, offsetXRow, resetBtn, note);
@@ -437,8 +451,6 @@ function createRangeRow(labelText, min, max, step, value, onInput, unit = "") {
   const valueEl = document.createElement("span");
   valueEl.textContent = unit ? `${value}${unit}` : String(value);
 
-  label.append(title, valueEl);
-
   const input = document.createElement("input");
   input.type = "range";
   input.min = String(min);
@@ -448,20 +460,21 @@ function createRangeRow(labelText, min, max, step, value, onInput, unit = "") {
 
   input.addEventListener("input", () => onInput(valueEl, input));
 
+  label.append(title, valueEl);
   row.append(label, input);
   return row;
 }
 
-function updateCharacter(id, patch) {
+async function updateCharacter(id, patch) {
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
 
   Object.assign(character, patch);
-  saveState();
+  await saveState();
   renderAll();
 }
 
-function updateCharacterCorrection(id, patch) {
+async function updateCharacterCorrection(id, patch) {
   const character = state.characters.find((item) => item.id === id);
   if (!character) return;
 
@@ -472,11 +485,11 @@ function updateCharacterCorrection(id, patch) {
     ...patch
   };
 
-  saveState();
+  await saveState();
   renderStage();
 }
 
-function moveCharacter(id, direction) {
+async function moveCharacter(id, direction) {
   const index = state.characters.findIndex((item) => item.id === id);
   if (index < 0) return;
 
@@ -487,20 +500,20 @@ function moveCharacter(id, direction) {
   state.characters[index] = state.characters[targetIndex];
   state.characters[targetIndex] = temp;
 
-  saveState();
+  await saveState();
   renderAll();
 }
 
-function removeCharacter(id) {
+async function removeCharacter(id) {
   state.characters = state.characters.filter((item) => item.id !== id);
-  saveState();
+  await saveState();
   renderAll();
 }
 
-function clearAll() {
+async function clearAll() {
   if (!confirm("登録キャラをすべて削除します。")) return;
   state.characters = [];
-  saveState();
+  await saveState();
   renderAll();
 }
 
@@ -574,7 +587,7 @@ async function saveStageAsImage() {
 function exportJson() {
   const dataStr = JSON.stringify(
     {
-      version: 4,
+      version: 5,
       maxCm: state.maxCm,
       characters: state.characters
     },
@@ -607,7 +620,7 @@ async function importJson(event) {
 
     state.characters = parsed.characters.map(normalizeCharacter);
     state.maxCm = Number(parsed.maxCm) || 200;
-    saveState();
+    await saveState();
     renderAll();
   } catch (error) {
     console.error(error);
@@ -634,38 +647,82 @@ function normalizeCharacter(character) {
   };
 }
 
-function saveState() {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({
-      version: 4,
-      maxCm: state.maxCm,
-      characters: state.characters
-    })
-  );
+function getDb() {
+  if (dbPromise) return dbPromise;
+
+  dbPromise = new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+
+  return dbPromise;
 }
 
-function loadState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return;
+async function saveState() {
+  const db = await getDb();
 
-  try {
-    const parsed = JSON.parse(raw);
-    state.maxCm = Number(parsed.maxCm) || 200;
-    state.characters = Array.isArray(parsed.characters)
-      ? parsed.characters.map(normalizeCharacter)
-      : [];
-  } catch (error) {
-    console.error("保存データの読み込みに失敗:", error);
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    const store = tx.objectStore(STORE_NAME);
+
+    store.put(
+      {
+        version: 5,
+        maxCm: state.maxCm,
+        characters: state.characters
+      },
+      APP_STATE_KEY
+    );
+
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error || new Error("IndexedDBへの保存に失敗しました。"));
+    tx.onabort = () => reject(tx.error || new Error("IndexedDBへの保存が中断されました。"));
+  });
+}
+
+async function loadState() {
+  const db = await getDb();
+
+  const saved = await new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const store = tx.objectStore(STORE_NAME);
+    const request = store.get(APP_STATE_KEY);
+
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject(request.error);
+  });
+
+  if (!saved) {
     state.characters = [];
     state.maxCm = 200;
+    return;
   }
+
+  state.maxCm = Number(saved.maxCm) || 200;
+  state.characters = Array.isArray(saved.characters)
+    ? saved.characters.map(normalizeCharacter)
+    : [];
 }
 
 async function prepareImageFile(file) {
   const originalImageData = await fileToDataURL(file);
   const trimmed = await trimTransparentImage(originalImageData);
-  return trimmed;
+  const resized = await resizeImageDataUrl(trimmed.dataUrl, IMAGE_MAX_DIMENSION, IMAGE_OUTPUT_QUALITY);
+
+  return {
+    dataUrl: resized.dataUrl,
+    width: resized.width,
+    height: resized.height
+  };
 }
 
 function fileToDataURL(file) {
@@ -742,6 +799,36 @@ async function trimTransparentImage(dataUrl) {
     dataUrl: trimmedCanvas.toDataURL("image/png"),
     width: trimmedWidth,
     height: trimmedHeight
+  };
+}
+
+async function resizeImageDataUrl(dataUrl, maxDimension = 1200, quality = 0.92) {
+  const img = await loadImage(dataUrl);
+
+  let { width, height } = img;
+  const longestSide = Math.max(width, height);
+
+  if (longestSide <= maxDimension) {
+    return { dataUrl, width, height };
+  }
+
+  const scale = maxDimension / longestSide;
+  width = Math.round(width * scale);
+  height = Math.round(height * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(img, 0, 0, width, height);
+
+  const resizedDataUrl = canvas.toDataURL("image/webp", quality);
+
+  return {
+    dataUrl: resizedDataUrl,
+    width,
+    height
   };
 }
 
