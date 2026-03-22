@@ -10,12 +10,14 @@ const IMAGE_OUTPUT_QUALITY = 0.92;
 
 const state = {
   characters: [],
-  maxCm: 200
+  maxCm: 200,
+  showLabel: true
 };
 
 const el = {
   nameInput: document.getElementById("nameInput"),
   heightInput: document.getElementById("heightInput"),
+  ageInput: document.getElementById("ageInput"),
   labelColorInput: document.getElementById("labelColorInput"),
   imageInput: document.getElementById("imageInput"),
   insertModeInput: document.getElementById("insertModeInput"),
@@ -27,6 +29,7 @@ const el = {
   characterList: document.getElementById("characterList"),
   compareStage: document.getElementById("compareStage"),
   maxCmSelect: document.getElementById("maxCmSelect"),
+  labelToggle: document.getElementById("labelToggle"),
   countBadge: document.getElementById("countBadge")
 };
 
@@ -65,11 +68,20 @@ function bindEvents() {
     await saveState();
     renderStage();
   });
+
+  if (el.labelToggle) {
+    el.labelToggle.addEventListener("change", async () => {
+      state.showLabel = el.labelToggle.value === "show";
+      await saveState();
+      renderAll();
+    });
+  }
 }
 
 async function handleAddCharacter() {
   const name = el.nameInput.value.trim();
   const height = Number(el.heightInput.value);
+  const age = el.ageInput.value.trim();
   const labelColor = el.labelColorInput.value;
   const file = el.imageInput.files?.[0] || null;
   const insertMode = el.insertModeInput.value;
@@ -101,16 +113,17 @@ async function handleAddCharacter() {
       id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
       name,
       height,
+      age,
       labelColor,
       imageData,
       imageMeta,
+      visible: true,
       correction: {
         scale: 1,
         offsetY: 0,
         offsetX: 0
       },
       slotX: getDefaultSlotX(state.characters.length),
-      showLabel: true,
       createdAt: Date.now()
     };
 
@@ -163,11 +176,15 @@ function normalizeSlotPositions(force = false) {
 function resetForm() {
   el.nameInput.value = "";
   el.heightInput.value = "160";
+  if (el.ageInput) el.ageInput.value = "";
   el.imageInput.value = "";
 }
 
 function renderAll() {
   el.maxCmSelect.value = String(state.maxCm);
+  if (el.labelToggle) {
+    el.labelToggle.value = state.showLabel ? "show" : "hide";
+  }
   renderStage();
   renderCharacterList();
   renderCount();
@@ -177,8 +194,14 @@ function renderCount() {
   el.countBadge.textContent = `${state.characters.length}人`;
 }
 
+function getVisibleCharacters() {
+  return state.characters.filter((character) => character.visible !== false);
+}
+
 function getStageContentWidth() {
-  const maxSlotX = state.characters.reduce((max, character) => {
+  const visibleCharacters = getVisibleCharacters();
+
+  const maxSlotX = visibleCharacters.reduce((max, character) => {
     const slotX = Number(character.slotX || 0);
     return Math.max(max, slotX);
   }, 0);
@@ -187,13 +210,13 @@ function getStageContentWidth() {
 }
 
 function getStageTopPadding() {
-  const anyLabelVisible = state.characters.some((character) => character.showLabel !== false);
-  return anyLabelVisible ? 44 : 8;
+  return state.showLabel ? 58 : 8;
 }
 
 function renderStage() {
   normalizeSlotPositions();
 
+  const visibleCharacters = getVisibleCharacters();
   const stageHeight = state.maxCm * PX_PER_CM;
   const topPadding = getStageTopPadding();
   const totalStageHeight = stageHeight + topPadding;
@@ -225,14 +248,14 @@ function renderStage() {
   strip.style.bottom = "0";
   el.compareStage.appendChild(strip);
 
-  state.characters.forEach((character) => {
+  visibleCharacters.forEach((character) => {
     strip.appendChild(createCharacterElement(character));
   });
 
-  if (state.characters.length === 0) {
+  if (visibleCharacters.length === 0) {
     const emptyHint = document.createElement("div");
     emptyHint.className = "stage-empty-hint";
-    emptyHint.textContent = "キャラを追加するとここに表示されます";
+    emptyHint.textContent = "表示中のキャラがいません";
     el.compareStage.appendChild(emptyHint);
   }
 }
@@ -309,15 +332,18 @@ function createCharacterElement(character) {
   label.style.setProperty("--label-text", mainTextColor);
   label.style.setProperty("--label-subtext", subTextColor);
 
+  const ageText = character.age ? `${escapeHtml(character.age)}` : "―";
+
   label.innerHTML = `
     <span class="cm">${escapeHtml(character.height)}cm</span>
     <span class="name">${escapeHtml(character.name)}</span>
+    <span class="age">${ageText}</span>
   `;
 
   const scale = Number(character.correction.scale ?? 1);
   const visualHeight = character.height * PX_PER_CM * scale;
 
-  if (character.showLabel !== false) {
+  if (state.showLabel) {
     inner.appendChild(label);
   }
 
@@ -330,9 +356,19 @@ function createCharacterElement(character) {
     inner.appendChild(img);
   } else {
     const silhouette = document.createElement("div");
-    silhouette.className = "placeholder-silhouette";
-    silhouette.style.height = `${Math.max(52, visualHeight)}px`;
-    silhouette.style.setProperty("--silhouette-color", character.labelColor);
+    silhouette.className = "placeholder-human";
+    silhouette.style.height = `${Math.max(56, visualHeight)}px`;
+    silhouette.style.setProperty("--human-color", character.labelColor);
+
+    silhouette.innerHTML = `
+      <div class="placeholder-head"></div>
+      <div class="placeholder-body"></div>
+      <div class="placeholder-arm left"></div>
+      <div class="placeholder-arm right"></div>
+      <div class="placeholder-leg left"></div>
+      <div class="placeholder-leg right"></div>
+    `;
+
     inner.appendChild(silhouette);
   }
 
@@ -361,9 +397,12 @@ function renderCharacterList() {
 
     const titleArea = document.createElement("div");
     const hasImageText = character.imageData ? "画像あり" : "画像なし";
+    const visibleText = character.visible === false ? "非表示中" : "表示中";
+    const ageText = character.age ? `${escapeHtml(character.age)}` : "年齢未設定";
+
     titleArea.innerHTML = `
       <div class="char-card-title">${escapeHtml(character.name)}</div>
-      <div class="char-card-sub">${escapeHtml(character.height)}cm / ${hasImageText}</div>
+      <div class="char-card-sub">${escapeHtml(character.height)}cm / ${ageText} / ${hasImageText} / ${visibleText}</div>
     `;
 
     const actions = document.createElement("div");
@@ -435,6 +474,17 @@ function createEditPanel(character) {
     await updateCharacter(character.id, { height: value });
   });
 
+  const ageField = document.createElement("label");
+  ageField.className = "field";
+  ageField.innerHTML = `
+    <span>年齢</span>
+    <input type="text" value="${escapeAttribute(character.age || "")}" />
+  `;
+  const ageInput = ageField.querySelector("input");
+  ageInput.addEventListener("change", async () => {
+    await updateCharacter(character.id, { age: ageInput.value.trim() });
+  });
+
   const colorField = document.createElement("label");
   colorField.className = "field";
   colorField.innerHTML = `
@@ -446,20 +496,20 @@ function createEditPanel(character) {
     await updateCharacter(character.id, { labelColor: colorInput.value });
   });
 
-  const labelVisibleField = document.createElement("label");
-  labelVisibleField.className = "field";
-  labelVisibleField.innerHTML = `
-    <span>頭上ラベル表示</span>
+  const visibleField = document.createElement("label");
+  visibleField.className = "field";
+  visibleField.innerHTML = `
+    <span>キャラ表示</span>
     <select>
       <option value="show">表示</option>
       <option value="hide">非表示</option>
     </select>
   `;
-  const labelVisibleInput = labelVisibleField.querySelector("select");
-  labelVisibleInput.value = character.showLabel === false ? "hide" : "show";
-  labelVisibleInput.addEventListener("change", async () => {
+  const visibleInput = visibleField.querySelector("select");
+  visibleInput.value = character.visible === false ? "hide" : "show";
+  visibleInput.addEventListener("change", async () => {
     await updateCharacter(character.id, {
-      showLabel: labelVisibleInput.value === "show"
+      visible: visibleInput.value === "show"
     });
   });
 
@@ -584,9 +634,9 @@ function createEditPanel(character) {
 
   const note = document.createElement("div");
   note.className = "note";
-  note.textContent = "ステージ上ではキャラ全体を左右ドラッグして距離を調整できます。ラベル表示はキャラごとに切り替えできます。";
+  note.textContent = "キャラ表示を非表示にすると削除せず一時的に画面から外せます。";
 
-  editGrid.append(nameField, heightField, colorField, labelVisibleField);
+  editGrid.append(nameField, heightField, ageField, colorField, visibleField);
   panel.append(editGrid, imageRow, scaleRow, offsetYRow, offsetXRow, slotXRow, resetBtn, note);
   return panel;
 }
@@ -669,8 +719,8 @@ async function clearAll() {
 }
 
 async function saveStageAsImage() {
-  if (!state.characters.length) {
-    alert("保存するキャラがいません。");
+  if (!getVisibleCharacters().length) {
+    alert("保存する表示キャラがいません。");
     return;
   }
 
@@ -689,7 +739,7 @@ async function saveStageAsImage() {
 
     const sub = document.createElement("div");
     sub.className = "save-capture-sub";
-    sub.textContent = `Max ${state.maxCm}cm / ${state.characters.length} characters`;
+    sub.textContent = `Max ${state.maxCm}cm / ${getVisibleCharacters().length} characters`;
 
     const stageClone = el.compareStage.cloneNode(true);
     stageClone.style.minWidth = `${el.compareStage.scrollWidth}px`;
@@ -738,8 +788,9 @@ async function saveStageAsImage() {
 function exportJson() {
   const dataStr = JSON.stringify(
     {
-      version: 8,
+      version: 9,
       maxCm: state.maxCm,
+      showLabel: state.showLabel,
       characters: state.characters
     },
     null,
@@ -772,6 +823,7 @@ async function importJson(event) {
     state.characters = parsed.characters.map(normalizeCharacter);
     normalizeSlotPositions();
     state.maxCm = Number(parsed.maxCm) || 200;
+    state.showLabel = parsed.showLabel !== false;
     await saveState();
     renderAll();
   } catch (error) {
@@ -787,16 +839,17 @@ function normalizeCharacter(character) {
     id: character.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random())),
     name: character.name || "名称未設定",
     height: Number(character.height) || 160,
+    age: character.age || "",
     labelColor: character.labelColor || "#f2df9b",
     imageData: character.imageData || "",
     imageMeta: character.imageMeta || { width: 0, height: 0 },
+    visible: character.visible !== false,
     correction: {
       scale: Number(character.correction?.scale ?? 1),
       offsetY: Number(character.correction?.offsetY ?? 0),
       offsetX: Number(character.correction?.offsetX ?? 0)
     },
     slotX: Number(character.slotX ?? 0),
-    showLabel: character.showLabel !== false,
     createdAt: character.createdAt || Date.now()
   };
 }
@@ -830,8 +883,9 @@ async function saveState() {
 
     store.put(
       {
-        version: 8,
+        version: 9,
         maxCm: state.maxCm,
+        showLabel: state.showLabel,
         characters: state.characters
       },
       APP_STATE_KEY
@@ -858,10 +912,12 @@ async function loadState() {
   if (!saved) {
     state.characters = [];
     state.maxCm = 200;
+    state.showLabel = true;
     return;
   }
 
   state.maxCm = Number(saved.maxCm) || 200;
+  state.showLabel = saved.showLabel !== false;
   state.characters = Array.isArray(saved.characters)
     ? saved.characters.map(normalizeCharacter)
     : [];
