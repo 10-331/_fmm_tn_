@@ -96,21 +96,7 @@ async function handleAddCharacter() {
       };
     }
 
-    const character = {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
-      name,
-      height,
-      labelColor,
-      imageData,
-      imageMeta,
-      correction: {
-        scale: 1,
-        offsetY: 0,
-        offsetX: 0
-      },
-      slotX: 0,
-      createdAt: Date.now()
-    };
+const character = {
 
     state.characters.push(character);
     sortCharacters(insertMode);
@@ -132,11 +118,32 @@ function sortCharacters(mode) {
   }
 }
 
-function normalizeSlotPositions() {
+function getDefaultSlotX(index = state.characters.length) {
   const spacing = BASE_CHARACTER_WIDTH + 18;
+  return index * spacing;
+}
+
+function normalizeSlotPositions(force = false) {
+  const spacing = BASE_CHARACTER_WIDTH + 18;
+
+  const allZeroLike =
+    state.characters.length > 1 &&
+    state.characters.every((character) => {
+      const x = Number(character.slotX ?? 0);
+      return !Number.isFinite(x) || x === 0;
+    });
+
   state.characters.forEach((character, index) => {
-    if (typeof character.slotX !== "number" || Number.isNaN(character.slotX)) {
+    const currentX = Number(character.slotX);
+
+    if (
+      force ||
+      !Number.isFinite(currentX) ||
+      (allZeroLike && index > 0)
+    ) {
       character.slotX = index * spacing;
+    } else if (index === 0 && (!Number.isFinite(currentX) || force)) {
+      character.slotX = 0;
     }
   });
 }
@@ -801,10 +808,10 @@ async function loadState() {
   }
 
   state.maxCm = Number(saved.maxCm) || 200;
-  state.characters = Array.isArray(saved.characters)
-    ? saved.characters.map(normalizeCharacter)
-    : [];
-  normalizeSlotPositions();
+state.characters = Array.isArray(saved.characters)
+  ? saved.characters.map(normalizeCharacter)
+  : [];
+normalizeSlotPositions();
 }
 
 async function prepareImageFile(file) {
