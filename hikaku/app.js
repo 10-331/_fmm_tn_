@@ -96,21 +96,23 @@ async function handleAddCharacter() {
       };
     }
 
-const character = {
-  id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
-  name,
-  height,
-  labelColor,
-  imageData,
-  imageMeta,
-  correction: {
-    scale: 1,
-    offsetY: 0,
-    offsetX: 0
-  },
-  slotX: getDefaultSlotX(state.characters.length),
-  createdAt: Date.now()
-};
+    const character = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+      name,
+      height,
+      labelColor,
+      imageData,
+      imageMeta,
+      correction: {
+        scale: 1,
+        offsetY: 0,
+        offsetX: 0
+      },
+      slotX: getDefaultSlotX(state.characters.length),
+      createdAt: Date.now()
+    };
+
+    state.characters.push(character);
     sortCharacters(insertMode);
     normalizeSlotPositions();
     await saveState();
@@ -148,11 +150,7 @@ function normalizeSlotPositions(force = false) {
   state.characters.forEach((character, index) => {
     const currentX = Number(character.slotX);
 
-    if (
-      force ||
-      !Number.isFinite(currentX) ||
-      (allZeroLike && index > 0)
-    ) {
+    if (force || !Number.isFinite(currentX) || (allZeroLike && index > 0)) {
       character.slotX = index * spacing;
     } else if (index === 0 && (!Number.isFinite(currentX) || force)) {
       character.slotX = 0;
@@ -222,6 +220,13 @@ function renderStage() {
   state.characters.forEach((character) => {
     strip.appendChild(createCharacterElement(character));
   });
+
+  if (state.characters.length === 0) {
+    const emptyHint = document.createElement("div");
+    emptyHint.className = "stage-empty-hint";
+    emptyHint.textContent = "キャラを追加するとここに表示されます";
+    el.compareStage.appendChild(emptyHint);
+  }
 }
 
 function createCharacterElement(character) {
@@ -597,12 +602,6 @@ async function updateCharacterCorrection(id, patch) {
 
   await saveState();
   renderStage();
-  if (state.characters.length === 0) {
-  const emptyHint = document.createElement("div");
-  emptyHint.className = "stage-empty-hint";
-  emptyHint.textContent = "キャラを追加するとここに表示されます";
-  el.compareStage.appendChild(emptyHint);
-}
 }
 
 async function moveCharacter(id, direction) {
@@ -826,10 +825,10 @@ async function loadState() {
   }
 
   state.maxCm = Number(saved.maxCm) || 200;
-state.characters = Array.isArray(saved.characters)
-  ? saved.characters.map(normalizeCharacter)
-  : [];
-normalizeSlotPositions();
+  state.characters = Array.isArray(saved.characters)
+    ? saved.characters.map(normalizeCharacter)
+    : [];
+  normalizeSlotPositions();
 }
 
 async function prepareImageFile(file) {
