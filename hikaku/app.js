@@ -72,7 +72,7 @@ function bindEvents() {
     el.labelToggle.addEventListener("change", async () => {
       state.showLabel = el.labelToggle.value === "show";
       await saveState();
-      renderStage();
+      renderAll();
     });
   }
 }
@@ -198,6 +198,10 @@ function getStageContentWidth() {
   return Math.max(900, 200 + maxSlotX + BASE_CHARACTER_WIDTH + 80);
 }
 
+function getStageTopPadding() {
+  return state.showLabel ? 44 : 8;
+}
+
 function renderStage() {
   normalizeSlotPositions();
 
@@ -206,7 +210,7 @@ function renderStage() {
   const totalStageHeight = stageHeight + topPadding;
   const stageWidth = getStageContentWidth();
 
-  // 一番下を 0cm の基準にする
+  // 一番下を 0cm にする
   const baselineY = totalStageHeight - 1;
 
   el.compareStage.innerHTML = "";
@@ -302,7 +306,13 @@ function createCharacterElement(character) {
   const visual = document.createElement("div");
   visual.className = "character-visual";
   visual.style.setProperty("--offset-x", `${character.correction.offsetX || 0}px`);
-  visual.style.bottom = `${character.correction.offsetY || 0}px`;
+  visual.style.bottom = "0px";
+
+  const inner = document.createElement("div");
+  inner.style.transform = `translateY(${character.correction.offsetY || 0}px)`;
+  inner.style.display = "flex";
+  inner.style.flexDirection = "column";
+  inner.style.alignItems = "center";
 
   const label = document.createElement("div");
   label.className = "character-label";
@@ -321,7 +331,7 @@ function createCharacterElement(character) {
   const visualHeight = character.height * PX_PER_CM * scale;
 
   if (state.showLabel) {
-    visual.appendChild(label);
+    inner.appendChild(label);
   }
 
   if (character.imageData) {
@@ -329,14 +339,16 @@ function createCharacterElement(character) {
     img.src = character.imageData;
     img.alt = character.name;
     img.style.height = `${visualHeight}px`;
-    visual.appendChild(img);
+    img.style.display = "block";
+    inner.appendChild(img);
   } else {
     const placeholder = document.createElement("div");
     placeholder.className = "placeholder-figure";
     placeholder.style.height = `${Math.max(40, visualHeight - 22)}px`;
-    visual.appendChild(placeholder);
+    inner.appendChild(placeholder);
   }
 
+  visual.appendChild(inner);
   wrapper.appendChild(visual);
   return wrapper;
 }
