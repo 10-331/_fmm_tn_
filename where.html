@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>入口</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  color: #eee;
+  background: radial-gradient(circle at center, #1a1c22 0%, #0c0d11 100%);
+}
+
+/* 全体中央配置 */
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+/* 本文 */
+.text {
+  max-width: 420px;
+  font-size: 16px;
+  line-height: 2;
+  margin-bottom: 48px;
+  opacity: 0;
+  animation: fadeIn 2s ease forwards;
+}
+
+/* 選択肢 */
+.choices {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.choice {
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 10px;
+  text-decoration: none;
+  color: #eee;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.choice small {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
+.choice:hover {
+  background: rgba(255,255,255,0.08);
+  transform: translateY(-2px);
+}
+
+/* フェード */
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="text">
+    気づくと、知らない場所に立っていた。<br><br>
+    風はないのに、どこかで何かが揺れている。<br><br>
+    「……ここ、どこ？」<br><br>
+    視線の先に、いくつかの違和感がある。
+  </div>
+
+  <div class="choices">
+    
+    <a href="story.html" class="choice">
+      鈴の音がする方へ
+      <small>かすかに聞こえる音を追う（物語）</small>
+    </a>
+
+    <a href="world.html" class="choice">
+      古びた看板を読む
+      <small>この場所について知る（世界観）</small>
+    </a>
+
+    <a href="gallery.html" class="choice">
+      落ちている紙を見る
+      <small>誰かが残したもの（イラスト）</small>
+    </a>
+
+  </div>
+
+</div>
+
+</body>
+</html>
