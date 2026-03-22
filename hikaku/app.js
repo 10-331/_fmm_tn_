@@ -1,6 +1,6 @@
-const STORAGE_KEY = "height-comparison-tool-v2";
+const STORAGE_KEY = "height-comparison-tool-v4";
 const PX_PER_CM = 4;
-const BASE_CHARACTER_WIDTH = 140;
+const BASE_CHARACTER_WIDTH = 136;
 
 const state = {
   characters: [],
@@ -49,7 +49,7 @@ async function handleAddCharacter() {
   const name = el.nameInput.value.trim();
   const height = Number(el.heightInput.value);
   const labelColor = el.labelColorInput.value;
-  const file = el.imageInput.files?.[0];
+  const file = el.imageInput.files?.[0] || null;
   const insertMode = el.insertModeInput.value;
 
   if (!name) {
@@ -62,25 +62,26 @@ async function handleAddCharacter() {
     return;
   }
 
-  if (!file) {
-    alert("画像を選択してください。");
-    return;
-  }
+  let imageData = "";
+  let imageMeta = { width: 0, height: 0 };
 
   try {
-    const originalImageData = await fileToDataURL(file);
-    const trimmed = await trimTransparentImage(originalImageData);
+    if (file) {
+      const prepared = await prepareImageFile(file);
+      imageData = prepared.dataUrl;
+      imageMeta = {
+        width: prepared.width,
+        height: prepared.height
+      };
+    }
 
     const character = {
       id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
       name,
       height,
       labelColor,
-      imageData: trimmed.dataUrl,
-      imageMeta: {
-        width: trimmed.width,
-        height: trimmed.height
-      },
+      imageData,
+      imageMeta,
       correction: {
         scale: 1,
         offsetY: 0,
@@ -95,8 +96,8 @@ async function handleAddCharacter() {
     renderAll();
     resetForm();
   } catch (error) {
-    console.error(error);
-    alert("画像の読み込みに失敗しました。PNG推奨です。");
+    console.error("画像処理エラー:", error);
+    alert(`画像の読み込みに失敗しました: ${error?.message || error}`);
   }
 }
 
@@ -127,10 +128,10 @@ function renderCount() {
 
 function renderStage() {
   const stageHeight = state.maxCm * PX_PER_CM;
-  const baseWidth = Math.max(1000, 120 + state.characters.length * (BASE_CHARACTER_WIDTH + 20));
+  const baseWidth = Math.max(900, 120 + state.characters.length * (BASE_CHARACTER_WIDTH + 18));
 
   el.compareStage.innerHTML = "";
-  el.compareStage.style.height = `${stageHeight + 40}px`;
+  el.compareStage.style.height = `${stageHeight + 44}px`;
   el.compareStage.style.minWidth = `${baseWidth}px`;
 
   for (let cm = 0; cm <= state.maxCm; cm += 10) {
@@ -183,16 +184,23 @@ function createCharacterElement(character) {
     <span class="name">${escapeHtml(character.name)}</span>
   `;
 
-  const img = document.createElement("img");
-  img.src = character.imageData;
-  img.alt = character.name;
-
   const scale = Number(character.correction.scale ?? 1);
   const visualHeight = character.height * PX_PER_CM * scale;
-  img.style.height = `${visualHeight}px`;
 
   visual.appendChild(label);
-  visual.appendChild(img);
+
+  if (character.imageData) {
+    const img = document.createElement("img");
+    img.src = character.imageData;
+    img.alt = character.name;
+    img.style.height = `${visualHeight}px`;
+    visual.appendChild(img);
+  } else {
+    const placeholder = document.createElement("div");
+    placeholder.className = "placeholder-figure";
+    placeholder.style.height = `${Math.max(40, visualHeight - 22)}px`;
+    visual.appendChild(placeholder);
+  }
 
   wrapper.appendChild(visual);
   return wrapper;
@@ -217,9 +225,10 @@ function renderCharacterList() {
     head.className = "char-card-head";
 
     const titleArea = document.createElement("div");
+    const hasImageText = character.imageData ? "画像あり" : "画像なし";
     titleArea.innerHTML = `
       <div class="char-card-title">${escapeHtml(character.name)}</div>
-      <div class="char-card-sub">${escapeHtml(character.height)}cm</div>
+      <div class="char-card-sub">${escapeHtml(character.height)}cm / ${hasImageText}</div>
     `;
 
     const actions = document.createElement("div");
@@ -260,6 +269,99 @@ function renderCharacterList() {
 function createEditPanel(character) {
   const panel = document.createElement("div");
   panel.className = "edit-panel";
+
+  const editGrid = document.createElement("div");
+  editGrid.className = "edit-grid";
+
+  const nameField = document.createElement("label");
+  nameField.className = "field";
+  nameField.innerHTML = `
+    <span>名前</span>
+    <input type="text" value="${escapeAttribute(character.name)}" />
+  `;
+  const nameInput = nameField.querySelector("input");
+  nameInput.addEventListener("change", () => {
+    updateCharacter(character.id, { name: nameInput.value.trim() || character.name });
+  });
+
+  const heightField = document.createElement("label");
+  heightField.className = "field";
+  heightField.innerHTML = `
+    <span>身長(cm)</span>
+    <input type="number" min="1" max="300" value="${escapeAttribute(character.height)}" />
+  `;
+  const heightInput = heightField.querySelector("input");
+  heightInput.addEventListener("change", () => {
+    const value = Number(heightInput.value);
+    if (!value || value <= 0) {
+      heightInput.value = String(character.height);
+      return;
+    }
+    updateCharacter(character.id, { height: value });
+  });
+
+  const colorField = document.createElement("label");
+  colorField.className = "field";
+  colorField.innerHTML = `
+    <span>ラベル色</span>
+    <input type="color" value="${escapeAttribute(character.labelColor || "#f2df9b")}" />
+  `;
+  const colorInput = colorField.querySelector("input");
+  colorInput.addEventListener("input", () => {
+    updateCharacter(character.id, { labelColor: colorInput.value });
+  });
+
+  const imageRow = document.createElement("div");
+  imageRow.className = "edit-image-row";
+
+  const imageLabel = document.createElement("label");
+  imageLabel.className = "field";
+  imageLabel.innerHTML = `
+    <span>画像を追加・変更</span>
+    <input type="file" accept="image/*" />
+  `;
+  const imageInput = imageLabel.querySelector("input");
+
+  const imageStatus = document.createElement("div");
+  imageStatus.className = "image-status";
+  imageStatus.textContent = character.imageData ? "現在: 画像あり" : "現在: 画像なし";
+
+  imageInput.addEventListener("change", async () => {
+    const file = imageInput.files?.[0];
+    if (!file) return;
+
+    try {
+      const prepared = await prepareImageFile(file);
+      updateCharacter(character.id, {
+        imageData: prepared.dataUrl,
+        imageMeta: {
+          width: prepared.width,
+          height: prepared.height
+        }
+      });
+    } catch (error) {
+      console.error("画像差し替えエラー:", error);
+      alert(`画像の読み込みに失敗しました: ${error?.message || error}`);
+    } finally {
+      imageInput.value = "";
+    }
+  });
+
+  const imageActions = document.createElement("div");
+  imageActions.className = "row-actions";
+
+  const removeImageBtn = document.createElement("button");
+  removeImageBtn.className = "mini-btn";
+  removeImageBtn.textContent = "画像を削除";
+  removeImageBtn.addEventListener("click", () => {
+    updateCharacter(character.id, {
+      imageData: "",
+      imageMeta: { width: 0, height: 0 }
+    });
+  });
+
+  imageActions.append(removeImageBtn);
+  imageRow.append(imageLabel, imageStatus, imageActions);
 
   const scaleValue = Number(character.correction.scale ?? 1).toFixed(2);
   const offsetYValue = Number(character.correction.offsetY ?? 0);
@@ -317,9 +419,10 @@ function createEditPanel(character) {
 
   const note = document.createElement("div");
   note.className = "note";
-  note.textContent = "スケールは見た目補正です。基本は自動トリミングと足元補正を優先し、必要なときだけ少し触るのがおすすめです。";
+  note.textContent = "画像なしでも登録できます。スケールは見た目補正なので、基本は自動トリミングと足元補正を優先するのがおすすめです。";
 
-  panel.append(scaleRow, offsetYRow, offsetXRow, resetBtn, note);
+  editGrid.append(nameField, heightField, colorField);
+  panel.append(editGrid, imageRow, scaleRow, offsetYRow, offsetXRow, resetBtn, note);
   return panel;
 }
 
@@ -347,6 +450,15 @@ function createRangeRow(labelText, min, max, step, value, onInput, unit = "") {
 
   row.append(label, input);
   return row;
+}
+
+function updateCharacter(id, patch) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+
+  Object.assign(character, patch);
+  saveState();
+  renderAll();
 }
 
 function updateCharacterCorrection(id, patch) {
@@ -392,10 +504,77 @@ function clearAll() {
   renderAll();
 }
 
+async function saveStageAsImage() {
+  if (!state.characters.length) {
+    alert("保存するキャラがいません。");
+    return;
+  }
+
+  if (typeof html2canvas === "undefined") {
+    alert("画像保存ライブラリの読み込みに失敗しました。");
+    return;
+  }
+
+  try {
+    const shell = document.createElement("div");
+    shell.className = "save-capture-shell";
+
+    const title = document.createElement("div");
+    title.className = "save-capture-title";
+    title.textContent = "Height Comparison";
+
+    const sub = document.createElement("div");
+    sub.className = "save-capture-sub";
+    sub.textContent = `Max ${state.maxCm}cm / ${state.characters.length} characters`;
+
+    const stageClone = el.compareStage.cloneNode(true);
+    stageClone.style.minWidth = `${el.compareStage.scrollWidth}px`;
+    stageClone.style.width = `${el.compareStage.scrollWidth}px`;
+
+    shell.append(title, sub, stageClone);
+
+    shell.style.position = "fixed";
+    shell.style.left = "-100000px";
+    shell.style.top = "0";
+    shell.style.zIndex = "-1";
+    document.body.appendChild(shell);
+
+    const canvas = await html2canvas(shell, {
+      backgroundColor: "#f9fafc",
+      scale: 2,
+      useCORS: true
+    });
+
+    shell.remove();
+
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const fileName =
+      `height-comparison-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.png`;
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        alert("画像の生成に失敗しました。");
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    }, "image/png");
+  } catch (error) {
+    console.error("画像保存エラー:", error);
+    alert(`画像の保存に失敗しました: ${error?.message || error}`);
+  }
+}
+
 function exportJson() {
   const dataStr = JSON.stringify(
     {
-      version: 2,
+      version: 4,
       maxCm: state.maxCm,
       characters: state.characters
     },
@@ -459,7 +638,7 @@ function saveState() {
   localStorage.setItem(
     STORAGE_KEY,
     JSON.stringify({
-      version: 2,
+      version: 4,
       maxCm: state.maxCm,
       characters: state.characters
     })
@@ -481,6 +660,12 @@ function loadState() {
     state.characters = [];
     state.maxCm = 200;
   }
+}
+
+async function prepareImageFile(file) {
+  const originalImageData = await fileToDataURL(file);
+  const trimmed = await trimTransparentImage(originalImageData);
+  return trimmed;
 }
 
 function fileToDataURL(file) {
@@ -600,50 +785,6 @@ function getLabelTextColors(bgColor) {
   };
 }
 
-async function saveStageAsImage() {
-  if (!state.characters.length) {
-    alert("保存するキャラがいません。");
-    return;
-  }
-
-  if (typeof html2canvas === "undefined") {
-    alert("画像保存ライブラリの読み込みに失敗しました。");
-    return;
-  }
-
-  try {
-    const stage = el.compareStage;
-
-    const canvas = await html2canvas(stage, {
-      backgroundColor: "#f8f9fc",
-      scale: 2,
-      useCORS: true
-    });
-
-    const now = new Date();
-    const pad = (n) => String(n).padStart(2, "0");
-    const fileName =
-      `height-comparison-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.png`;
-
-    canvas.toBlob((blob) => {
-      if (!blob) {
-        alert("画像の生成に失敗しました。");
-        return;
-      }
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fileName;
-      a.click();
-      URL.revokeObjectURL(url);
-    }, "image/png");
-  } catch (error) {
-    console.error("画像保存エラー:", error);
-    alert(`画像の保存に失敗しました: ${error?.message || error}`);
-  }
-}
-
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -651,4 +792,8 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value);
 }
