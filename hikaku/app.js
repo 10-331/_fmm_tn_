@@ -202,14 +202,19 @@ function renderStage() {
   normalizeSlotPositions();
 
   const stageHeight = state.maxCm * PX_PER_CM;
+  const topPadding = getStageTopPadding();
+  const totalStageHeight = stageHeight + topPadding;
   const stageWidth = getStageContentWidth();
 
+  // 一番下を 0cm の基準にする
+  const baselineY = totalStageHeight - 1;
+
   el.compareStage.innerHTML = "";
-  el.compareStage.style.height = `${stageHeight + 44}px`;
+  el.compareStage.style.height = `${totalStageHeight}px`;
   el.compareStage.style.minWidth = `${stageWidth}px`;
 
   for (let cm = 0; cm <= state.maxCm; cm += 10) {
-    const y = stageHeight - cm * PX_PER_CM;
+    const y = baselineY - cm * PX_PER_CM;
 
     const line = document.createElement("div");
     line.className = `guide-line ${cm % 50 === 0 ? "major" : ""}`;
@@ -223,12 +228,10 @@ function renderStage() {
     el.compareStage.appendChild(label);
   }
 
-  const ground = document.createElement("div");
-  ground.className = "ground-line";
-  el.compareStage.appendChild(ground);
-
   const strip = document.createElement("div");
   strip.className = "characters-strip";
+  strip.style.top = `${topPadding}px`;
+  strip.style.bottom = "0";
   el.compareStage.appendChild(strip);
 
   state.characters.forEach((character) => {
