@@ -253,29 +253,9 @@ input[type="file"]{
   border-top: 2px solid #9ba7bf;
 }
 
-.characters-strip{
-  position: absolute;
-  left: 88px;
-  right: 24px;
-  bottom: 0;
-  top: 0;
-  display: flex;
-  align-items: flex-end;
-  gap: 18px;
-  padding: 0 20px 0 8px;
-}
+.characters-strip
 
-.character{
-  position: relative;
-  width: 136px;
-  min-width: 136px;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  cursor: grab;
-  touch-action: none;
-}
+.character
 
 .character.is-dragging{
   opacity: 0.72;
@@ -553,10 +533,10 @@ input[type="file"]{
     padding-right: 14px;
   }
 
-  .character{
-    width: 110px;
-    min-width: 110px;
-  }
+.character{
+  width: 110px;
+  min-width: 110px;
+}
 
   .character-label{
     top: -40px;
