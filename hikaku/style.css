@@ -561,6 +561,15 @@ input[type="file"]{
     min-width: 720px;
   }
 
+  .character{
+  touch-action: none; /* モバイルで効く */
+}
+
+.character.is-dragging{
+  opacity: 0.7;
+  cursor: grabbing;
+}
+  
   .characters-strip{
     left: 70px;
     gap: 12px;
