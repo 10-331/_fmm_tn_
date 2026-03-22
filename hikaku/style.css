@@ -382,6 +382,27 @@ input[type="file"]{
   justify-content: flex-end;
 }
 
+.character.is-dragging,
+.char-card.is-dragging{
+  opacity: 0.55;
+}
+
+.character{
+  cursor: grab;
+}
+
+.character:active{
+  cursor: grabbing;
+}
+
+.char-card{
+  cursor: grab;
+}
+
+.char-card:active{
+  cursor: grabbing;
+}
+
 .mini-btn{
   border: none;
   border-radius: 10px;
