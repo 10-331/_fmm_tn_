@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>身長比較ツール</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>身長比較ツール</h1>
+      <p class="sub">立ち絵と身長を追加して、横並びで比較できます。保存はブラウザ内。GitHub Pagesでも動きます。</p>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="panel">
+      <section class="card">
+        <h2>キャラ追加</h2>
+        <form id="characterForm" class="form-grid">
+          <label>
+            名前
+            <input type="text" id="name" placeholder="例：綾" required />
+          </label>
+
+          <label>
+            身長(cm)
+            <input type="number" id="height" min="1" max="250" placeholder="160" required />
+          </label>
+
+          <label>
+            ラベル色
+            <input type="color" id="labelColor" value="#7cc8ff" />
+          </label>
+
+          <label>
+            画像(PNG推奨)
+            <input type="file" id="image" accept="image/png,image/webp,image/jpeg" required />
+          </label>
+
+          <label>
+            表示順
+            <select id="sortMode">
+              <option value="append">末尾に追加</option>
+              <option value="heightAsc">身長が低い順</option>
+              <option value="heightDesc">身長が高い順</option>
+            </select>
+          </label>
+
+          <button type="submit" class="primary">追加する</button>
+        </form>
+      </section>
+
+      <section class="card actions-card">
+        <h2>データ操作</h2>
+        <div class="actions">
+          <button id="exportBtn">JSONを書き出し</button>
+          <label class="import-label">
+            JSONを読み込み
+            <input type="file" id="importInput" accept="application/json" />
+          </label>
+          <button id="clearBtn" class="danger">全部削除</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>登録キャラ</h2>
+        <div id="characterList" class="character-list empty">まだ登録されていません。</div>
+      </section>
+    </aside>
+
+    <section class="viewer card">
+      <div class="viewer-head">
+        <div>
+          <h2>比較ビュー</h2>
+          <p>足元基準で並びます。横スクロール対応。</p>
+        </div>
+        <div class="viewer-options">
+          <label>
+            最大目盛り
+            <select id="maxScale">
+              <option value="180">180cm</option>
+              <option value="200" selected>200cm</option>
+              <option value="220">220cm</option>
+              <option value="250">250cm</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="comparison-wrap">
+        <div id="comparisonStage" class="comparison-stage"></div>
+      </div>
+    </section>
+  </main>
+
+  <template id="characterItemTemplate">
+    <div class="character-item">
+      <div class="meta-row">
+        <span class="chip"></span>
+        <button class="remove-btn" type="button">削除</button>
+      </div>
+      <div class="meta-sub"></div>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
