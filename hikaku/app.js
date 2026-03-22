@@ -558,6 +558,46 @@ async function trimTransparentImage(dataUrl) {
   };
 }
 
+function getLabelTextColors(bgColor) {
+  const hex = String(bgColor || "").replace("#", "");
+
+  if (![3, 6].includes(hex.length)) {
+    return {
+      mainTextColor: "#ffffff",
+      subTextColor: "rgba(255,255,255,0.92)"
+    };
+  }
+
+  const normalized = hex.length === 3
+    ? hex.split("").map((c) => c + c).join("")
+    : hex;
+
+  const r = parseInt(normalized.slice(0, 2), 16);
+  const g = parseInt(normalized.slice(2, 4), 16);
+  const b = parseInt(normalized.slice(4, 6), 16);
+
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  if (luminance > 0.72) {
+    return {
+      mainTextColor: "#4b5568",
+      subTextColor: "#6b7486"
+    };
+  }
+
+  if (luminance > 0.55) {
+    return {
+      mainTextColor: "#445063",
+      subTextColor: "#667388"
+    };
+  }
+
+  return {
+    mainTextColor: "#ffffff",
+    subTextColor: "rgba(255,255,255,0.92)"
+  };
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
