@@ -171,6 +171,11 @@ function createCharacterElement(character) {
   const label = document.createElement("div");
   label.className = "character-label";
   label.style.background = character.labelColor;
+
+  const { mainTextColor, subTextColor } = getLabelTextColors(character.labelColor);
+  label.style.setProperty("--label-text", mainTextColor);
+  label.style.setProperty("--label-subtext", subTextColor);
+
   label.innerHTML = `
     <span class="cm">${escapeHtml(character.height)}cm</span>
     <span class="name">${escapeHtml(character.name)}</span>
@@ -187,12 +192,7 @@ function createCharacterElement(character) {
   visual.appendChild(label);
   visual.appendChild(img);
 
-  const bottomName = document.createElement("div");
-  bottomName.className = "character-name-bottom";
-  bottomName.textContent = character.name;
-
   wrapper.appendChild(visual);
-  wrapper.appendChild(bottomName);
   return wrapper;
 }
 
