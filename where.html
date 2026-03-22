@@ -10,7 +10,6 @@
     --bg-2:#14161b;
     --text:#ece8df;
     --muted:rgba(236,232,223,.66);
-    --line:rgba(236,232,223,.18);
   }
 
   *{
@@ -64,7 +63,7 @@
     justify-content:center;
     padding:7vh 6vw;
     z-index:3;
-    transition:opacity .7s ease, transform .7s ease, filter .7s ease;
+    transition:opacity .55s ease, transform .55s ease, filter .55s ease;
     pointer-events:none;
   }
 
@@ -98,6 +97,10 @@
     -webkit-tap-highlight-color:transparent;
   }
 
+  .tapStart.hidden{
+    pointer-events:none;
+  }
+
   .tapGuide{
     position:absolute;
     bottom:7vh;
@@ -106,16 +109,24 @@
     font-size:12px;
     letter-spacing:.16em;
     color:rgba(236,232,223,.52);
-    transition:opacity .5s ease;
-    pointer-events:none;
-  }
-
-  .tapStart.hidden{
+    transition:opacity .35s ease;
     pointer-events:none;
   }
 
   .tapStart.hidden .tapGuide{
     opacity:0;
+  }
+
+  .backZone{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    background:transparent;
+    border:none;
+    padding:0;
+    margin:0;
+    cursor:default;
+    -webkit-tap-highlight-color:transparent;
   }
 
   .description{
@@ -124,11 +135,11 @@
     left:50%;
     transform:translateX(-50%);
     width:min(88vw, 430px);
-    min-height:74px;
+    min-height:64px;
     text-align:center;
     z-index:7;
     opacity:0;
-    transition:opacity .35s ease;
+    transition:opacity .3s ease;
     pointer-events:none;
     padding:0 8px;
   }
@@ -151,13 +162,6 @@
     color:var(--muted);
   }
 
-  .stepGuide{
-    margin-top:8px;
-    font-size:11px;
-    letter-spacing:.12em;
-    color:rgba(236,232,223,.48);
-  }
-
   .choiceObjects{
     position:absolute;
     inset:0;
@@ -170,9 +174,8 @@
     opacity:0;
     transform:translateY(10px);
     transition:
-      opacity .55s ease,
-      transform .55s ease,
-      filter .55s ease,
+      opacity .45s ease,
+      transform .45s ease,
       text-shadow .3s ease;
     pointer-events:auto;
     background:transparent;
@@ -214,23 +217,7 @@
   .choice.active .label{
     opacity:1;
     color:#f3efe7;
-  }
-
-  .choice.confirmed .label{
-    text-shadow:0 0 8px rgba(255,255,255,.16);
-  }
-
-  /* 何もない場所を押した時に戻る用 */
-  .backZone{
-    position:absolute;
-    inset:0;
-    z-index:2;
-    background:transparent;
-    border:none;
-    padding:0;
-    margin:0;
-    cursor:default;
-    -webkit-tap-highlight-color:transparent;
+    text-shadow:0 0 8px rgba(255,255,255,.14);
   }
 
   /* 声 */
@@ -352,7 +339,7 @@
 <main class="scene" aria-label="神隠しの後の入口">
   <div class="veil"></div>
 
-  <button class="backZone" id="backZone" aria-label="一つ前の状態に戻る"></button>
+  <button class="backZone" id="backZone" aria-label="初回状態に戻る"></button>
 
   <section class="intro" id="intro">
     <div class="introText">
@@ -375,7 +362,6 @@
   <div class="description" id="description" aria-live="polite">
     <div class="descriptionTitle" id="descriptionTitle"></div>
     <div class="descriptionText" id="descriptionText"></div>
-    <div class="stepGuide" id="stepGuide"></div>
   </div>
 
   <div class="choiceObjects">
@@ -398,13 +384,12 @@
 
 <script>
   const tapStart = document.getElementById('tapStart');
-  const intro = document.getElementById('intro');
   const backZone = document.getElementById('backZone');
+  const intro = document.getElementById('intro');
 
   const description = document.getElementById('description');
   const descriptionTitle = document.getElementById('descriptionTitle');
   const descriptionText = document.getElementById('descriptionText');
-  const stepGuide = document.getElementById('stepGuide');
 
   const storyChoice = document.getElementById('storyChoice');
   const worldChoice = document.getElementById('worldChoice');
@@ -414,12 +399,10 @@
 
   let started = false;
   let activeChoice = null;
-  let tapStage = 0;
-  // tapStage:
-  // 0 = 選択肢表示のみ
-  // 1 = 説明表示
-  // 2 = 確認段階
-  // 3回目タップで遷移
+  let stage = 0;
+  // 0 = 初回起動
+  // 1 = 選択肢表示
+  // 2 = 説明表示（同じ選択肢をもう一度押すと遷移）
 
   const choiceData = {
     storyChoice: {
@@ -439,9 +422,16 @@
     }
   };
 
-  function showChoices() {
+  function resetChoiceStates() {
+    choices.forEach(choice => {
+      choice.classList.remove('active', 'show');
+    });
+  }
+
+  function showChoicesOnly() {
     intro.classList.add('dim');
     tapStart.classList.add('hidden');
+    description.classList.remove('show');
 
     choices.forEach((choice, i) => {
       setTimeout(() => {
@@ -449,119 +439,72 @@
       }, i * 120);
     });
 
+    stage = 1;
+    activeChoice = null;
     started = true;
   }
 
-  function resetChoiceStates() {
-    choices.forEach(choice => {
-      choice.classList.remove('active', 'confirmed');
-    });
-  }
-
-  function setDescription(choice, stage) {
+  function showDescription(choice) {
     const data = choiceData[choice.id];
     descriptionTitle.textContent = data.title;
     descriptionText.textContent = data.text;
-
-    if (stage === 1) {
-      stepGuide.textContent = 'もう一度触れると、選択する';
-    } else if (stage === 2) {
-      stepGuide.textContent = 'さらにもう一度触れると、進む';
-    } else {
-      stepGuide.textContent = '';
-    }
-
     description.classList.add('show');
   }
 
-  function renderStage() {
+  function goInitialState() {
+    stage = 0;
+    activeChoice = null;
+    started = false;
+
+    description.classList.remove('show');
     resetChoiceStates();
 
-    if (activeChoice === null || tapStage === 0) {
-      description.classList.remove('show');
-      return;
-    }
-
-    activeChoice.classList.add('active');
-
-    if (tapStage === 2) {
-      activeChoice.classList.add('confirmed');
-    }
-
-    setDescription(activeChoice, tapStage);
+    intro.classList.remove('dim');
+    tapStart.classList.remove('hidden');
   }
 
   function handleChoiceClick(choice) {
-    if (!started) return;
-
-    if (activeChoice !== choice) {
+    if (stage === 1) {
       activeChoice = choice;
-      tapStage = 1;
-      renderStage();
+      choices.forEach(c => c.classList.remove('active'));
+      choice.classList.add('active');
+      showDescription(choice);
+      stage = 2;
       return;
     }
 
-    if (tapStage === 1) {
-      tapStage = 2;
-      renderStage();
-      return;
-    }
+    if (stage === 2) {
+      if (activeChoice !== choice) {
+        activeChoice = choice;
+        choices.forEach(c => c.classList.remove('active'));
+        choice.classList.add('active');
+        showDescription(choice);
+        return;
+      }
 
-    if (tapStage === 2) {
       const data = choiceData[choice.id];
       window.location.href = data.href;
     }
   }
 
-  function stepBack() {
-    if (!started) return;
-
-    if (tapStage === 1 || tapStage === 2) {
-      description.classList.remove('show');
-
-      setTimeout(() => {
-        tapStage = 0;
-        activeChoice = null;
-        resetChoiceStates();
-      }, 120);
+  tapStart.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (stage === 0) {
+      showChoicesOnly();
     }
-  }
-
-  tapStart.addEventListener('click', showChoices);
+  });
 
   choices.forEach(choice => {
     choice.addEventListener('click', (event) => {
       event.stopPropagation();
       handleChoiceClick(choice);
     });
-
-    choice.addEventListener('mouseenter', () => {
-      if (!started) return;
-
-      if (activeChoice === null) {
-        choice.classList.add('active');
-        const data = choiceData[choice.id];
-        descriptionTitle.textContent = data.title;
-        descriptionText.textContent = data.text;
-        stepGuide.textContent = '触れて選ぶ';
-        description.classList.add('show');
-      }
-    });
-
-    choice.addEventListener('mouseleave', () => {
-      if (!started) return;
-
-      if (tapStage === 0 && activeChoice === null) {
-        choice.classList.remove('active');
-        description.classList.remove('show');
-      } else {
-        renderStage();
-      }
-    });
   });
 
   backZone.addEventListener('click', () => {
-    stepBack();
+    if (stage === 2) {
+      goInitialState();
+    }
   });
 </script>
 </body>
