@@ -272,9 +272,26 @@ input[type="file"]{
   border: 1px dashed rgba(150,162,186,0.32);
 }
 
-.characters-strip
+.characters-strip{
+  position: absolute;
+  left: 88px;
+  right: 24px;
+  bottom: 0;
+  top: 0;
+  padding: 0 20px 0 8px;
+}
 
-.character
+.character{
+  position: absolute;
+  width: 136px;
+  min-width: 136px;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  cursor: grab;
+  touch-action: none;
+}
 
 .character.is-dragging{
   opacity: 0.72;
