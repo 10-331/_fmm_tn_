@@ -229,6 +229,40 @@ document.body.onclick = () => {
   }
 };
 </script>
+.voiceChoice::before,
+.voiceChoice::after{
+  content:"";
+  position:absolute;
+  border:1px solid rgba(255,255,255,.3);
+  border-left-color:transparent;
+  border-top-color:transparent;
+  border-bottom-color:transparent;
+  border-radius:50%;
+  top:50%;
+  transform:translateY(-50%);
+}
 
+.voiceChoice::before{
+  width:16px;
+  height:28px;
+  left:-10px;
+}
+
+.voiceChoice::after{
+  width:28px;
+  height:46px;
+  left:-18px;
+}
+
+.signChoice{
+  border:1px solid rgba(255,255,255,.3);
+  padding:10px;
+}
+
+.paperChoice{
+  border:1px solid rgba(255,255,255,.3);
+  transform:translateX(-50%) rotate(-6deg);
+  padding:10px;
+}
 </body>
 </html>
