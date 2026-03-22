@@ -30,11 +30,14 @@ const el = {
   countBadge: document.getElementById("countBadge")
 };
 
-let dbPromise = null;
-
-let dragState = {
-  draggingId: null
+let dragMoveState = {
+  activeId: null,
+  startX: 0,
+  baseSlotX: 0,
+  pointerId: null
 };
+
+let dbPromise = null;
 
 init();
 
@@ -105,11 +108,13 @@ async function handleAddCharacter() {
         offsetY: 0,
         offsetX: 0
       },
+      slotX: 0,
       createdAt: Date.now()
     };
 
     state.characters.push(character);
     sortCharacters(insertMode);
+    normalizeSlotPositions();
     await saveState();
     renderAll();
     resetForm();
@@ -125,6 +130,15 @@ function sortCharacters(mode) {
   } else if (mode === "heightDesc") {
     state.characters.sort((a, b) => b.height - a.height);
   }
+}
+
+function normalizeSlotPositions() {
+  const spacing = BASE_CHARACTER_WIDTH + 18;
+  state.characters.forEach((character, index) => {
+    if (typeof character.slotX !== "number" || Number.isNaN(character.slotX)) {
+      character.slotX = index * spacing;
+    }
+  });
 }
 
 function resetForm() {
@@ -144,13 +158,24 @@ function renderCount() {
   el.countBadge.textContent = `${state.characters.length}人`;
 }
 
+function getStageContentWidth() {
+  const maxSlotX = state.characters.reduce((max, character) => {
+    const slotX = Number(character.slotX || 0);
+    return Math.max(max, slotX);
+  }, 0);
+
+  return Math.max(900, 200 + maxSlotX + BASE_CHARACTER_WIDTH + 80);
+}
+
 function renderStage() {
+  normalizeSlotPositions();
+
   const stageHeight = state.maxCm * PX_PER_CM;
-  const baseWidth = Math.max(900, 120 + state.characters.length * (BASE_CHARACTER_WIDTH + 18));
+  const stageWidth = getStageContentWidth();
 
   el.compareStage.innerHTML = "";
   el.compareStage.style.height = `${stageHeight + 44}px`;
-  el.compareStage.style.minWidth = `${baseWidth}px`;
+  el.compareStage.style.minWidth = `${stageWidth}px`;
 
   for (let cm = 0; cm <= state.maxCm; cm += 10) {
     const y = stageHeight - cm * PX_PER_CM;
@@ -183,32 +208,54 @@ function renderStage() {
 function createCharacterElement(character) {
   const wrapper = document.createElement("div");
   wrapper.className = "character";
-  wrapper.draggable = true;
-  wrapper.dataset.id = character.id;
+  wrapper.style.left = `${character.slotX}px`;
 
-  wrapper.addEventListener("dragstart", (event) => {
-    dragState.draggingId = character.id;
+  wrapper.addEventListener("pointerdown", (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+
+    dragMoveState.activeId = character.id;
+    dragMoveState.startX = e.clientX;
+    dragMoveState.baseSlotX = Number(character.slotX || 0);
+    dragMoveState.pointerId = e.pointerId;
+
+    try {
+      wrapper.setPointerCapture(e.pointerId);
+    } catch (_) {}
+
     wrapper.classList.add("is-dragging");
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", character.id);
   });
 
-  wrapper.addEventListener("dragend", () => {
-    dragState.draggingId = null;
+  wrapper.addEventListener("pointermove", (e) => {
+    if (dragMoveState.activeId !== character.id) return;
+    if (dragMoveState.pointerId !== e.pointerId) return;
+
+    const dx = e.clientX - dragMoveState.startX;
+    const raw = dragMoveState.baseSlotX + dx;
+    const newSlotX = Math.max(0, Math.min(3000, raw));
+
+    character.slotX = newSlotX;
+    renderStage();
+  });
+
+  wrapper.addEventListener("pointerup", async (e) => {
+    if (dragMoveState.activeId !== character.id) return;
+    if (dragMoveState.pointerId !== e.pointerId) return;
+
+    try {
+      wrapper.releasePointerCapture(e.pointerId);
+    } catch (_) {}
+
     wrapper.classList.remove("is-dragging");
+    dragMoveState.activeId = null;
+    dragMoveState.pointerId = null;
+
+    await saveState();
   });
 
-  wrapper.addEventListener("dragover", (event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "move";
-  });
-
-  wrapper.addEventListener("drop", async (event) => {
-    event.preventDefault();
-    const fromId = dragState.draggingId || event.dataTransfer.getData("text/plain");
-    const toId = character.id;
-    if (!fromId || !toId || fromId === toId) return;
-    await reorderCharacters(fromId, toId);
+  wrapper.addEventListener("pointercancel", () => {
+    wrapper.classList.remove("is-dragging");
+    dragMoveState.activeId = null;
+    dragMoveState.pointerId = null;
   });
 
   const visual = document.createElement("div");
@@ -256,35 +303,6 @@ function renderCharacterList() {
 
   if (state.characters.length === 0) {
     const empty = document.createElement("div");
-    const card = document.createElement("div");
-card.className = "char-card";
-card.draggable = true;
-card.dataset.id = character.id;
-
-card.addEventListener("dragstart", (event) => {
-  dragState.draggingId = character.id;
-  card.classList.add("is-dragging");
-  event.dataTransfer.effectAllowed = "move";
-  event.dataTransfer.setData("text/plain", character.id);
-});
-
-card.addEventListener("dragend", () => {
-  dragState.draggingId = null;
-  card.classList.remove("is-dragging");
-});
-
-card.addEventListener("dragover", (event) => {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
-});
-
-card.addEventListener("drop", async (event) => {
-  event.preventDefault();
-  const fromId = dragState.draggingId || event.dataTransfer.getData("text/plain");
-  const toId = character.id;
-  if (!fromId || !toId || fromId === toId) return;
-  await reorderCharacters(fromId, toId);
-});
     empty.className = "empty";
     empty.textContent = "まだキャラが登録されていません。";
     el.characterList.appendChild(empty);
@@ -355,7 +373,7 @@ function createEditPanel(character) {
   `;
   const nameInput = nameField.querySelector("input");
   nameInput.addEventListener("change", async () => {
-    updateCharacter(character.id, { name: nameInput.value.trim() || character.name });
+    await updateCharacter(character.id, { name: nameInput.value.trim() || character.name });
   });
 
   const heightField = document.createElement("label");
@@ -371,7 +389,7 @@ function createEditPanel(character) {
       heightInput.value = String(character.height);
       return;
     }
-    updateCharacter(character.id, { height: value });
+    await updateCharacter(character.id, { height: value });
   });
 
   const colorField = document.createElement("label");
@@ -382,7 +400,7 @@ function createEditPanel(character) {
   `;
   const colorInput = colorField.querySelector("input");
   colorInput.addEventListener("input", async () => {
-    updateCharacter(character.id, { labelColor: colorInput.value });
+    await updateCharacter(character.id, { labelColor: colorInput.value });
   });
 
   const imageRow = document.createElement("div");
@@ -467,14 +485,27 @@ function createEditPanel(character) {
   );
 
   const offsetXRow = createRangeRow(
-    "左右位置補正",
-    -80,
-    80,
+    "立ち絵内の左右補正",
+    -300,
+    300,
     1,
     offsetXValue,
     async (valueEl, input) => {
       valueEl.textContent = `${input.value}px`;
       await updateCharacterCorrection(character.id, { offsetX: Number(input.value) });
+    },
+    "px"
+  );
+
+  const slotXRow = createRangeRow(
+    "キャラ位置",
+    0,
+    3000,
+    1,
+    Number(character.slotX || 0),
+    async (valueEl, input) => {
+      valueEl.textContent = `${input.value}px`;
+      await updateCharacter(character.id, { slotX: Number(input.value) });
     },
     "px"
   );
@@ -493,10 +524,10 @@ function createEditPanel(character) {
 
   const note = document.createElement("div");
   note.className = "note";
-  note.textContent = "画像は自動で軽量化して保存されます。スケールは見た目補正なので、基本は自動トリミングと足元補正を優先するのがおすすめです。";
+  note.textContent = "ステージ上ではキャラ全体を左右ドラッグして距離を調整できます。『キャラ位置』はその値です。";
 
   editGrid.append(nameField, heightField, colorField);
-  panel.append(editGrid, imageRow, scaleRow, offsetYRow, offsetXRow, resetBtn, note);
+  panel.append(editGrid, imageRow, scaleRow, offsetYRow, offsetXRow, slotXRow, resetBtn, note);
   return panel;
 }
 
@@ -566,19 +597,6 @@ async function moveCharacter(id, direction) {
 
 async function removeCharacter(id) {
   state.characters = state.characters.filter((item) => item.id !== id);
-  await saveState();
-  renderAll();
-}
-
-async function reorderCharacters(fromId, toId) {
-  const fromIndex = state.characters.findIndex((item) => item.id === fromId);
-  const toIndex = state.characters.findIndex((item) => item.id === toId);
-
-  if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
-
-  const [moved] = state.characters.splice(fromIndex, 1);
-  state.characters.splice(toIndex, 0, moved);
-
   await saveState();
   renderAll();
 }
@@ -660,7 +678,7 @@ async function saveStageAsImage() {
 function exportJson() {
   const dataStr = JSON.stringify(
     {
-      version: 5,
+      version: 6,
       maxCm: state.maxCm,
       characters: state.characters
     },
@@ -692,6 +710,7 @@ async function importJson(event) {
     }
 
     state.characters = parsed.characters.map(normalizeCharacter);
+    normalizeSlotPositions();
     state.maxCm = Number(parsed.maxCm) || 200;
     await saveState();
     renderAll();
@@ -716,6 +735,7 @@ function normalizeCharacter(character) {
       offsetY: Number(character.correction?.offsetY ?? 0),
       offsetX: Number(character.correction?.offsetX ?? 0)
     },
+    slotX: Number(character.slotX ?? 0),
     createdAt: character.createdAt || Date.now()
   };
 }
@@ -749,7 +769,7 @@ async function saveState() {
 
     store.put(
       {
-        version: 5,
+        version: 6,
         maxCm: state.maxCm,
         characters: state.characters
       },
@@ -784,6 +804,7 @@ async function loadState() {
   state.characters = Array.isArray(saved.characters)
     ? saved.characters.map(normalizeCharacter)
     : [];
+  normalizeSlotPositions();
 }
 
 async function prepareImageFile(file) {
