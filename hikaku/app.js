@@ -14,6 +14,7 @@ const el = {
   imageInput: document.getElementById("imageInput"),
   insertModeInput: document.getElementById("insertModeInput"),
   addButton: document.getElementById("addButton"),
+  saveImageButton: document.getElementById("saveImageButton"),
   exportButton: document.getElementById("exportButton"),
   importInput: document.getElementById("importInput"),
   clearButton: document.getElementById("clearButton"),
@@ -33,6 +34,7 @@ function init() {
 
 function bindEvents() {
   el.addButton.addEventListener("click", handleAddCharacter);
+  el.saveImageButton.addEventListener("click", saveStageAsImage);
   el.exportButton.addEventListener("click", exportJson);
   el.importInput.addEventListener("change", importJson);
   el.clearButton.addEventListener("click", clearAll);
@@ -596,6 +598,50 @@ function getLabelTextColors(bgColor) {
     mainTextColor: "#ffffff",
     subTextColor: "rgba(255,255,255,0.92)"
   };
+}
+
+async function saveStageAsImage() {
+  if (!state.characters.length) {
+    alert("保存するキャラがいません。");
+    return;
+  }
+
+  if (typeof html2canvas === "undefined") {
+    alert("画像保存ライブラリの読み込みに失敗しました。");
+    return;
+  }
+
+  try {
+    const stage = el.compareStage;
+
+    const canvas = await html2canvas(stage, {
+      backgroundColor: "#f8f9fc",
+      scale: 2,
+      useCORS: true
+    });
+
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const fileName =
+      `height-comparison-${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}.png`;
+
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        alert("画像の生成に失敗しました。");
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    }, "image/png");
+  } catch (error) {
+    console.error("画像保存エラー:", error);
+    alert(`画像の保存に失敗しました: ${error?.message || error}`);
+  }
 }
 
 function escapeHtml(value) {
