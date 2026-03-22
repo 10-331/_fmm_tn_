@@ -342,8 +342,7 @@
   <button class="backZone" id="backZone" aria-label="初回状態に戻る"></button>
 
   <section class="intro" id="intro">
-    <div class="introText">
-気づくと、知らない場所に立っていた。
+    <div class="introText">気づくと、知らない場所に立っていた。
 
 風はないのに、
 どこかで何かが揺れている。
@@ -351,8 +350,7 @@
 「……ここ、どこ？」
 
 視線の先に、
-いくつかの違和感がある。
-    </div>
+いくつかの違和感がある。</div>
   </section>
 
   <button class="tapStart" id="tapStart" aria-label="画面に触れる">
@@ -397,9 +395,8 @@
 
   const choices = [storyChoice, worldChoice, galleryChoice];
 
-  let started = false;
-  let activeChoice = null;
   let stage = 0;
+  let activeChoice = null;
   // 0 = 初回起動
   // 1 = 選択肢表示
   // 2 = 説明表示（同じ選択肢をもう一度押すと遷移）
@@ -441,7 +438,6 @@
 
     stage = 1;
     activeChoice = null;
-    started = true;
   }
 
   function showDescription(choice) {
@@ -454,7 +450,6 @@
   function goInitialState() {
     stage = 0;
     activeChoice = null;
-    started = false;
 
     description.classList.remove('show');
     resetChoiceStates();
@@ -502,7 +497,7 @@
   });
 
   backZone.addEventListener('click', () => {
-    if (stage === 2) {
+    if (stage === 1 || stage === 2) {
       goInitialState();
     }
   });
