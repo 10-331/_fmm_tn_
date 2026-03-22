@@ -9,9 +9,9 @@
     --bg-1:#0b0c10;
     --bg-2:#14161b;
     --text:#ece8df;
-    --muted:rgba(236,232,223,.58);
-    --line:rgba(236,232,223,.14);
-    --glow:rgba(236,232,223,.08);
+    --muted:rgba(236,232,223,.62);
+    --line:rgba(236,232,223,.18);
+    --soft:rgba(236,232,223,.08);
   }
 
   *{ box-sizing:border-box; }
@@ -47,7 +47,14 @@
     isolation:isolate;
   }
 
-  /* 中央の縦書きテキスト */
+  .veil{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:radial-gradient(circle at center, transparent 18%, rgba(0,0,0,.18) 72%, rgba(0,0,0,.45) 100%);
+    z-index:1;
+  }
+
   .intro{
     position:absolute;
     inset:0;
@@ -55,8 +62,14 @@
     align-items:center;
     justify-content:center;
     padding:7vh 6vw;
-    transition:opacity .7s ease, transform .7s ease, filter .7s ease;
     z-index:3;
+    transition:opacity .7s ease, transform .7s ease, filter .7s ease;
+  }
+
+  .intro.dim{
+    opacity:.2;
+    filter:blur(1px);
+    transform:scale(.985);
   }
 
   .introText{
@@ -66,255 +79,229 @@
     line-height:2.15;
     letter-spacing:.12em;
     max-height:76vh;
-    text-shadow:0 0 12px rgba(255,255,255,.05);
     white-space:pre-wrap;
+    text-shadow:0 0 12px rgba(255,255,255,.05);
   }
 
-  .intro.dim{
-    opacity:.18;
-    filter:blur(1px);
-    transform:scale(.985);
-  }
-
-  /* 空間にあるもの */
-  .worldObject{
+  .tapStart{
     position:absolute;
-    opacity:0;
-    transform:translateY(8px);
-    transition:opacity .6s ease, transform .6s ease, filter .6s ease;
-    z-index:2;
-    pointer-events:none;
-    filter:blur(.4px);
-  }
-
-  .worldObject.show{
-    opacity:1;
-    transform:translateY(0);
-  }
-
-  .bell{
-    left:10vw;
-    top:50%;
-    width:28px;
-    height:86px;
-  }
-
-  .bell::before{
-    content:"";
-    position:absolute;
-    top:0;
-    left:50%;
-    width:1px;
-    height:26px;
-    background:rgba(255,255,255,.2);
-    transform:translateX(-50%);
-  }
-
-  .bell::after{
-    content:"";
-    position:absolute;
-    bottom:0;
-    left:50%;
-    width:26px;
-    height:38px;
-    border:1px solid rgba(255,255,255,.28);
-    border-radius:50% 50% 42% 42%;
-    transform:translateX(-50%);
-    box-shadow:0 0 20px rgba(255,255,255,.04);
-  }
-
-  .sign{
-    right:9vw;
-    top:46%;
-    width:76px;
-    height:120px;
-  }
-
-  .sign::before{
-    content:"";
-    position:absolute;
-    bottom:0;
-    left:50%;
-    width:2px;
-    height:70px;
-    background:rgba(255,255,255,.18);
-    transform:translateX(-50%);
-  }
-
-  .sign::after{
-    content:"";
-    position:absolute;
-    top:0;
-    left:50%;
-    width:70px;
-    height:44px;
-    border:1px solid rgba(255,255,255,.22);
-    transform:translateX(-50%) rotate(-2deg);
-    box-shadow:0 0 18px rgba(255,255,255,.03);
-  }
-
-  .paper{
-    left:50%;
-    bottom:13vh;
-    width:72px;
-    height:92px;
-    transform:translateX(-50%) rotate(-8deg) translateY(10px);
-    border:1px solid rgba(255,255,255,.2);
-    background:linear-gradient(to bottom, rgba(255,255,255,.04), rgba(255,255,255,.015));
-    box-shadow:0 0 20px rgba(255,255,255,.03);
-  }
-
-  .paper.show{
-    transform:translateX(-50%) rotate(-8deg) translateY(0);
-  }
-
-  /* 当たり判定 */
-  .hotspot{
-    position:absolute;
-    z-index:5;
+    inset:0;
+    z-index:8;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     background:transparent;
     border:none;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .tapGuide{
+    position:absolute;
+    bottom:7vh;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:12px;
+    letter-spacing:.16em;
+    color:rgba(236,232,223,.52);
+    transition:opacity .5s ease;
+    pointer-events:none;
+  }
+
+  .tapStart.hidden{
+    pointer-events:none;
+  }
+
+  .tapStart.hidden .tapGuide{
+    opacity:0;
+  }
+
+  .choiceObjects{
+    position:absolute;
+    inset:0;
+    z-index:4;
+    pointer-events:none;
+  }
+
+  .choice{
+    position:absolute;
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity .55s ease, transform .55s ease, filter .55s ease;
+    pointer-events:auto;
+    background:transparent;
+    border:none;
+    color:var(--text);
     padding:0;
     margin:0;
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
   }
 
-  .hotspot:focus-visible{
-    outline:1px solid rgba(255,255,255,.35);
-    outline-offset:-1px;
-  }
-
-  .leftZone{
-    left:0;
-    top:0;
-    width:34%;
-    height:100%;
-  }
-
-  .rightZone{
-    right:0;
-    top:0;
-    width:34%;
-    height:100%;
-  }
-
-  .backZone{
-    left:30%;
-    bottom:0;
-    width:40%;
-    height:26%;
-  }
-
-  .paperZone{
-    left:50%;
-    bottom:11vh;
-    width:110px;
-    height:120px;
-    transform:translateX(-50%);
-    display:none;
-  }
-
-  .paperZone.active{
-    display:block;
-  }
-
-  /* うっすら出るヒント */
-  .hint{
-    position:absolute;
-    font-size:12px;
-    letter-spacing:.12em;
-    color:var(--muted);
-    opacity:0;
-    transform:translateY(6px);
-    transition:opacity .45s ease, transform .45s ease;
-    pointer-events:none;
-    z-index:4;
-  }
-
-  .hint.show{
+  .choice.show{
     opacity:1;
     transform:translateY(0);
   }
 
-  .hint.left{
-    left:6vw;
-    top:50%;
+  .choice:focus-visible{
+    outline:1px solid rgba(255,255,255,.35);
+    outline-offset:6px;
   }
 
-  .hint.right{
-    right:6vw;
-    top:50%;
-    text-align:right;
+  .choice .shape{
+    position:relative;
+    display:block;
+    filter:drop-shadow(0 0 14px rgba(255,255,255,.03));
   }
 
-  .hint.back{
-    left:50%;
-    bottom:7vh;
-    transform:translateX(-50%) translateY(6px);
+  .choice .label{
+    margin-top:10px;
+    font-size:12px;
+    letter-spacing:.12em;
+    color:rgba(236,232,223,.72);
+    white-space:nowrap;
     text-align:center;
+    opacity:.9;
+    transition:opacity .35s ease;
   }
 
-  .hint.back.show{
+  .choice.active .label{
+    opacity:1;
+  }
+
+  /* 鈴 */
+  .bellChoice{
+    left:9vw;
+    top:46%;
+  }
+
+  .bellShape{
+    width:30px;
+    height:90px;
+  }
+
+  .bellShape::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:50%;
+    width:1px;
+    height:28px;
+    background:rgba(255,255,255,.22);
+    transform:translateX(-50%);
+  }
+
+  .bellShape::after{
+    content:"";
+    position:absolute;
+    bottom:0;
+    left:50%;
+    width:28px;
+    height:40px;
+    border:1px solid rgba(255,255,255,.30);
+    border-radius:50% 50% 42% 42%;
+    transform:translateX(-50%);
+  }
+
+  /* 看板 */
+  .signChoice{
+    right:8vw;
+    top:42%;
+  }
+
+  .signShape{
+    width:78px;
+    height:124px;
+  }
+
+  .signShape::before{
+    content:"";
+    position:absolute;
+    bottom:0;
+    left:50%;
+    width:2px;
+    height:74px;
+    background:rgba(255,255,255,.20);
+    transform:translateX(-50%);
+  }
+
+  .signShape::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:50%;
+    width:72px;
+    height:46px;
+    border:1px solid rgba(255,255,255,.24);
+    transform:translateX(-50%) rotate(-2deg);
+  }
+
+  /* 紙 */
+  .paperChoice{
+    left:50%;
+    bottom:12vh;
+    transform:translateX(-50%) translateY(10px);
+  }
+
+  .paperChoice.show{
     transform:translateX(-50%) translateY(0);
   }
 
-  .status{
+  .paperShape{
+    width:74px;
+    height:94px;
+    border:1px solid rgba(255,255,255,.22);
+    background:linear-gradient(to bottom, rgba(255,255,255,.04), rgba(255,255,255,.015));
+    transform:rotate(-8deg);
+  }
+
+  .description{
     position:absolute;
+    top:8vh;
     left:50%;
-    top:7vh;
     transform:translateX(-50%);
-    font-size:12px;
-    letter-spacing:.16em;
-    color:rgba(236,232,223,.45);
-    z-index:4;
-    transition:opacity .5s ease;
-  }
-
-  .status.hide{
+    width:min(88vw, 420px);
+    min-height:48px;
+    text-align:center;
+    font-size:13px;
+    line-height:1.9;
+    letter-spacing:.08em;
+    color:var(--muted);
+    z-index:6;
     opacity:0;
-  }
-
-  .veil{
-    position:absolute;
-    inset:0;
+    transition:opacity .35s ease;
     pointer-events:none;
-    background:radial-gradient(circle at center, transparent 18%, rgba(0,0,0,.18) 72%, rgba(0,0,0,.45) 100%);
-    z-index:1;
   }
 
-  @media (max-width: 640px){
+  .description.show{
+    opacity:1;
+  }
+
+  .description strong{
+    display:block;
+    font-weight:500;
+    color:var(--text);
+    margin-bottom:4px;
+  }
+
+  @media (max-width:640px){
     .introText{
       font-size:clamp(18px, 5vw, 24px);
       line-height:2.05;
       max-height:72vh;
     }
 
-    .bell{
-      left:7vw;
-      width:24px;
-    }
-
-    .sign{
-      right:7vw;
-      width:68px;
-    }
-
-    .paperZone{
-      width:96px;
-      height:110px;
-    }
+    .bellChoice{ left:7vw; }
+    .signChoice{ right:7vw; }
   }
 </style>
 </head>
 <body>
-  <main class="scene" aria-label="神隠しの後の入口">
-    <div class="veil"></div>
+<main class="scene" aria-label="神隠しの後の入口">
+  <div class="veil"></div>
 
-    <div class="status" id="status">左へ、右へ、あるいは振り返る</div>
-
-    <section class="intro" id="intro">
-      <div class="introText">
+  <section class="intro" id="intro">
+    <div class="introText">
 気づくと、知らない場所に立っていた。
 
 風はないのに、
@@ -324,148 +311,103 @@
 
 視線の先に、
 いくつかの違和感がある。
-      </div>
-    </section>
+    </div>
+  </section>
 
-    <div class="worldObject bell" id="bellObj" aria-hidden="true"></div>
-    <div class="worldObject sign" id="signObj" aria-hidden="true"></div>
-    <div class="worldObject paper" id="paperObj" aria-hidden="true"></div>
+  <button class="tapStart" id="tapStart" aria-label="画面に触れる">
+    <span class="tapGuide">触れる</span>
+  </button>
 
-    <div class="hint left" id="hintLeft">鈴の音がする</div>
-    <div class="hint right" id="hintRight">古びた看板がある</div>
-    <div class="hint back" id="hintBack">足元に紙が落ちている</div>
+  <div class="description" id="description" aria-live="polite"></div>
 
-    <button class="hotspot leftZone" id="goStory" aria-label="左へ向く。鈴の音がする方へ進む"></button>
-    <button class="hotspot rightZone" id="goWorld" aria-label="右へ向く。古びた看板を読む"></button>
-    <button class="hotspot backZone" id="turnBack" aria-label="振り返る"></button>
-    <button class="hotspot paperZone" id="goGallery" aria-label="落ちている紙を見る"></button>
-  </main>
+  <div class="choiceObjects" id="choiceObjects" aria-hidden="false">
+    <button class="choice bellChoice" id="storyChoice" aria-label="鈴の音がする方へ">
+      <span class="shape bellShape"></span>
+      <span class="label">鈴</span>
+    </button>
+
+    <button class="choice signChoice" id="worldChoice" aria-label="古びた看板を読む">
+      <span class="shape signShape"></span>
+      <span class="label">看板</span>
+    </button>
+
+    <button class="choice paperChoice" id="galleryChoice" aria-label="落ちている紙を見る">
+      <span class="shape paperShape"></span>
+      <span class="label">紙</span>
+    </button>
+  </div>
+</main>
 
 <script>
+  const tapStart = document.getElementById('tapStart');
   const intro = document.getElementById('intro');
-  const status = document.getElementById('status');
+  const description = document.getElementById('description');
 
-  const bellObj = document.getElementById('bellObj');
-  const signObj = document.getElementById('signObj');
-  const paperObj = document.getElementById('paperObj');
+  const storyChoice = document.getElementById('storyChoice');
+  const worldChoice = document.getElementById('worldChoice');
+  const galleryChoice = document.getElementById('galleryChoice');
 
-  const hintLeft = document.getElementById('hintLeft');
-  const hintRight = document.getElementById('hintRight');
-  const hintBack = document.getElementById('hintBack');
+  const choices = [storyChoice, worldChoice, galleryChoice];
+  let started = false;
+  let activeChoice = null;
 
-  const goStory = document.getElementById('goStory');
-  const goWorld = document.getElementById('goWorld');
-  const turnBack = document.getElementById('turnBack');
-  const goGallery = document.getElementById('goGallery');
+  const choiceData = {
+    storyChoice: {
+      title: '鈴の音がする方へ',
+      text: 'かすかに聞こえる音を追う。物語へ進む。',
+      href: 'story.html'
+    },
+    worldChoice: {
+      title: '古びた看板を読む',
+      text: 'この場所について知る。世界観や資料を見る。',
+      href: 'worldbuilding.html'
+    },
+    galleryChoice: {
+      title: '落ちている紙を見る',
+      text: '誰かが残したものに触れる。イラストや展示を見る。',
+      href: 'gallery.html'
+    }
+  };
 
-  let turned = false;
-
-  function softenIntro() {
+  function showChoices() {
     intro.classList.add('dim');
-    status.classList.add('hide');
+    tapStart.classList.add('hidden');
+    choices.forEach((choice, i) => {
+      setTimeout(() => choice.classList.add('show'), i * 120);
+    });
+    started = true;
   }
 
-  goStory.addEventListener('mouseenter', () => {
-    bellObj.classList.add('show');
-    hintLeft.classList.add('show');
-    softenIntro();
-  });
+  function activateChoice(choice) {
+    choices.forEach(c => c.classList.remove('active'));
+    choice.classList.add('active');
+    activeChoice = choice;
 
-  goStory.addEventListener('mouseleave', () => {
-    bellObj.classList.remove('show');
-    hintLeft.classList.remove('show');
-    if (!turned) {
-      intro.classList.remove('dim');
-      status.classList.remove('hide');
-    }
-  });
-
-  goWorld.addEventListener('mouseenter', () => {
-    signObj.classList.add('show');
-    hintRight.classList.add('show');
-    softenIntro();
-  });
-
-  goWorld.addEventListener('mouseleave', () => {
-    signObj.classList.remove('show');
-    hintRight.classList.remove('show');
-    if (!turned) {
-      intro.classList.remove('dim');
-      status.classList.remove('hide');
-    }
-  });
-
-  turnBack.addEventListener('mouseenter', () => {
-    if (!turned) {
-      hintBack.classList.add('show');
-      softenIntro();
-    }
-  });
-
-  turnBack.addEventListener('mouseleave', () => {
-    if (!turned) {
-      hintBack.classList.remove('show');
-      intro.classList.remove('dim');
-      status.classList.remove('hide');
-    }
-  });
-
-  turnBack.addEventListener('click', () => {
-    turned = true;
-    intro.classList.add('dim');
-    status.textContent = '落ちている紙に気づく';
-    status.classList.remove('hide');
-
-    hintBack.classList.add('show');
-    paperObj.classList.add('show');
-    goGallery.classList.add('active');
-  });
-
-  goGallery.addEventListener('mouseenter', () => {
-    if (turned) {
-      hintBack.textContent = '拾い上げて、見る';
-    }
-  });
-
-  goGallery.addEventListener('mouseleave', () => {
-    if (turned) {
-      hintBack.textContent = '足元に紙が落ちている';
-    }
-  });
-
-  goStory.addEventListener('click', () => {
-    window.location.href = 'story.html';
-  });
-
-  goWorld.addEventListener('click', () => {
-    window.location.href = 'worldbuilding.html';
-  });
-
-  goGallery.addEventListener('click', () => {
-    window.location.href = 'gallery.html';
-  });
-
-  /* モバイル向けに軽い触覚的ヒント */
-  function flashHint(targetObj, targetHint) {
-    targetObj.classList.add('show');
-    targetHint.classList.add('show');
-    intro.classList.add('dim');
-    setTimeout(() => {
-      if (!turned || targetObj === paperObj) return;
-      targetObj.classList.remove('show');
-      targetHint.classList.remove('show');
-      intro.classList.remove('dim');
-    }, 900);
+    const data = choiceData[choice.id];
+    description.innerHTML = `<strong>${data.title}</strong>${data.text}`;
+    description.classList.add('show');
   }
 
-  goStory.addEventListener('touchstart', () => flashHint(bellObj, hintLeft), { passive: true });
-  goWorld.addEventListener('touchstart', () => flashHint(signObj, hintRight), { passive: true });
-  turnBack.addEventListener('touchstart', () => {
-    if (!turned) {
-      hintBack.classList.add('show');
-      intro.classList.add('dim');
+  function handleChoiceClick(choice) {
+    if (!started) return;
+
+    if (activeChoice !== choice) {
+      activateChoice(choice);
+      return;
     }
-  }, { passive: true });
+
+    const data = choiceData[choice.id];
+    window.location.href = data.href;
+  }
+
+  tapStart.addEventListener('click', showChoices);
+
+  choices.forEach(choice => {
+    choice.addEventListener('click', () => handleChoiceClick(choice));
+    choice.addEventListener('mouseenter', () => {
+      if (started) activateChoice(choice);
+    });
+  });
 </script>
 </body>
 </html>
