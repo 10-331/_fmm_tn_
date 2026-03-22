@@ -32,6 +32,10 @@ const el = {
 
 let dbPromise = null;
 
+let dragState = {
+  draggingId: null
+};
+
 init();
 
 async function init() {
@@ -179,6 +183,33 @@ function renderStage() {
 function createCharacterElement(character) {
   const wrapper = document.createElement("div");
   wrapper.className = "character";
+  wrapper.draggable = true;
+  wrapper.dataset.id = character.id;
+
+  wrapper.addEventListener("dragstart", (event) => {
+    dragState.draggingId = character.id;
+    wrapper.classList.add("is-dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", character.id);
+  });
+
+  wrapper.addEventListener("dragend", () => {
+    dragState.draggingId = null;
+    wrapper.classList.remove("is-dragging");
+  });
+
+  wrapper.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  });
+
+  wrapper.addEventListener("drop", async (event) => {
+    event.preventDefault();
+    const fromId = dragState.draggingId || event.dataTransfer.getData("text/plain");
+    const toId = character.id;
+    if (!fromId || !toId || fromId === toId) return;
+    await reorderCharacters(fromId, toId);
+  });
 
   const visual = document.createElement("div");
   visual.className = "character-visual";
@@ -225,6 +256,35 @@ function renderCharacterList() {
 
   if (state.characters.length === 0) {
     const empty = document.createElement("div");
+    const card = document.createElement("div");
+card.className = "char-card";
+card.draggable = true;
+card.dataset.id = character.id;
+
+card.addEventListener("dragstart", (event) => {
+  dragState.draggingId = character.id;
+  card.classList.add("is-dragging");
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", character.id);
+});
+
+card.addEventListener("dragend", () => {
+  dragState.draggingId = null;
+  card.classList.remove("is-dragging");
+});
+
+card.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+});
+
+card.addEventListener("drop", async (event) => {
+  event.preventDefault();
+  const fromId = dragState.draggingId || event.dataTransfer.getData("text/plain");
+  const toId = character.id;
+  if (!fromId || !toId || fromId === toId) return;
+  await reorderCharacters(fromId, toId);
+});
     empty.className = "empty";
     empty.textContent = "まだキャラが登録されていません。";
     el.characterList.appendChild(empty);
@@ -506,6 +566,19 @@ async function moveCharacter(id, direction) {
 
 async function removeCharacter(id) {
   state.characters = state.characters.filter((item) => item.id !== id);
+  await saveState();
+  renderAll();
+}
+
+async function reorderCharacters(fromId, toId) {
+  const fromIndex = state.characters.findIndex((item) => item.id === fromId);
+  const toIndex = state.characters.findIndex((item) => item.id === toId);
+
+  if (fromIndex < 0 || toIndex < 0 || fromIndex === toIndex) return;
+
+  const [moved] = state.characters.splice(fromIndex, 1);
+  state.characters.splice(toIndex, 0, moved);
+
   await saveState();
   renderAll();
 }
