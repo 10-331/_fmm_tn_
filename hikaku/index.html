@@ -10,7 +10,7 @@
   <div class="page">
     <header class="page-header">
       <h1>身長比較ツール</h1>
-      <p>立ち絵と身長を追加して比較できます。初回アップロード時に透過余白を自動調整し、あとから修正モードで微調整できます。</p>
+      <p>立ち絵と身長を追加して比較できます。画像なしでも登録でき、あとから修正モードで画像追加や位置調整ができます。</p>
     </header>
 
     <div class="layout">
@@ -34,7 +34,7 @@
           </label>
 
           <label class="field">
-            <span>画像（PNG推奨）</span>
+            <span>画像（任意 / PNG推奨）</span>
             <input id="imageInput" type="file" accept="image/*" />
           </label>
 
@@ -52,15 +52,15 @@
 
         <section class="panel">
           <h2>データ操作</h2>
-<div class="button-stack">
-  <button id="saveImageButton" class="btn">画像を保存</button>
-  <button id="exportButton" class="btn">JSONを書き出し</button>
-  <label class="btn file-btn">
-    <input id="importInput" type="file" accept=".json,application/json" hidden />
-    JSONを読み込み
-  </label>
-  <button id="clearButton" class="btn danger">全削除</button>
-</div>
+          <div class="button-stack">
+            <button id="saveImageButton" class="btn">画像を保存</button>
+            <button id="exportButton" class="btn">JSONを書き出し</button>
+            <label class="btn file-btn">
+              <input id="importInput" type="file" accept=".json,application/json" hidden />
+              JSONを読み込み
+            </label>
+            <button id="clearButton" class="btn danger">全削除</button>
+          </div>
         </section>
 
         <section class="panel">
@@ -74,22 +74,24 @@
 
       <main class="main">
         <section class="panel stage-panel">
-          <div class="panel-row top-align">
+          <div class="panel-row top-align stage-head">
             <div>
               <h2>比較ビュー</h2>
               <p class="sub">足元基準で並びます。横スクロール対応。</p>
             </div>
 
-            <label class="field compact">
-              <span>最大目盛り</span>
-              <select id="maxCmSelect">
-                <option value="160">160cm</option>
-                <option value="180">180cm</option>
-                <option value="200" selected>200cm</option>
-                <option value="220">220cm</option>
-                <option value="250">250cm</option>
-              </select>
-            </label>
+            <div class="stage-controls">
+              <label class="field compact">
+                <span>最大目盛り</span>
+                <select id="maxCmSelect">
+                  <option value="160">160cm</option>
+                  <option value="180">180cm</option>
+                  <option value="200" selected>200cm</option>
+                  <option value="220">220cm</option>
+                  <option value="250">250cm</option>
+                </select>
+              </label>
+            </div>
           </div>
 
           <div class="stage-scroll">
@@ -99,7 +101,8 @@
       </main>
     </div>
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
