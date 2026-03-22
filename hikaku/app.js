@@ -10,8 +10,7 @@ const IMAGE_OUTPUT_QUALITY = 0.92;
 
 const state = {
   characters: [],
-  maxCm: 200,
-  showLabel: true
+  maxCm: 200
 };
 
 const el = {
@@ -28,7 +27,6 @@ const el = {
   characterList: document.getElementById("characterList"),
   compareStage: document.getElementById("compareStage"),
   maxCmSelect: document.getElementById("maxCmSelect"),
-  labelToggle: document.getElementById("labelToggle"),
   countBadge: document.getElementById("countBadge")
 };
 
@@ -67,14 +65,6 @@ function bindEvents() {
     await saveState();
     renderStage();
   });
-
-  if (el.labelToggle) {
-    el.labelToggle.addEventListener("change", async () => {
-      state.showLabel = el.labelToggle.value === "show";
-      await saveState();
-      renderAll();
-    });
-  }
 }
 
 async function handleAddCharacter() {
@@ -120,6 +110,7 @@ async function handleAddCharacter() {
         offsetX: 0
       },
       slotX: getDefaultSlotX(state.characters.length),
+      showLabel: true,
       createdAt: Date.now()
     };
 
@@ -177,9 +168,6 @@ function resetForm() {
 
 function renderAll() {
   el.maxCmSelect.value = String(state.maxCm);
-  if (el.labelToggle) {
-    el.labelToggle.value = state.showLabel ? "show" : "hide";
-  }
   renderStage();
   renderCharacterList();
   renderCount();
@@ -199,7 +187,8 @@ function getStageContentWidth() {
 }
 
 function getStageTopPadding() {
-  return state.showLabel ? 44 : 8;
+  const anyLabelVisible = state.characters.some((character) => character.showLabel !== false);
+  return anyLabelVisible ? 44 : 8;
 }
 
 function renderStage() {
@@ -209,8 +198,6 @@ function renderStage() {
   const topPadding = getStageTopPadding();
   const totalStageHeight = stageHeight + topPadding;
   const stageWidth = getStageContentWidth();
-
-  // 一番下を 0cm にする
   const baselineY = totalStageHeight - 1;
 
   el.compareStage.innerHTML = "";
@@ -330,7 +317,7 @@ function createCharacterElement(character) {
   const scale = Number(character.correction.scale ?? 1);
   const visualHeight = character.height * PX_PER_CM * scale;
 
-  if (state.showLabel) {
+  if (character.showLabel !== false) {
     inner.appendChild(label);
   }
 
@@ -342,10 +329,11 @@ function createCharacterElement(character) {
     img.style.display = "block";
     inner.appendChild(img);
   } else {
-    const placeholder = document.createElement("div");
-    placeholder.className = "placeholder-figure";
-    placeholder.style.height = `${Math.max(40, visualHeight - 22)}px`;
-    inner.appendChild(placeholder);
+    const silhouette = document.createElement("div");
+    silhouette.className = "placeholder-silhouette";
+    silhouette.style.height = `${Math.max(52, visualHeight)}px`;
+    silhouette.style.setProperty("--silhouette-color", character.labelColor);
+    inner.appendChild(silhouette);
   }
 
   visual.appendChild(inner);
@@ -456,6 +444,23 @@ function createEditPanel(character) {
   const colorInput = colorField.querySelector("input");
   colorInput.addEventListener("input", async () => {
     await updateCharacter(character.id, { labelColor: colorInput.value });
+  });
+
+  const labelVisibleField = document.createElement("label");
+  labelVisibleField.className = "field";
+  labelVisibleField.innerHTML = `
+    <span>頭上ラベル表示</span>
+    <select>
+      <option value="show">表示</option>
+      <option value="hide">非表示</option>
+    </select>
+  `;
+  const labelVisibleInput = labelVisibleField.querySelector("select");
+  labelVisibleInput.value = character.showLabel === false ? "hide" : "show";
+  labelVisibleInput.addEventListener("change", async () => {
+    await updateCharacter(character.id, {
+      showLabel: labelVisibleInput.value === "show"
+    });
   });
 
   const imageRow = document.createElement("div");
@@ -579,9 +584,9 @@ function createEditPanel(character) {
 
   const note = document.createElement("div");
   note.className = "note";
-  note.textContent = "ステージ上ではキャラ全体を左右ドラッグして距離を調整できます。『キャラ位置』はその値です。";
+  note.textContent = "ステージ上ではキャラ全体を左右ドラッグして距離を調整できます。ラベル表示はキャラごとに切り替えできます。";
 
-  editGrid.append(nameField, heightField, colorField);
+  editGrid.append(nameField, heightField, colorField, labelVisibleField);
   panel.append(editGrid, imageRow, scaleRow, offsetYRow, offsetXRow, slotXRow, resetBtn, note);
   return panel;
 }
@@ -733,9 +738,8 @@ async function saveStageAsImage() {
 function exportJson() {
   const dataStr = JSON.stringify(
     {
-      version: 7,
+      version: 8,
       maxCm: state.maxCm,
-      showLabel: state.showLabel,
       characters: state.characters
     },
     null,
@@ -768,7 +772,6 @@ async function importJson(event) {
     state.characters = parsed.characters.map(normalizeCharacter);
     normalizeSlotPositions();
     state.maxCm = Number(parsed.maxCm) || 200;
-    state.showLabel = parsed.showLabel !== false;
     await saveState();
     renderAll();
   } catch (error) {
@@ -793,6 +796,7 @@ function normalizeCharacter(character) {
       offsetX: Number(character.correction?.offsetX ?? 0)
     },
     slotX: Number(character.slotX ?? 0),
+    showLabel: character.showLabel !== false,
     createdAt: character.createdAt || Date.now()
   };
 }
@@ -826,9 +830,8 @@ async function saveState() {
 
     store.put(
       {
-        version: 7,
+        version: 8,
         maxCm: state.maxCm,
-        showLabel: state.showLabel,
         characters: state.characters
       },
       APP_STATE_KEY
@@ -855,12 +858,10 @@ async function loadState() {
   if (!saved) {
     state.characters = [];
     state.maxCm = 200;
-    state.showLabel = true;
     return;
   }
 
   state.maxCm = Number(saved.maxCm) || 200;
-  state.showLabel = saved.showLabel !== false;
   state.characters = Array.isArray(saved.characters)
     ? saved.characters.map(normalizeCharacter)
     : [];
