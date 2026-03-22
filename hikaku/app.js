@@ -585,6 +585,12 @@ async function updateCharacterCorrection(id, patch) {
 
   await saveState();
   renderStage();
+  if (state.characters.length === 0) {
+  const emptyHint = document.createElement("div");
+  emptyHint.className = "stage-empty-hint";
+  emptyHint.textContent = "キャラを追加するとここに表示されます";
+  el.compareStage.appendChild(emptyHint);
+}
 }
 
 async function moveCharacter(id, direction) {
