@@ -1,279 +1,568 @@
-const DB_NAME = 'heightComparisonDB';
-const STORE_NAME = 'characters';
-const DB_VERSION = 1;
+const STORAGE_KEY = "height-comparison-tool-v2";
+const PX_PER_CM = 4;
+const BASE_CHARACTER_WIDTH = 140;
 
-const form = document.getElementById('characterForm');
-const nameInput = document.getElementById('name');
-const heightInput = document.getElementById('height');
-const colorInput = document.getElementById('labelColor');
-const imageInput = document.getElementById('image');
-const sortModeInput = document.getElementById('sortMode');
-const maxScaleInput = document.getElementById('maxScale');
-const stage = document.getElementById('comparisonStage');
-const list = document.getElementById('characterList');
-const exportBtn = document.getElementById('exportBtn');
-const importInput = document.getElementById('importInput');
-const clearBtn = document.getElementById('clearBtn');
-const characterItemTemplate = document.getElementById('characterItemTemplate');
+const state = {
+  characters: [],
+  maxCm: 200
+};
 
-let db;
-let characters = [];
+const el = {
+  nameInput: document.getElementById("nameInput"),
+  heightInput: document.getElementById("heightInput"),
+  labelColorInput: document.getElementById("labelColorInput"),
+  imageInput: document.getElementById("imageInput"),
+  insertModeInput: document.getElementById("insertModeInput"),
+  addButton: document.getElementById("addButton"),
+  exportButton: document.getElementById("exportButton"),
+  importInput: document.getElementById("importInput"),
+  clearButton: document.getElementById("clearButton"),
+  characterList: document.getElementById("characterList"),
+  compareStage: document.getElementById("compareStage"),
+  maxCmSelect: document.getElementById("maxCmSelect"),
+  countBadge: document.getElementById("countBadge")
+};
 
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+init();
 
-    request.onupgradeneeded = (event) => {
-      const database = event.target.result;
-      if (!database.objectStoreNames.contains(STORE_NAME)) {
-        database.createObjectStore(STORE_NAME, { keyPath: 'id' });
-      }
+function init() {
+  loadState();
+  bindEvents();
+  renderAll();
+}
+
+function bindEvents() {
+  el.addButton.addEventListener("click", handleAddCharacter);
+  el.exportButton.addEventListener("click", exportJson);
+  el.importInput.addEventListener("change", importJson);
+  el.clearButton.addEventListener("click", clearAll);
+  el.maxCmSelect.addEventListener("change", () => {
+    state.maxCm = Number(el.maxCmSelect.value);
+    saveState();
+    renderStage();
+  });
+}
+
+async function handleAddCharacter() {
+  const name = el.nameInput.value.trim();
+  const height = Number(el.heightInput.value);
+  const labelColor = el.labelColorInput.value;
+  const file = el.imageInput.files?.[0];
+  const insertMode = el.insertModeInput.value;
+
+  if (!name) {
+    alert("名前を入力してください。");
+    return;
+  }
+
+  if (!height || height <= 0) {
+    alert("身長を正しく入力してください。");
+    return;
+  }
+
+  if (!file) {
+    alert("画像を選択してください。");
+    return;
+  }
+
+  try {
+    const originalImageData = await fileToDataURL(file);
+    const trimmed = await trimTransparentImage(originalImageData);
+
+    const character = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+      name,
+      height,
+      labelColor,
+      imageData: trimmed.dataUrl,
+      imageMeta: {
+        width: trimmed.width,
+        height: trimmed.height
+      },
+      correction: {
+        scale: 1,
+        offsetY: 0,
+        offsetX: 0
+      },
+      createdAt: Date.now()
     };
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    state.characters.push(character);
+    sortCharacters(insertMode);
+    saveState();
+    renderAll();
+    resetForm();
+  } catch (error) {
+    console.error(error);
+    alert("画像の読み込みに失敗しました。PNG推奨です。");
+  }
+}
+
+function sortCharacters(mode) {
+  if (mode === "heightAsc") {
+    state.characters.sort((a, b) => a.height - b.height);
+  } else if (mode === "heightDesc") {
+    state.characters.sort((a, b) => b.height - a.height);
+  }
+}
+
+function resetForm() {
+  el.nameInput.value = "";
+  el.heightInput.value = "160";
+  el.imageInput.value = "";
+}
+
+function renderAll() {
+  el.maxCmSelect.value = String(state.maxCm);
+  renderStage();
+  renderCharacterList();
+  renderCount();
+}
+
+function renderCount() {
+  el.countBadge.textContent = `${state.characters.length}人`;
+}
+
+function renderStage() {
+  const stageHeight = state.maxCm * PX_PER_CM;
+  const baseWidth = Math.max(1000, 120 + state.characters.length * (BASE_CHARACTER_WIDTH + 20));
+
+  el.compareStage.innerHTML = "";
+  el.compareStage.style.height = `${stageHeight + 40}px`;
+  el.compareStage.style.minWidth = `${baseWidth}px`;
+
+  for (let cm = 0; cm <= state.maxCm; cm += 10) {
+    const y = stageHeight - cm * PX_PER_CM;
+
+    const line = document.createElement("div");
+    line.className = `guide-line ${cm % 50 === 0 ? "major" : ""}`;
+    line.style.top = `${y}px`;
+    el.compareStage.appendChild(line);
+
+    const label = document.createElement("div");
+    label.className = "guide-label";
+    label.style.top = `${y}px`;
+    label.textContent = `${cm}`;
+    el.compareStage.appendChild(label);
+  }
+
+  const ground = document.createElement("div");
+  ground.className = "ground-line";
+  el.compareStage.appendChild(ground);
+
+  const strip = document.createElement("div");
+  strip.className = "characters-strip";
+  el.compareStage.appendChild(strip);
+
+  state.characters.forEach((character) => {
+    strip.appendChild(createCharacterElement(character));
   });
 }
 
-function tx(storeMode = 'readonly') {
-  return db.transaction(STORE_NAME, storeMode).objectStore(STORE_NAME);
+function createCharacterElement(character) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "character";
+
+  const visual = document.createElement("div");
+  visual.className = "character-visual";
+  visual.style.setProperty("--offset-x", `${character.correction.offsetX || 0}px`);
+  visual.style.bottom = `${character.correction.offsetY || 0}px`;
+
+  const label = document.createElement("div");
+  label.className = "character-label";
+  label.style.background = character.labelColor;
+  label.innerHTML = `
+    <span class="cm">${escapeHtml(character.height)}cm</span>
+    <span class="name">${escapeHtml(character.name)}</span>
+  `;
+
+  const img = document.createElement("img");
+  img.src = character.imageData;
+  img.alt = character.name;
+
+  const scale = Number(character.correction.scale ?? 1);
+  const visualHeight = character.height * PX_PER_CM * scale;
+  img.style.height = `${visualHeight}px`;
+
+  visual.appendChild(label);
+  visual.appendChild(img);
+
+  const bottomName = document.createElement("div");
+  bottomName.className = "character-name-bottom";
+  bottomName.textContent = character.name;
+
+  wrapper.appendChild(visual);
+  wrapper.appendChild(bottomName);
+  return wrapper;
 }
 
-function getAllCharacters() {
-  return new Promise((resolve, reject) => {
-    const request = tx().getAll();
-    request.onsuccess = () => resolve(request.result || []);
-    request.onerror = () => reject(request.error);
+function renderCharacterList() {
+  el.characterList.innerHTML = "";
+
+  if (state.characters.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "まだキャラが登録されていません。";
+    el.characterList.appendChild(empty);
+    return;
+  }
+
+  state.characters.forEach((character) => {
+    const card = document.createElement("div");
+    card.className = "char-card";
+
+    const head = document.createElement("div");
+    head.className = "char-card-head";
+
+    const titleArea = document.createElement("div");
+    titleArea.innerHTML = `
+      <div class="char-card-title">${escapeHtml(character.name)}</div>
+      <div class="char-card-sub">${escapeHtml(character.height)}cm</div>
+    `;
+
+    const actions = document.createElement("div");
+    actions.className = "char-card-actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "mini-btn";
+    editBtn.textContent = "修正モード";
+    editBtn.addEventListener("click", () => {
+      editPanel.classList.toggle("open");
+    });
+
+    const upBtn = document.createElement("button");
+    upBtn.className = "mini-btn";
+    upBtn.textContent = "↑";
+    upBtn.addEventListener("click", () => moveCharacter(character.id, -1));
+
+    const downBtn = document.createElement("button");
+    downBtn.className = "mini-btn";
+    downBtn.textContent = "↓";
+    downBtn.addEventListener("click", () => moveCharacter(character.id, 1));
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "mini-btn delete";
+    deleteBtn.textContent = "削除";
+    deleteBtn.addEventListener("click", () => removeCharacter(character.id));
+
+    actions.append(editBtn, upBtn, downBtn, deleteBtn);
+    head.append(titleArea, actions);
+
+    const editPanel = createEditPanel(character);
+
+    card.append(head, editPanel);
+    el.characterList.appendChild(card);
   });
 }
 
-function saveCharacter(character) {
-  return new Promise((resolve, reject) => {
-    const request = tx('readwrite').put(character);
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
+function createEditPanel(character) {
+  const panel = document.createElement("div");
+  panel.className = "edit-panel";
+
+  const scaleValue = Number(character.correction.scale ?? 1).toFixed(2);
+  const offsetYValue = Number(character.correction.offsetY ?? 0);
+  const offsetXValue = Number(character.correction.offsetX ?? 0);
+
+  const scaleRow = createRangeRow(
+    "見た目補正スケール",
+    0.7,
+    1.3,
+    0.01,
+    Number(scaleValue),
+    (valueEl, input) => {
+      valueEl.textContent = Number(input.value).toFixed(2);
+      updateCharacterCorrection(character.id, { scale: Number(input.value) });
+    }
+  );
+
+  const offsetYRow = createRangeRow(
+    "足元の上下補正",
+    -120,
+    120,
+    1,
+    offsetYValue,
+    (valueEl, input) => {
+      valueEl.textContent = `${input.value}px`;
+      updateCharacterCorrection(character.id, { offsetY: Number(input.value) });
+    },
+    "px"
+  );
+
+  const offsetXRow = createRangeRow(
+    "左右位置補正",
+    -80,
+    80,
+    1,
+    offsetXValue,
+    (valueEl, input) => {
+      valueEl.textContent = `${input.value}px`;
+      updateCharacterCorrection(character.id, { offsetX: Number(input.value) });
+    },
+    "px"
+  );
+
+  const resetBtn = document.createElement("button");
+  resetBtn.className = "mini-btn";
+  resetBtn.textContent = "補正をリセット";
+  resetBtn.addEventListener("click", () => {
+    updateCharacterCorrection(character.id, {
+      scale: 1,
+      offsetY: 0,
+      offsetX: 0
+    });
+    renderAll();
   });
+
+  const note = document.createElement("div");
+  note.className = "note";
+  note.textContent = "スケールは見た目補正です。基本は自動トリミングと足元補正を優先し、必要なときだけ少し触るのがおすすめです。";
+
+  panel.append(scaleRow, offsetYRow, offsetXRow, resetBtn, note);
+  return panel;
 }
 
-function deleteCharacter(id) {
-  return new Promise((resolve, reject) => {
-    const request = tx('readwrite').delete(id);
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
+function createRangeRow(labelText, min, max, step, value, onInput, unit = "") {
+  const row = document.createElement("div");
+  row.className = "range-row";
+
+  const label = document.createElement("label");
+  const title = document.createElement("span");
+  title.textContent = labelText;
+
+  const valueEl = document.createElement("span");
+  valueEl.textContent = unit ? `${value}${unit}` : String(value);
+
+  label.append(title, valueEl);
+
+  const input = document.createElement("input");
+  input.type = "range";
+  input.min = String(min);
+  input.max = String(max);
+  input.step = String(step);
+  input.value = String(value);
+
+  input.addEventListener("input", () => onInput(valueEl, input));
+
+  row.append(label, input);
+  return row;
 }
 
-function clearCharacters() {
-  return new Promise((resolve, reject) => {
-    const request = tx('readwrite').clear();
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
+function updateCharacterCorrection(id, patch) {
+  const character = state.characters.find((item) => item.id === id);
+  if (!character) return;
+
+  character.correction = {
+    scale: Number(character.correction.scale ?? 1),
+    offsetY: Number(character.correction.offsetY ?? 0),
+    offsetX: Number(character.correction.offsetX ?? 0),
+    ...patch
+  };
+
+  saveState();
+  renderStage();
+}
+
+function moveCharacter(id, direction) {
+  const index = state.characters.findIndex((item) => item.id === id);
+  if (index < 0) return;
+
+  const targetIndex = index + direction;
+  if (targetIndex < 0 || targetIndex >= state.characters.length) return;
+
+  const temp = state.characters[index];
+  state.characters[index] = state.characters[targetIndex];
+  state.characters[targetIndex] = temp;
+
+  saveState();
+  renderAll();
+}
+
+function removeCharacter(id) {
+  state.characters = state.characters.filter((item) => item.id !== id);
+  saveState();
+  renderAll();
+}
+
+function clearAll() {
+  if (!confirm("登録キャラをすべて削除します。")) return;
+  state.characters = [];
+  saveState();
+  renderAll();
+}
+
+function exportJson() {
+  const dataStr = JSON.stringify(
+    {
+      version: 2,
+      maxCm: state.maxCm,
+      characters: state.characters
+    },
+    null,
+    2
+  );
+
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "height-comparison-data.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+async function importJson(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+
+    if (!Array.isArray(parsed.characters)) {
+      throw new Error("characters がありません");
+    }
+
+    state.characters = parsed.characters.map(normalizeCharacter);
+    state.maxCm = Number(parsed.maxCm) || 200;
+    saveState();
+    renderAll();
+  } catch (error) {
+    console.error(error);
+    alert("JSONの読み込みに失敗しました。");
+  } finally {
+    el.importInput.value = "";
+  }
+}
+
+function normalizeCharacter(character) {
+  return {
+    id: character.id || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random())),
+    name: character.name || "名称未設定",
+    height: Number(character.height) || 160,
+    labelColor: character.labelColor || "#f2df9b",
+    imageData: character.imageData || "",
+    imageMeta: character.imageMeta || { width: 0, height: 0 },
+    correction: {
+      scale: Number(character.correction?.scale ?? 1),
+      offsetY: Number(character.correction?.offsetY ?? 0),
+      offsetX: Number(character.correction?.offsetX ?? 0)
+    },
+    createdAt: character.createdAt || Date.now()
+  };
+}
+
+function saveState() {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({
+      version: 2,
+      maxCm: state.maxCm,
+      characters: state.characters
+    })
+  );
+}
+
+function loadState() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
+
+  try {
+    const parsed = JSON.parse(raw);
+    state.maxCm = Number(parsed.maxCm) || 200;
+    state.characters = Array.isArray(parsed.characters)
+      ? parsed.characters.map(normalizeCharacter)
+      : [];
+  } catch (error) {
+    console.error("保存データの読み込みに失敗:", error);
+    state.characters = [];
+    state.maxCm = 200;
+  }
 }
 
 function fileToDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(reader.error);
+    reader.onerror = reject;
     reader.readAsDataURL(file);
   });
 }
 
-function sortCharacters(items) {
-  const mode = sortModeInput.value;
-  const copied = [...items];
-
-  if (mode === 'heightAsc') {
-    copied.sort((a, b) => a.height - b.height || a.createdAt - b.createdAt);
-  } else if (mode === 'heightDesc') {
-    copied.sort((a, b) => b.height - a.height || a.createdAt - b.createdAt);
-  } else {
-    copied.sort((a, b) => a.createdAt - b.createdAt);
-  }
-
-  return copied;
-}
-
-function renderScale() {
-  const maxScale = Number(maxScaleInput.value);
-  const groundOffset = 48;
-  const stageHeight = stage.clientHeight;
-  const usableHeight = stageHeight - groundOffset - 20;
-
-  stage.innerHTML = '';
-
-  for (let cm = 0; cm <= maxScale; cm += 10) {
-    const ratio = cm / maxScale;
-    const y = stageHeight - groundOffset - usableHeight * ratio;
-
-    const line = document.createElement('div');
-    line.className = `scale-line${cm % 50 === 0 ? ' major' : ''}`;
-    line.style.top = `${y}px`;
-
-    const label = document.createElement('div');
-    label.className = 'scale-label';
-    label.style.top = `${y}px`;
-    label.textContent = `${cm}`;
-
-    stage.appendChild(line);
-    stage.appendChild(label);
-  }
-
-  const ground = document.createElement('div');
-  ground.className = 'ground-line';
-  stage.appendChild(ground);
-
-  return { maxScale, usableHeight };
-}
-
-function renderCharacters() {
-  const { maxScale, usableHeight } = renderScale();
-  const ordered = sortCharacters(characters);
-  const row = document.createElement('div');
-  row.className = 'sprite-row';
-
-  ordered.forEach((character) => {
-    const figure = document.createElement('div');
-    figure.className = 'character-figure';
-
-    const img = document.createElement('img');
-    img.src = character.imageData;
-    img.alt = character.name;
-    const pxHeight = Math.max(40, Math.round((character.height / maxScale) * usableHeight));
-    img.style.height = `${pxHeight}px`;
-
-    const tag = document.createElement('div');
-    tag.className = 'height-tag';
-    tag.style.background = character.labelColor;
-    tag.innerHTML = `<strong>${character.height}cm</strong><span>${character.name}</span>`;
-
-    const nameLabel = document.createElement('div');
-    nameLabel.className = 'name-label';
-    nameLabel.textContent = character.name;
-
-    figure.appendChild(tag);
-    figure.appendChild(img);
-    figure.appendChild(nameLabel);
-    row.appendChild(figure);
-  });
-
-  stage.appendChild(row);
-}
-
-function renderList() {
-  if (!characters.length) {
-    list.className = 'character-list empty';
-    list.textContent = 'まだ登録されていません。';
-    return;
-  }
-
-  list.className = 'character-list';
-  list.innerHTML = '';
-
-  sortCharacters(characters).forEach((character) => {
-    const fragment = characterItemTemplate.content.cloneNode(true);
-    const item = fragment.querySelector('.character-item');
-    const chip = fragment.querySelector('.chip');
-    const sub = fragment.querySelector('.meta-sub');
-    const removeBtn = fragment.querySelector('.remove-btn');
-
-    chip.textContent = character.name;
-    chip.style.setProperty('--chip-color', character.labelColor);
-    sub.textContent = `${character.height}cm`;
-    removeBtn.addEventListener('click', async () => {
-      await deleteCharacter(character.id);
-      await refresh();
-    });
-
-    list.appendChild(item);
-    item.replaceWith(fragment);
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
   });
 }
 
-async function refresh() {
-  characters = await getAllCharacters();
-  renderCharacters();
-  renderList();
-}
+async function trimTransparentImage(dataUrl) {
+  const img = await loadImage(dataUrl);
 
-form.addEventListener('submit', async (event) => {
-  event.preventDefault();
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
 
-  const file = imageInput.files[0];
-  if (!file) {
-    alert('画像を選んでください。');
-    return;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(img, 0, 0);
+
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const { data, width, height } = imageData;
+
+  let top = null;
+  let bottom = null;
+  let left = null;
+  let right = null;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const alpha = data[(y * width + x) * 4 + 3];
+      if (alpha > 8) {
+        if (top === null) top = y;
+        bottom = y;
+        if (left === null || x < left) left = x;
+        if (right === null || x > right) right = x;
+      }
+    }
   }
 
-  const imageData = await fileToDataURL(file);
-  const character = {
-    id: crypto.randomUUID(),
-    name: nameInput.value.trim(),
-    height: Number(heightInput.value),
-    labelColor: colorInput.value,
-    imageData,
-    createdAt: Date.now(),
+  if (top === null || left === null || right === null || bottom === null) {
+    return {
+      dataUrl,
+      width: img.width,
+      height: img.height
+    };
+  }
+
+  const trimmedWidth = right - left + 1;
+  const trimmedHeight = bottom - top + 1;
+
+  const trimmedCanvas = document.createElement("canvas");
+  trimmedCanvas.width = trimmedWidth;
+  trimmedCanvas.height = trimmedHeight;
+
+  const trimmedCtx = trimmedCanvas.getContext("2d");
+  trimmedCtx.drawImage(
+    canvas,
+    left, top, trimmedWidth, trimmedHeight,
+    0, 0, trimmedWidth, trimmedHeight
+  );
+
+  return {
+    dataUrl: trimmedCanvas.toDataURL("image/png"),
+    width: trimmedWidth,
+    height: trimmedHeight
   };
+}
 
-  await saveCharacter(character);
-  form.reset();
-  colorInput.value = '#7cc8ff';
-  await refresh();
-});
-
-maxScaleInput.addEventListener('change', renderCharacters);
-sortModeInput.addEventListener('change', () => {
-  renderCharacters();
-  renderList();
-});
-
-exportBtn.addEventListener('click', async () => {
-  const data = await getAllCharacters();
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'height-comparison-data.json';
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-importInput.addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  try {
-    const text = await file.text();
-    const imported = JSON.parse(text);
-    if (!Array.isArray(imported)) {
-      throw new Error('JSONの形式が不正です。');
-    }
-
-    for (const item of imported) {
-      if (!item.id) item.id = crypto.randomUUID();
-      if (!item.createdAt) item.createdAt = Date.now();
-      await saveCharacter(item);
-    }
-
-    await refresh();
-    importInput.value = '';
-  } catch (error) {
-    console.error(error);
-    alert('JSONの読み込みに失敗しました。形式を確認してください。');
-  }
-});
-
-clearBtn.addEventListener('click', async () => {
-  const ok = confirm('登録したキャラを全部削除します。よければOK。');
-  if (!ok) return;
-  await clearCharacters();
-  await refresh();
-});
-
-window.addEventListener('resize', renderCharacters);
-
-(async function init() {
-  db = await openDB();
-  await refresh();
-})();
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
