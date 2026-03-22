@@ -52,14 +52,15 @@
 
         <section class="panel">
           <h2>データ操作</h2>
-          <div class="button-stack">
-            <button id="exportButton" class="btn">JSONを書き出し</button>
-            <label class="btn file-btn">
-              <input id="importInput" type="file" accept=".json,application/json" hidden />
-              JSONを読み込み
-            </label>
-            <button id="clearButton" class="btn danger">全削除</button>
-          </div>
+<div class="button-stack">
+  <button id="saveImageButton" class="btn">画像を保存</button>
+  <button id="exportButton" class="btn">JSONを書き出し</button>
+  <label class="btn file-btn">
+    <input id="importInput" type="file" accept=".json,application/json" hidden />
+    JSONを読み込み
+  </label>
+  <button id="clearButton" class="btn danger">全削除</button>
+</div>
         </section>
 
         <section class="panel">
@@ -98,7 +99,7 @@
       </main>
     </div>
   </div>
-
-  <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
