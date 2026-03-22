@@ -344,55 +344,84 @@ input[type="file"]{
   margin-top: 2px;
 }
 
-.placeholder-silhouette{
-  --silhouette-color: #9aa3b8;
+.placeholder-human{
+  --human-color: #9aa3b8;
   position: relative;
-  width: 42px;
-  min-width: 42px;
-  background: color-mix(in srgb, var(--silhouette-color) 72%, #ffffff 28%);
-  border-radius: 14px 14px 10px 10px;
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.22),
-    0 4px 10px rgba(40,48,66,0.08);
+  width: 54px;
+  min-width: 54px;
 }
 
-.placeholder-silhouette::before{
-  content: "";
+.placeholder-head{
   position: absolute;
-  top: -24px;
+  top: 0;
   left: 50%;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   transform: translateX(-50%);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--silhouette-color) 78%, #ffffff 22%);
+  background: color-mix(in srgb, var(--human-color) 78%, #ffffff 22%);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22);
 }
 
-.placeholder-silhouette::after{
-  content: "";
+.placeholder-body{
   position: absolute;
+  top: 22px;
   left: 50%;
-  bottom: 16px;
-  width: 62px;
-  height: 38%;
+  width: 24px;
+  height: calc(100% - 56px);
   transform: translateX(-50%);
-  background:
-    linear-gradient(
-      to right,
-      transparent 0 18%,
-      color-mix(in srgb, var(--silhouette-color) 78%, #ffffff 22%) 18% 32%,
-      transparent 32% 40%,
-      color-mix(in srgb, var(--silhouette-color) 78%, #ffffff 22%) 40% 60%,
-      transparent 60% 68%,
-      color-mix(in srgb, var(--silhouette-color) 78%, #ffffff 22%) 68% 82%,
-      transparent 82% 100%
-    );
-  pointer-events: none;
+  border-radius: 12px 12px 8px 8px;
+  background: color-mix(in srgb, var(--human-color) 74%, #ffffff 26%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18);
 }
+
+.placeholder-arm{
+  position: absolute;
+  top: 30px;
+  width: 9px;
+  height: calc(100% - 84px);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--human-color) 76%, #ffffff 24%);
+  opacity: 0.95;
+}
+
+.placeholder-arm.left{
+  left: 8px;
+  transform: rotate(6deg);
+}
+
+.placeholder-arm.right{
+  right: 8px;
+  transform: rotate(-6deg);
+}
+
+.placeholder-leg{
+  position: absolute;
+  bottom: 0;
+  width: 10px;
+  height: 34px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--human-color) 80%, #ffffff 20%);
+}
+
+.placeholder-leg.left{
+  left: 18px;
+}
+
+.placeholder-leg.right{
+  right: 18px;
+}
+
 .character-list{
   display: grid;
   gap: 10px;
+}
+
+.character-label .age{
+  display: block;
+  font-size: 0.66rem;
+  color: var(--label-subtext, rgba(255,255,255,0.92));
+  margin-top: 2px;
 }
 
 .char-card{
