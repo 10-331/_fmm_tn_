@@ -220,7 +220,8 @@ input[type="file"]{
   min-width: 1000px;
   border: 1px solid #cfd6e4;
   border-radius: 16px;
-  background: var(--stage-bg);
+  background:
+    linear-gradient(180deg, #f8f9fc 0%, #f4f6fb 100%);
   overflow: hidden;
 }
 
@@ -228,12 +229,12 @@ input[type="file"]{
   position: absolute;
   left: 0;
   right: 0;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid rgba(150, 162, 186, 0.38);
   pointer-events: none;
 }
 
 .guide-line.major{
-  border-top-color: var(--line-strong);
+  border-top-color: rgba(120, 134, 162, 0.62);
 }
 
 .guide-label{
@@ -241,8 +242,11 @@ input[type="file"]{
   left: 12px;
   transform: translateY(-50%);
   font-size: 12px;
-  color: #667085;
+  color: #6a7488;
   pointer-events: none;
+  background: rgba(248, 249, 252, 0.82);
+  padding: 0 4px;
+  border-radius: 6px;
 }
 
 .ground-line{
@@ -250,7 +254,22 @@ input[type="file"]{
   left: 0;
   right: 0;
   bottom: 0;
-  border-top: 2px solid #9ba7bf;
+  border-top: 2px solid #8f9bb3;
+}
+
+.stage-empty-hint{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(90, 103, 126, 0.58);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  background: rgba(248,249,252,0.72);
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px dashed rgba(150,162,186,0.32);
 }
 
 .characters-strip
