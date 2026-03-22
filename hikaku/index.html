@@ -7,103 +7,97 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div>
+  <div class="page">
+    <header class="page-header">
       <h1>身長比較ツール</h1>
-      <p class="sub">立ち絵と身長を追加して、横並びで比較できます。保存はブラウザ内。GitHub Pagesでも動きます。</p>
-    </div>
-  </header>
+      <p>立ち絵と身長を追加して比較できます。初回アップロード時に透過余白を自動調整し、あとから修正モードで微調整できます。</p>
+    </header>
 
-  <main class="app-shell">
-    <aside class="panel">
-      <section class="card">
-        <h2>キャラ追加</h2>
-        <form id="characterForm" class="form-grid">
-          <label>
-            名前
-            <input type="text" id="name" placeholder="例：綾" required />
+    <div class="layout">
+      <aside class="sidebar">
+        <section class="panel">
+          <h2>キャラ追加</h2>
+
+          <label class="field">
+            <span>名前</span>
+            <input id="nameInput" type="text" placeholder="例：綾" />
           </label>
 
-          <label>
-            身長(cm)
-            <input type="number" id="height" min="1" max="250" placeholder="160" required />
+          <label class="field">
+            <span>身長(cm)</span>
+            <input id="heightInput" type="number" min="1" max="300" value="160" />
           </label>
 
-          <label>
-            ラベル色
-            <input type="color" id="labelColor" value="#7cc8ff" />
+          <label class="field">
+            <span>ラベル色</span>
+            <input id="labelColorInput" type="color" value="#f2df9b" />
           </label>
 
-          <label>
-            画像(PNG推奨)
-            <input type="file" id="image" accept="image/png,image/webp,image/jpeg" required />
+          <label class="field">
+            <span>画像（PNG推奨）</span>
+            <input id="imageInput" type="file" accept="image/*" />
           </label>
 
-          <label>
-            表示順
-            <select id="sortMode">
-              <option value="append">末尾に追加</option>
-              <option value="heightAsc">身長が低い順</option>
-              <option value="heightDesc">身長が高い順</option>
+          <label class="field">
+            <span>表示順</span>
+            <select id="insertModeInput">
+              <option value="end">末尾に追加</option>
+              <option value="heightAsc">身長が低い順で並べる</option>
+              <option value="heightDesc">身長が高い順で並べる</option>
             </select>
           </label>
 
-          <button type="submit" class="primary">追加する</button>
-        </form>
-      </section>
+          <button id="addButton" class="btn primary">追加する</button>
+        </section>
 
-      <section class="card actions-card">
-        <h2>データ操作</h2>
-        <div class="actions">
-          <button id="exportBtn">JSONを書き出し</button>
-          <label class="import-label">
-            JSONを読み込み
-            <input type="file" id="importInput" accept="application/json" />
-          </label>
-          <button id="clearBtn" class="danger">全部削除</button>
-        </div>
-      </section>
+        <section class="panel">
+          <h2>データ操作</h2>
+          <div class="button-stack">
+            <button id="exportButton" class="btn">JSONを書き出し</button>
+            <label class="btn file-btn">
+              <input id="importInput" type="file" accept=".json,application/json" hidden />
+              JSONを読み込み
+            </label>
+            <button id="clearButton" class="btn danger">全削除</button>
+          </div>
+        </section>
 
-      <section class="card">
-        <h2>登録キャラ</h2>
-        <div id="characterList" class="character-list empty">まだ登録されていません。</div>
-      </section>
-    </aside>
+        <section class="panel">
+          <div class="panel-row">
+            <h2>登録キャラ</h2>
+            <span id="countBadge" class="count-badge">0人</span>
+          </div>
+          <div id="characterList" class="character-list"></div>
+        </section>
+      </aside>
 
-    <section class="viewer card">
-      <div class="viewer-head">
-        <div>
-          <h2>比較ビュー</h2>
-          <p>足元基準で並びます。横スクロール対応。</p>
-        </div>
-        <div class="viewer-options">
-          <label>
-            最大目盛り
-            <select id="maxScale">
-              <option value="180">180cm</option>
-              <option value="200" selected>200cm</option>
-              <option value="220">220cm</option>
-              <option value="250">250cm</option>
-            </select>
-          </label>
-        </div>
-      </div>
+      <main class="main">
+        <section class="panel stage-panel">
+          <div class="panel-row top-align">
+            <div>
+              <h2>比較ビュー</h2>
+              <p class="sub">足元基準で並びます。横スクロール対応。</p>
+            </div>
 
-      <div class="comparison-wrap">
-        <div id="comparisonStage" class="comparison-stage"></div>
-      </div>
-    </section>
-  </main>
+            <label class="field compact">
+              <span>最大目盛り</span>
+              <select id="maxCmSelect">
+                <option value="160">160cm</option>
+                <option value="180">180cm</option>
+                <option value="200" selected>200cm</option>
+                <option value="220">220cm</option>
+                <option value="250">250cm</option>
+              </select>
+            </label>
+          </div>
 
-  <template id="characterItemTemplate">
-    <div class="character-item">
-      <div class="meta-row">
-        <span class="chip"></span>
-        <button class="remove-btn" type="button">削除</button>
-      </div>
-      <div class="meta-sub"></div>
+          <div class="stage-scroll">
+            <div id="compareStage" class="compare-stage"></div>
+          </div>
+        </section>
+      </main>
     </div>
-  </template>
+  </div>
 
   <script src="app.js"></script>
 </body>
