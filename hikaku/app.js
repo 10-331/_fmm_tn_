@@ -97,8 +97,20 @@ async function handleAddCharacter() {
     }
 
 const character = {
-
-    state.characters.push(character);
+  id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()),
+  name,
+  height,
+  labelColor,
+  imageData,
+  imageMeta,
+  correction: {
+    scale: 1,
+    offsetY: 0,
+    offsetX: 0
+  },
+  slotX: getDefaultSlotX(state.characters.length),
+  createdAt: Date.now()
+};
     sortCharacters(insertMode);
     normalizeSlotPositions();
     await saveState();
