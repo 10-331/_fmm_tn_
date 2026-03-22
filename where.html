@@ -5,344 +5,117 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>入口</title>
 <style>
-  :root{
-    --bg-1:#0b0c10;
-    --bg-2:#14161b;
-    --text:#ece8df;
-    --muted:rgba(236,232,223,.66);
-  }
+:root{
+  --bg-1:#0b0c10;
+  --bg-2:#14161b;
+  --text:#ece8df;
+  --muted:rgba(236,232,223,.66);
+}
 
-  *{
-    box-sizing:border-box;
-  }
+*{ box-sizing:border-box; }
 
-  html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:
-      radial-gradient(circle at 50% 42%, rgba(95,105,120,.08), transparent 34%),
-      radial-gradient(circle at 50% 50%, #1a1d24 0%, var(--bg-2) 38%, var(--bg-1) 100%);
-    color:var(--text);
-    font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
-  }
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(95,105,120,.08), transparent 34%),
+    radial-gradient(circle at 50% 50%, #1a1d24 0%, var(--bg-2) 38%, var(--bg-1) 100%);
+  color:var(--text);
+  font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+}
 
-  body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    background:
-      linear-gradient(to bottom, rgba(255,255,255,.03), transparent 20%, transparent 80%, rgba(255,255,255,.02)),
-      radial-gradient(circle at 50% 20%, rgba(255,255,255,.03), transparent 24%);
-    opacity:.55;
-  }
+.scene{ position:relative; width:100%; height:100%; }
 
-  .scene{
-    position:relative;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    isolation:isolate;
-  }
+.intro{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:7vh 6vw;
+  z-index:3;
+  transition:.5s;
+}
 
-  .veil{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    background:radial-gradient(circle at center, transparent 18%, rgba(0,0,0,.18) 72%, rgba(0,0,0,.45) 100%);
-    z-index:1;
-  }
+.intro.dim{ opacity:.18; filter:blur(1px); }
 
-  .intro{
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:7vh 6vw;
-    z-index:3;
-    transition:opacity .55s ease, transform .55s ease, filter .55s ease;
-    pointer-events:none;
-  }
+.introText{
+  writing-mode:vertical-rl;
+  font-size:clamp(20px, 4.8vw, 30px);
+  line-height:2.1;
+  letter-spacing:.12em;
+  white-space:pre-wrap;
+}
 
-  .intro.dim{
-    opacity:.18;
-    filter:blur(1px);
-    transform:scale(.985);
-  }
+.tapStart{
+  position:absolute;
+  inset:0;
+  z-index:8;
+  background:transparent;
+  border:none;
+}
 
-  .introText{
-    writing-mode:vertical-rl;
-    text-orientation:mixed;
-    font-size:clamp(20px, 4.8vw, 30px);
-    line-height:2.15;
-    letter-spacing:.12em;
-    max-height:76vh;
-    white-space:pre-wrap;
-    text-shadow:0 0 12px rgba(255,255,255,.05);
-  }
+.tapStart.hidden{ pointer-events:none; }
 
-  .tapStart{
-    position:absolute;
-    inset:0;
-    z-index:8;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:transparent;
-    border:none;
-    cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
-  }
+.tapGuide{
+  position:absolute;
+  bottom:7vh;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:12px;
+  color:rgba(236,232,223,.52);
+}
 
-  .tapStart.hidden{
-    pointer-events:none;
-  }
+.choice{
+  position:absolute;
+  opacity:0;
+  transition:.4s;
+  background:none;
+  border:none;
+  color:#fff;
+}
 
-  .tapGuide{
-    position:absolute;
-    bottom:7vh;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:12px;
-    letter-spacing:.16em;
-    color:rgba(236,232,223,.52);
-    transition:opacity .35s ease;
-    pointer-events:none;
-  }
+.choice.show{ opacity:1; }
 
-  .tapStart.hidden .tapGuide{
-    opacity:0;
-  }
+.voiceChoice{ left:9vw; top:45%; }
+.signChoice{ right:8vw; top:42%; }
+.paperChoice{ left:50%; bottom:12vh; transform:translateX(-50%); }
 
-  .backZone{
-    position:absolute;
-    inset:0;
-    z-index:2;
-    background:transparent;
-    border:none;
-    padding:0;
-    margin:0;
-    cursor:default;
-    -webkit-tap-highlight-color:transparent;
-  }
+.description{
+  position:absolute;
+  top:6vh;
+  left:50%;
+  transform:translateX(-50%);
+  opacity:0;
+  transition:.3s;
+}
 
-  .description{
-    position:absolute;
-    top:7vh;
-    left:50%;
-    transform:translateX(-50%);
-    width:min(88vw, 430px);
-    min-height:64px;
-    text-align:center;
-    z-index:7;
-    opacity:0;
-    transition:opacity .3s ease;
-    pointer-events:none;
-    padding:0 8px;
-  }
+.description.show{ opacity:1; }
 
-  .description.show{
-    opacity:1;
-  }
+/* ▼ 白フェード */
+.pageFade{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,255,255,.18), rgba(255,255,255,.85) 60%, #fff 100%);
+  opacity:0;
+  pointer-events:none;
+  z-index:9999;
+  transition:opacity 1s ease;
+}
+.pageFade.show{ opacity:1; }
 
-  .descriptionTitle{
-    font-size:14px;
-    letter-spacing:.12em;
-    color:var(--text);
-    margin-bottom:8px;
-  }
-
-  .descriptionText{
-    font-size:13px;
-    line-height:1.9;
-    letter-spacing:.06em;
-    color:var(--muted);
-  }
-
-  .choiceObjects{
-    position:absolute;
-    inset:0;
-    z-index:4;
-    pointer-events:none;
-  }
-
-  .choice{
-    position:absolute;
-    opacity:0;
-    transform:translateY(10px);
-    transition:
-      opacity .45s ease,
-      transform .45s ease,
-      text-shadow .3s ease;
-    pointer-events:auto;
-    background:transparent;
-    border:none;
-    color:var(--text);
-    padding:0;
-    margin:0;
-    cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
-  }
-
-  .choice.show{
-    opacity:1;
-    transform:translateY(0);
-  }
-
-  .choice:focus-visible{
-    outline:1px solid rgba(255,255,255,.35);
-    outline-offset:6px;
-  }
-
-  .choice .shape{
-    position:relative;
-    display:block;
-    filter:drop-shadow(0 0 14px rgba(255,255,255,.03));
-  }
-
-  .choice .label{
-    margin-top:10px;
-    font-size:12px;
-    letter-spacing:.12em;
-    color:rgba(236,232,223,.72);
-    white-space:nowrap;
-    text-align:center;
-    opacity:.9;
-    transition:opacity .35s ease, color .35s ease, text-shadow .35s ease;
-  }
-
-  .choice.active .label{
-    opacity:1;
-    color:#f3efe7;
-    text-shadow:0 0 8px rgba(255,255,255,.14);
-  }
-
-  /* 声 */
-  .voiceChoice{
-    left:9vw;
-    top:45%;
-  }
-
-  .voiceShape{
-    width:46px;
-    height:88px;
-  }
-
-  .voiceShape::before,
-  .voiceShape::after{
-    content:"";
-    position:absolute;
-    border:1px solid rgba(255,255,255,.26);
-    border-left-color:transparent;
-    border-top-color:transparent;
-    border-bottom-color:transparent;
-    border-radius:50%;
-    top:50%;
-    transform:translateY(-50%);
-  }
-
-  .voiceShape::before{
-    width:16px;
-    height:28px;
-    left:8px;
-  }
-
-  .voiceShape::after{
-    width:28px;
-    height:46px;
-    left:14px;
-  }
-
-  /* 看板 */
-  .signChoice{
-    right:8vw;
-    top:42%;
-  }
-
-  .signShape{
-    width:78px;
-    height:124px;
-  }
-
-  .signShape::before{
-    content:"";
-    position:absolute;
-    bottom:0;
-    left:50%;
-    width:2px;
-    height:74px;
-    background:rgba(255,255,255,.20);
-    transform:translateX(-50%);
-  }
-
-  .signShape::after{
-    content:"";
-    position:absolute;
-    top:0;
-    left:50%;
-    width:72px;
-    height:46px;
-    border:1px solid rgba(255,255,255,.24);
-    transform:translateX(-50%) rotate(-2deg);
-  }
-
-  /* 紙 */
-  .paperChoice{
-    left:50%;
-    bottom:12vh;
-    transform:translateX(-50%) translateY(10px);
-  }
-
-  .paperChoice.show{
-    transform:translateX(-50%) translateY(0);
-  }
-
-  .paperShape{
-    width:74px;
-    height:94px;
-    border:1px solid rgba(255,255,255,.22);
-    background:linear-gradient(to bottom, rgba(255,255,255,.04), rgba(255,255,255,.015));
-    transform:rotate(-8deg);
-  }
-
-  @media (max-width:640px){
-    .introText{
-      font-size:clamp(18px, 5vw, 24px);
-      line-height:2.05;
-      max-height:72vh;
-    }
-
-    .voiceChoice{
-      left:7vw;
-    }
-
-    .signChoice{
-      right:7vw;
-    }
-
-    .description{
-      top:6vh;
-      width:min(90vw, 400px);
-    }
-
-    .descriptionText{
-      font-size:12.5px;
-      line-height:1.85;
-    }
-  }
 </style>
 </head>
 <body>
-<main class="scene" aria-label="神隠しの後の入口">
-  <div class="veil"></div>
 
-  <button class="backZone" id="backZone" aria-label="初回状態に戻る"></button>
+<main class="scene">
 
   <section class="intro" id="intro">
-    <div class="introText">気づくと、知らない場所に立っていた。
+    <div class="introText">
+気づくと、知らない場所に立っていた。
 
 風はないのに、
 どこかで何かが揺れている。
@@ -350,157 +123,112 @@
 「……ここ、どこ？」
 
 視線の先に、
-いくつかの違和感がある。</div>
+いくつかの違和感がある。
+    </div>
   </section>
 
-  <button class="tapStart" id="tapStart" aria-label="画面に触れる">
+  <button class="tapStart" id="tapStart">
     <span class="tapGuide">触れる</span>
   </button>
 
-  <div class="description" id="description" aria-live="polite">
-    <div class="descriptionTitle" id="descriptionTitle"></div>
-    <div class="descriptionText" id="descriptionText"></div>
+  <div class="description" id="description">
+    <div id="title"></div>
+    <div id="text"></div>
   </div>
 
-  <div class="choiceObjects">
-    <button class="choice voiceChoice" id="storyChoice" aria-label="声が聞こえる方へ">
-      <span class="shape voiceShape"></span>
-      <span class="label">声</span>
-    </button>
+  <button class="choice voiceChoice" id="storyChoice">声</button>
+  <button class="choice signChoice" id="worldChoice">看板</button>
+  <button class="choice paperChoice" id="galleryChoice">紙</button>
 
-    <button class="choice signChoice" id="worldChoice" aria-label="古びた看板を読む">
-      <span class="shape signShape"></span>
-      <span class="label">看板</span>
-    </button>
-
-    <button class="choice paperChoice" id="galleryChoice" aria-label="落ちている紙を見る">
-      <span class="shape paperShape"></span>
-      <span class="label">紙</span>
-    </button>
-  </div>
 </main>
 
+<div class="pageFade" id="fade"></div>
+
 <script>
-  const tapStart = document.getElementById('tapStart');
-  const backZone = document.getElementById('backZone');
-  const intro = document.getElementById('intro');
+const tapStart = document.getElementById('tapStart');
+const intro = document.getElementById('intro');
+const description = document.getElementById('description');
+const fade = document.getElementById('fade');
 
-  const description = document.getElementById('description');
-  const descriptionTitle = document.getElementById('descriptionTitle');
-  const descriptionText = document.getElementById('descriptionText');
+const title = document.getElementById('title');
+const text = document.getElementById('text');
 
-  const storyChoice = document.getElementById('storyChoice');
-  const worldChoice = document.getElementById('worldChoice');
-  const galleryChoice = document.getElementById('galleryChoice');
-
-  const choices = [storyChoice, worldChoice, galleryChoice];
-
-  let stage = 0;
-  let activeChoice = null;
-  // 0 = 初回起動
-  // 1 = 選択肢表示
-  // 2 = 説明表示（同じ選択肢をもう一度押すと遷移）
-
-  const choiceData = {
-    storyChoice: {
-      title: '声が聞こえる方へ',
-      text: 'かすかな声を追う。物語へ進む。',
-      href: 'story.html'
-    },
-    worldChoice: {
-      title: '古びた看板を読む',
-      text: 'この場所について知る。世界観や資料を見る。',
-      href: 'worldbuilding.html'
-    },
-    galleryChoice: {
-      title: '落ちている紙を見る',
-      text: '誰かが残したものに触れる。イラストや展示を見る。',
-      href: 'gallery.html'
-    }
-  };
-
-  function resetChoiceStates() {
-    choices.forEach(choice => {
-      choice.classList.remove('active', 'show');
-    });
+const choices = {
+  storyChoice: {
+    el: document.getElementById('storyChoice'),
+    title: '声が聞こえる方へ',
+    text: '物語へ進む',
+    url: 'story.html'
+  },
+  worldChoice: {
+    el: document.getElementById('worldChoice'),
+    title: '看板',
+    text: '世界観を見る',
+    url: 'worldbuilding.html'
+  },
+  galleryChoice: {
+    el: document.getElementById('galleryChoice'),
+    title: '紙',
+    text: '展示を見る',
+    url: 'gallery.html'
   }
+};
 
-  function showChoicesOnly() {
-    intro.classList.add('dim');
-    tapStart.classList.add('hidden');
-    description.classList.remove('show');
+let stage = 0;
+let active = null;
 
-    choices.forEach((choice, i) => {
-      setTimeout(() => {
-        choice.classList.add('show');
-      }, i * 120);
-    });
+tapStart.onclick = () => {
+  intro.classList.add('dim');
+  tapStart.classList.add('hidden');
 
-    stage = 1;
-    activeChoice = null;
-  }
+  Object.values(choices).forEach(c => c.el.classList.add('show'));
+  stage = 1;
+};
 
-  function showDescription(choice) {
-    const data = choiceData[choice.id];
-    descriptionTitle.textContent = data.title;
-    descriptionText.textContent = data.text;
-    description.classList.add('show');
-  }
+Object.values(choices).forEach(c => {
+  c.el.onclick = (e) => {
+    e.stopPropagation();
 
-  function goInitialState() {
-    stage = 0;
-    activeChoice = null;
-
-    description.classList.remove('show');
-    resetChoiceStates();
-
-    intro.classList.remove('dim');
-    tapStart.classList.remove('hidden');
-  }
-
-  function handleChoiceClick(choice) {
-    if (stage === 1) {
-      activeChoice = choice;
-      choices.forEach(c => c.classList.remove('active'));
-      choice.classList.add('active');
-      showDescription(choice);
+    if(stage === 1){
+      active = c;
+      title.textContent = c.title;
+      text.textContent = c.text;
+      description.classList.add('show');
       stage = 2;
       return;
     }
 
-    if (stage === 2) {
-      if (activeChoice !== choice) {
-        activeChoice = choice;
-        choices.forEach(c => c.classList.remove('active'));
-        choice.classList.add('active');
-        showDescription(choice);
+    if(stage === 2){
+      if(active !== c){
+        active = c;
+        title.textContent = c.title;
+        text.textContent = c.text;
         return;
       }
 
-      const data = choiceData[choice.id];
-      window.location.href = data.href;
+      // ▼ フェードしてから遷移
+      fade.classList.add('show');
+
+      setTimeout(()=>{
+        window.location.href = c.url;
+      }, 900);
     }
+  };
+});
+
+document.body.onclick = () => {
+  if(stage === 2){
+    stage = 0;
+    active = null;
+
+    description.classList.remove('show');
+    intro.classList.remove('dim');
+    tapStart.classList.remove('hidden');
+
+    Object.values(choices).forEach(c => c.el.classList.remove('show'));
   }
-
-  tapStart.addEventListener('click', (event) => {
-    event.stopPropagation();
-    if (stage === 0) {
-      showChoicesOnly();
-    }
-  });
-
-  choices.forEach(choice => {
-    choice.addEventListener('click', (event) => {
-      event.stopPropagation();
-      handleChoiceClick(choice);
-    });
-  });
-
-  backZone.addEventListener('click', () => {
-    if (stage === 1 || stage === 2) {
-      goInitialState();
-    }
-  });
+};
 </script>
+
 </body>
 </html>
