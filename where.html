@@ -9,9 +9,8 @@
     --bg-1:#0b0c10;
     --bg-2:#14161b;
     --text:#ece8df;
-    --muted:rgba(236,232,223,.62);
+    --muted:rgba(236,232,223,.66);
     --line:rgba(236,232,223,.18);
-    --soft:rgba(236,232,223,.08);
   }
 
   *{ box-sizing:border-box; }
@@ -67,7 +66,7 @@
   }
 
   .intro.dim{
-    opacity:.2;
+    opacity:.18;
     filter:blur(1px);
     transform:scale(.985);
   }
@@ -116,6 +115,45 @@
     opacity:0;
   }
 
+  .description{
+    position:absolute;
+    top:7vh;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(88vw, 430px);
+    min-height:74px;
+    text-align:center;
+    z-index:7;
+    opacity:0;
+    transition:opacity .35s ease;
+    pointer-events:none;
+  }
+
+  .description.show{
+    opacity:1;
+  }
+
+  .descriptionTitle{
+    font-size:14px;
+    letter-spacing:.12em;
+    color:var(--text);
+    margin-bottom:8px;
+  }
+
+  .descriptionText{
+    font-size:13px;
+    line-height:1.9;
+    letter-spacing:.06em;
+    color:var(--muted);
+  }
+
+  .stepGuide{
+    margin-top:8px;
+    font-size:11px;
+    letter-spacing:.12em;
+    color:rgba(236,232,223,.48);
+  }
+
   .choiceObjects{
     position:absolute;
     inset:0;
@@ -127,7 +165,11 @@
     position:absolute;
     opacity:0;
     transform:translateY(10px);
-    transition:opacity .55s ease, transform .55s ease, filter .55s ease;
+    transition:
+      opacity .55s ease,
+      transform .55s ease,
+      filter .55s ease,
+      text-shadow .3s ease;
     pointer-events:auto;
     background:transparent;
     border:none;
@@ -167,40 +209,47 @@
 
   .choice.active .label{
     opacity:1;
+    color:#f3efe7;
   }
 
-  /* 鈴 */
-  .bellChoice{
+  .choice.confirmed .label{
+    text-shadow:0 0 8px rgba(255,255,255,.16);
+  }
+
+  /* 声 */
+  .voiceChoice{
     left:9vw;
-    top:46%;
+    top:45%;
   }
 
-  .bellShape{
-    width:30px;
-    height:90px;
+  .voiceShape{
+    width:46px;
+    height:88px;
   }
 
-  .bellShape::before{
+  .voiceShape::before,
+  .voiceShape::after{
     content:"";
     position:absolute;
-    top:0;
-    left:50%;
-    width:1px;
+    border:1px solid rgba(255,255,255,.26);
+    border-left-color:transparent;
+    border-top-color:transparent;
+    border-bottom-color:transparent;
+    border-radius:50%;
+    top:50%;
+    transform:translateY(-50%);
+  }
+
+  .voiceShape::before{
+    width:16px;
     height:28px;
-    background:rgba(255,255,255,.22);
-    transform:translateX(-50%);
+    left:8px;
   }
 
-  .bellShape::after{
-    content:"";
-    position:absolute;
-    bottom:0;
-    left:50%;
+  .voiceShape::after{
     width:28px;
-    height:40px;
-    border:1px solid rgba(255,255,255,.30);
-    border-radius:50% 50% 42% 42%;
-    transform:translateX(-50%);
+    height:46px;
+    left:14px;
   }
 
   /* 看板 */
@@ -255,35 +304,6 @@
     transform:rotate(-8deg);
   }
 
-  .description{
-    position:absolute;
-    top:8vh;
-    left:50%;
-    transform:translateX(-50%);
-    width:min(88vw, 420px);
-    min-height:48px;
-    text-align:center;
-    font-size:13px;
-    line-height:1.9;
-    letter-spacing:.08em;
-    color:var(--muted);
-    z-index:6;
-    opacity:0;
-    transition:opacity .35s ease;
-    pointer-events:none;
-  }
-
-  .description.show{
-    opacity:1;
-  }
-
-  .description strong{
-    display:block;
-    font-weight:500;
-    color:var(--text);
-    margin-bottom:4px;
-  }
-
   @media (max-width:640px){
     .introText{
       font-size:clamp(18px, 5vw, 24px);
@@ -291,7 +311,7 @@
       max-height:72vh;
     }
 
-    .bellChoice{ left:7vw; }
+    .voiceChoice{ left:7vw; }
     .signChoice{ right:7vw; }
   }
 </style>
@@ -318,12 +338,16 @@
     <span class="tapGuide">触れる</span>
   </button>
 
-  <div class="description" id="description" aria-live="polite"></div>
+  <div class="description" id="description" aria-live="polite">
+    <div class="descriptionTitle" id="descriptionTitle"></div>
+    <div class="descriptionText" id="descriptionText"></div>
+    <div class="stepGuide" id="stepGuide"></div>
+  </div>
 
-  <div class="choiceObjects" id="choiceObjects" aria-hidden="false">
-    <button class="choice bellChoice" id="storyChoice" aria-label="鈴の音がする方へ">
-      <span class="shape bellShape"></span>
-      <span class="label">鈴</span>
+  <div class="choiceObjects">
+    <button class="choice voiceChoice" id="storyChoice" aria-label="声が聞こえる方へ">
+      <span class="shape voiceShape"></span>
+      <span class="label">声</span>
     </button>
 
     <button class="choice signChoice" id="worldChoice" aria-label="古びた看板を読む">
@@ -341,7 +365,11 @@
 <script>
   const tapStart = document.getElementById('tapStart');
   const intro = document.getElementById('intro');
+
   const description = document.getElementById('description');
+  const descriptionTitle = document.getElementById('descriptionTitle');
+  const descriptionText = document.getElementById('descriptionText');
+  const stepGuide = document.getElementById('stepGuide');
 
   const storyChoice = document.getElementById('storyChoice');
   const worldChoice = document.getElementById('worldChoice');
@@ -350,11 +378,12 @@
   const choices = [storyChoice, worldChoice, galleryChoice];
   let started = false;
   let activeChoice = null;
+  let tapStage = 0; // 0: 未選択, 1:説明表示, 2:確認, 3:遷移
 
   const choiceData = {
     storyChoice: {
-      title: '鈴の音がする方へ',
-      text: 'かすかに聞こえる音を追う。物語へ進む。',
+      title: '声が聞こえる方へ',
+      text: 'かすかな声を追う。物語へ進む。',
       href: 'story.html'
     },
     worldChoice: {
@@ -378,13 +407,23 @@
     started = true;
   }
 
-  function activateChoice(choice) {
-    choices.forEach(c => c.classList.remove('active'));
-    choice.classList.add('active');
-    activeChoice = choice;
+  function resetChoiceStates() {
+    choices.forEach(c => c.classList.remove('active', 'confirmed'));
+  }
 
+  function setDescription(choice, stage) {
     const data = choiceData[choice.id];
-    description.innerHTML = `<strong>${data.title}</strong>${data.text}`;
+    descriptionTitle.textContent = data.title;
+    descriptionText.textContent = data.text;
+
+    if (stage === 1) {
+      stepGuide.textContent = 'もう一度触れると、選択する';
+    } else if (stage === 2) {
+      stepGuide.textContent = 'さらにもう一度触れると、進む';
+    } else {
+      stepGuide.textContent = '';
+    }
+
     description.classList.add('show');
   }
 
@@ -392,20 +431,52 @@
     if (!started) return;
 
     if (activeChoice !== choice) {
-      activateChoice(choice);
+      activeChoice = choice;
+      tapStage = 1;
+      resetChoiceStates();
+      choice.classList.add('active');
+      setDescription(choice, 1);
       return;
     }
 
-    const data = choiceData[choice.id];
-    window.location.href = data.href;
+    if (tapStage === 1) {
+      tapStage = 2;
+      choice.classList.add('confirmed');
+      setDescription(choice, 2);
+      return;
+    }
+
+    if (tapStage === 2) {
+      const data = choiceData[choice.id];
+      window.location.href = data.href;
+    }
   }
 
   tapStart.addEventListener('click', showChoices);
 
   choices.forEach(choice => {
     choice.addEventListener('click', () => handleChoiceClick(choice));
+
     choice.addEventListener('mouseenter', () => {
-      if (started) activateChoice(choice);
+      if (!started) return;
+      if (activeChoice !== choice) {
+        resetChoiceStates();
+        choice.classList.add('active');
+        const data = choiceData[choice.id];
+        descriptionTitle.textContent = data.title;
+        descriptionText.textContent = data.text;
+        stepGuide.textContent = '触れて選ぶ';
+        description.classList.add('show');
+      }
+    });
+
+    choice.addEventListener('mouseleave', () => {
+      if (!started) return;
+      if (activeChoice === null) {
+        description.classList.remove('show');
+      } else {
+        setDescription(activeChoice, tapStage);
+      }
     });
   });
 </script>
