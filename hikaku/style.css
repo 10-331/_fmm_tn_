@@ -300,26 +300,14 @@ input[type="file"]{
   display: block;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--label-text, #ffffff);
 }
 
 .character-label .name{
   display: block;
   font-size: 0.72rem;
-  color: rgba(255,255,255,0.92);
+  color: var(--label-subtext, rgba(255,255,255,0.92));
   margin-top: 2px;
-}
-
-.character-name-bottom{
-  position: absolute;
-  bottom: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  text-align: center;
-  font-size: 0.85rem;
-  color: #2d3442;
-  font-weight: 600;
 }
 
 .character-list{
