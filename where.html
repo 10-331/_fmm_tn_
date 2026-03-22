@@ -13,7 +13,9 @@
     --line:rgba(236,232,223,.18);
   }
 
-  *{ box-sizing:border-box; }
+  *{
+    box-sizing:border-box;
+  }
 
   html,body{
     margin:0;
@@ -63,6 +65,7 @@
     padding:7vh 6vw;
     z-index:3;
     transition:opacity .7s ease, transform .7s ease, filter .7s ease;
+    pointer-events:none;
   }
 
   .intro.dim{
@@ -127,6 +130,7 @@
     opacity:0;
     transition:opacity .35s ease;
     pointer-events:none;
+    padding:0 8px;
   }
 
   .description.show{
@@ -204,7 +208,7 @@
     white-space:nowrap;
     text-align:center;
     opacity:.9;
-    transition:opacity .35s ease;
+    transition:opacity .35s ease, color .35s ease, text-shadow .35s ease;
   }
 
   .choice.active .label{
@@ -214,6 +218,19 @@
 
   .choice.confirmed .label{
     text-shadow:0 0 8px rgba(255,255,255,.16);
+  }
+
+  /* 何もない場所を押した時に戻る用 */
+  .backZone{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    background:transparent;
+    border:none;
+    padding:0;
+    margin:0;
+    cursor:default;
+    -webkit-tap-highlight-color:transparent;
   }
 
   /* 声 */
@@ -311,14 +328,31 @@
       max-height:72vh;
     }
 
-    .voiceChoice{ left:7vw; }
-    .signChoice{ right:7vw; }
+    .voiceChoice{
+      left:7vw;
+    }
+
+    .signChoice{
+      right:7vw;
+    }
+
+    .description{
+      top:6vh;
+      width:min(90vw, 400px);
+    }
+
+    .descriptionText{
+      font-size:12.5px;
+      line-height:1.85;
+    }
   }
 </style>
 </head>
 <body>
 <main class="scene" aria-label="神隠しの後の入口">
   <div class="veil"></div>
+
+  <button class="backZone" id="backZone" aria-label="一つ前の状態に戻る"></button>
 
   <section class="intro" id="intro">
     <div class="introText">
@@ -365,6 +399,7 @@
 <script>
   const tapStart = document.getElementById('tapStart');
   const intro = document.getElementById('intro');
+  const backZone = document.getElementById('backZone');
 
   const description = document.getElementById('description');
   const descriptionTitle = document.getElementById('descriptionTitle');
@@ -376,9 +411,15 @@
   const galleryChoice = document.getElementById('galleryChoice');
 
   const choices = [storyChoice, worldChoice, galleryChoice];
+
   let started = false;
   let activeChoice = null;
-  let tapStage = 0; // 0: 未選択, 1:説明表示, 2:確認, 3:遷移
+  let tapStage = 0;
+  // tapStage:
+  // 0 = 選択肢表示のみ
+  // 1 = 説明表示
+  // 2 = 確認段階
+  // 3回目タップで遷移
 
   const choiceData = {
     storyChoice: {
@@ -401,14 +442,20 @@
   function showChoices() {
     intro.classList.add('dim');
     tapStart.classList.add('hidden');
+
     choices.forEach((choice, i) => {
-      setTimeout(() => choice.classList.add('show'), i * 120);
+      setTimeout(() => {
+        choice.classList.add('show');
+      }, i * 120);
     });
+
     started = true;
   }
 
   function resetChoiceStates() {
-    choices.forEach(c => c.classList.remove('active', 'confirmed'));
+    choices.forEach(choice => {
+      choice.classList.remove('active', 'confirmed');
+    });
   }
 
   function setDescription(choice, stage) {
@@ -427,22 +474,36 @@
     description.classList.add('show');
   }
 
+  function renderStage() {
+    resetChoiceStates();
+
+    if (activeChoice === null || tapStage === 0) {
+      description.classList.remove('show');
+      return;
+    }
+
+    activeChoice.classList.add('active');
+
+    if (tapStage === 2) {
+      activeChoice.classList.add('confirmed');
+    }
+
+    setDescription(activeChoice, tapStage);
+  }
+
   function handleChoiceClick(choice) {
     if (!started) return;
 
     if (activeChoice !== choice) {
       activeChoice = choice;
       tapStage = 1;
-      resetChoiceStates();
-      choice.classList.add('active');
-      setDescription(choice, 1);
+      renderStage();
       return;
     }
 
     if (tapStage === 1) {
       tapStage = 2;
-      choice.classList.add('confirmed');
-      setDescription(choice, 2);
+      renderStage();
       return;
     }
 
@@ -452,15 +513,32 @@
     }
   }
 
+  function stepBack() {
+    if (!started) return;
+
+    if (tapStage === 1 || tapStage === 2) {
+      description.classList.remove('show');
+
+      setTimeout(() => {
+        tapStage = 0;
+        activeChoice = null;
+        resetChoiceStates();
+      }, 120);
+    }
+  }
+
   tapStart.addEventListener('click', showChoices);
 
   choices.forEach(choice => {
-    choice.addEventListener('click', () => handleChoiceClick(choice));
+    choice.addEventListener('click', (event) => {
+      event.stopPropagation();
+      handleChoiceClick(choice);
+    });
 
     choice.addEventListener('mouseenter', () => {
       if (!started) return;
-      if (activeChoice !== choice) {
-        resetChoiceStates();
+
+      if (activeChoice === null) {
         choice.classList.add('active');
         const data = choiceData[choice.id];
         descriptionTitle.textContent = data.title;
@@ -472,12 +550,18 @@
 
     choice.addEventListener('mouseleave', () => {
       if (!started) return;
-      if (activeChoice === null) {
+
+      if (tapStage === 0 && activeChoice === null) {
+        choice.classList.remove('active');
         description.classList.remove('show');
       } else {
-        setDescription(activeChoice, tapStage);
+        renderStage();
       }
     });
+  });
+
+  backZone.addEventListener('click', () => {
+    stepBack();
   });
 </script>
 </body>
