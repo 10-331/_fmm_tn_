@@ -10,7 +10,8 @@ const IMAGE_OUTPUT_QUALITY = 0.92;
 
 const state = {
   characters: [],
-  maxCm: 200
+  maxCm: 200,
+  showLabel: true
 };
 
 const el = {
@@ -27,6 +28,7 @@ const el = {
   characterList: document.getElementById("characterList"),
   compareStage: document.getElementById("compareStage"),
   maxCmSelect: document.getElementById("maxCmSelect"),
+  labelToggle: document.getElementById("labelToggle"),
   countBadge: document.getElementById("countBadge")
 };
 
@@ -59,11 +61,20 @@ function bindEvents() {
   el.exportButton.addEventListener("click", exportJson);
   el.importInput.addEventListener("change", importJson);
   el.clearButton.addEventListener("click", clearAll);
+
   el.maxCmSelect.addEventListener("change", async () => {
     state.maxCm = Number(el.maxCmSelect.value);
     await saveState();
     renderStage();
   });
+
+  if (el.labelToggle) {
+    el.labelToggle.addEventListener("change", async () => {
+      state.showLabel = el.labelToggle.value === "show";
+      await saveState();
+      renderStage();
+    });
+  }
 }
 
 async function handleAddCharacter() {
@@ -166,6 +177,9 @@ function resetForm() {
 
 function renderAll() {
   el.maxCmSelect.value = String(state.maxCm);
+  if (el.labelToggle) {
+    el.labelToggle.value = state.showLabel ? "show" : "hide";
+  }
   renderStage();
   renderCharacterList();
   renderCount();
@@ -303,7 +317,9 @@ function createCharacterElement(character) {
   const scale = Number(character.correction.scale ?? 1);
   const visualHeight = character.height * PX_PER_CM * scale;
 
-  visual.appendChild(label);
+  if (state.showLabel) {
+    visual.appendChild(label);
+  }
 
   if (character.imageData) {
     const img = document.createElement("img");
@@ -702,8 +718,9 @@ async function saveStageAsImage() {
 function exportJson() {
   const dataStr = JSON.stringify(
     {
-      version: 6,
+      version: 7,
       maxCm: state.maxCm,
+      showLabel: state.showLabel,
       characters: state.characters
     },
     null,
@@ -736,6 +753,7 @@ async function importJson(event) {
     state.characters = parsed.characters.map(normalizeCharacter);
     normalizeSlotPositions();
     state.maxCm = Number(parsed.maxCm) || 200;
+    state.showLabel = parsed.showLabel !== false;
     await saveState();
     renderAll();
   } catch (error) {
@@ -793,8 +811,9 @@ async function saveState() {
 
     store.put(
       {
-        version: 6,
+        version: 7,
         maxCm: state.maxCm,
+        showLabel: state.showLabel,
         characters: state.characters
       },
       APP_STATE_KEY
@@ -821,10 +840,12 @@ async function loadState() {
   if (!saved) {
     state.characters = [];
     state.maxCm = 200;
+    state.showLabel = true;
     return;
   }
 
   state.maxCm = Number(saved.maxCm) || 200;
+  state.showLabel = saved.showLabel !== false;
   state.characters = Array.isArray(saved.characters)
     ? saved.characters.map(normalizeCharacter)
     : [];
