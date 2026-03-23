@@ -55,104 +55,109 @@
     z-index:1;
   }
 
-  /* 背景を這う“蛇みたいな何か” */
-  .serpent{
-    position:absolute;
-    pointer-events:none;
-    z-index:2;
-    opacity:.14;
-    filter:blur(7px);
-    transform-origin:center;
-    mix-blend-mode:screen;
-  }
+ .serpent{
+  position:absolute;
+  pointer-events:none;
+  z-index:2;
+  opacity:.20;
+  filter:blur(6px);
+  transform-origin:left center;
+  mix-blend-mode:screen;
+  will-change:transform, opacity;
+}
 
-  .serpent::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:999px;
-    background:linear-gradient(
-      90deg,
-      rgba(0,0,0,0) 0%,
-      rgba(56,66,92,.06) 10%,
-      rgba(82,96,126,.16) 32%,
-      rgba(118,132,160,.22) 50%,
-      rgba(82,96,126,.14) 68%,
-      rgba(56,66,92,.06) 90%,
-      rgba(0,0,0,0) 100%
-    );
-    box-shadow:
-      0 0 18px rgba(90,102,130,.08),
-      0 0 36px rgba(35,42,58,.06);
-  }
+.serpent::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:999px;
+  background:linear-gradient(
+    90deg,
+    rgba(0,0,0,0) 0%,
+    rgba(60,70,95,.08) 10%,
+    rgba(95,110,145,.20) 45%,
+    rgba(120,135,165,.26) 55%,
+    rgba(95,110,145,.16) 75%,
+    rgba(0,0,0,0) 100%
+  );
+}
 
-  .serpent1{
-    width:42vw;
-    height:10px;
-    left:4vw;
-    bottom:20vh;
-    animation:slither1 22s ease-in-out infinite alternate;
-  }
+/* 左下：ゆっくり大きく動く */
+.serpent1{
+  width:48vw;
+  height:10px;
+  left:2vw;
+  bottom:18vh;
+  animation:slither1 16s cubic-bezier(.4,0,.2,1) infinite;
+}
 
-  .serpent2{
-    width:34vw;
-    height:9px;
-    right:6vw;
-    top:27vh;
-    animation:slither2 28s ease-in-out infinite alternate;
-    opacity:.10;
-  }
+/* 右上：少し違う動き */
+.serpent2{
+  width:38vw;
+  height:9px;
+  right:4vw;
+  top:26vh;
+  animation:slither2 21s cubic-bezier(.45,0,.25,1) infinite;
+  opacity:.16;
+}
 
-  @keyframes slither1{
-    0%{
-      transform:translateX(0) translateY(0) rotate(7deg) scaleX(1);
-      opacity:.08;
-    }
-    18%{
-      transform:translateX(2vw) translateY(-1.2vh) rotate(3deg) scaleX(1.04);
-      opacity:.12;
-    }
-    40%{
-      transform:translateX(5vw) translateY(.8vh) rotate(-2deg) scaleX(.96);
-      opacity:.14;
-    }
-    62%{
-      transform:translateX(8vw) translateY(-.7vh) rotate(4deg) scaleX(1.08);
-      opacity:.11;
-    }
-    84%{
-      transform:translateX(11vw) translateY(1.1vh) rotate(-4deg) scaleX(.94);
-      opacity:.13;
-    }
-    100%{
-      transform:translateX(14vw) translateY(.2vh) rotate(6deg) scaleX(1.02);
-      opacity:.09;
-    }
-  }
+/* 微妙に違う第三の動き（重要） */
+.serpent3{
+  width:30vw;
+  height:8px;
+  left:30vw;
+  top:60vh;
+  animation:slither3 27s cubic-bezier(.42,0,.18,1) infinite;
+  opacity:.10;
+}
 
-  @keyframes slither2{
-    0%{
-      transform:translateX(0) translateY(0) rotate(-6deg) scaleX(1);
-      opacity:.05;
-    }
-    22%{
-      transform:translateX(-2vw) translateY(.8vh) rotate(-2deg) scaleX(1.03);
-      opacity:.08;
-    }
-    48%{
-      transform:translateX(-5vw) translateY(-1.1vh) rotate(2deg) scaleX(.95);
-      opacity:.10;
-    }
-    70%{
-      transform:translateX(-8vw) translateY(.6vh) rotate(-3deg) scaleX(1.07);
-      opacity:.07;
-    }
-    100%{
-      transform:translateX(-11vw) translateY(-.4vh) rotate(5deg) scaleX(.92);
-      opacity:.11;
-    }
+@keyframes slither1{
+  0%{
+    transform:translateX(0) translateY(0) rotate(6deg) scaleX(1);
   }
+  25%{
+    transform:translateX(4vw) translateY(-1vh) rotate(-3deg) scaleX(1.08);
+  }
+  50%{
+    transform:translateX(9vw) translateY(.8vh) rotate(4deg) scaleX(.92);
+  }
+  75%{
+    transform:translateX(13vw) translateY(-.6vh) rotate(-5deg) scaleX(1.1);
+  }
+  100%{
+    transform:translateX(18vw) translateY(.5vh) rotate(7deg) scaleX(.95);
+  }
+}
 
+@keyframes slither2{
+  0%{
+    transform:translateX(0) translateY(0) rotate(-6deg);
+  }
+  30%{
+    transform:translateX(-3vw) translateY(1vh) rotate(-2deg);
+  }
+  60%{
+    transform:translateX(-8vw) translateY(-1.2vh) rotate(3deg);
+  }
+  100%{
+    transform:translateX(-14vw) translateY(.6vh) rotate(-6deg);
+  }
+}
+
+@keyframes slither3{
+  0%{
+    transform:translateX(0) translateY(0) rotate(4deg);
+  }
+  40%{
+    transform:translateX(5vw) translateY(-1.5vh) rotate(-4deg);
+  }
+  70%{
+    transform:translateX(9vw) translateY(1vh) rotate(5deg);
+  }
+  100%{
+    transform:translateX(14vw) translateY(-.4vh) rotate(-3deg);
+  }
+}
   .intro{
     position:absolute;
     inset:0;
@@ -466,7 +471,8 @@
 
   <div class="serpent serpent1"></div>
   <div class="serpent serpent2"></div>
-
+<div class="serpent serpent3"></div>
+  
   <button class="backZone" id="backZone" aria-label="初回状態に戻る"></button>
 
   <section class="intro" id="intro">
