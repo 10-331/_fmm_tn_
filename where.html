@@ -396,30 +396,41 @@ body::before{
 
 /* モバイル */
 @media (max-width:640px){
+  .intro{
+    padding:2vh 6vw 10vh;
+  }
+
+  .introText{
+    font-size:clamp(15px, 3.6vw, 20px);
+    line-height:1.75;
+    letter-spacing:.06em;
+    max-height:72vh;
+  }
+
   .voiceChoice{
-    left:14vw;
-    top:52%;
+    left:18vw;
+    top:50%;
   }
 
   .signChoice{
-    right:14vw;
-    top:46%;
+    right:18vw;
+    top:44%;
   }
 
   .paperChoice{
     left:50%;
-    bottom:11vh;
+    bottom:14vh;
+    transform:translateX(-50%) translateY(10px);
   }
 
   .paperShape{
-    width:66px;
-    height:84px;
+    width:54px;
+    height:70px;
   }
 
   .paperChoice .label{
-    margin-top:18px;
+    margin-top:12px;
   }
-}
 
   .description{
     top:11vh;
