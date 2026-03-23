@@ -455,6 +455,21 @@
     top:25vh;
   }
 }
+  /* 最終確認用: 紙を下げて、文字との距離も開ける */
+.paperChoice{
+  left:50% !important;
+  bottom:2vh !important;
+  transform:translateX(-50%) translateY(10px) !important;
+}
+
+.paperChoice.show{
+  transform:translateX(-50%) translateY(0) !important;
+}
+
+.paperChoice .label{
+  margin-top:44px !important;
+}
+  
 </style>
 </head>
 <body>
