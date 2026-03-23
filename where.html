@@ -112,8 +112,8 @@ body::before{
 }
 
 .intro.dim{
-  opacity:.18;
-  filter:blur(1px);
+  opacity:.16;
+  filter:blur(1.2px);
   transform:scale(.985);
 }
 
@@ -271,10 +271,10 @@ body::before{
   margin-top:16px;
   font-size:12px;
   letter-spacing:.12em;
-  color:rgba(236,232,223,.72);
+  color:rgba(236,232,223,.78);
   white-space:nowrap;
   text-align:center;
-  opacity:.9;
+  opacity:.95;
   transition:opacity .35s ease, color .35s ease, text-shadow .35s ease;
 }
 
@@ -321,7 +321,6 @@ body::before{
 }
 
 /* 右：看板 */
-
 .signChoice{
   right:20vw;
   top:44%;
@@ -378,26 +377,16 @@ body::before{
   margin-top:20px;
 }
 
-/* ページ遷移フェード */
-.pageFade{
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(255,255,255,.16), rgba(255,255,255,.78) 58%, rgba(255,255,255,.98) 100%);
-  opacity:0;
-  pointer-events:none;
-  z-index:9999;
-  transition:opacity 1s ease;
-}
-
-.pageFade.show{
-  opacity:1;
-}
-
 /* モバイル */
 @media (max-width:640px){
   .intro{
     padding:2vh 6vw 10vh;
+  }
+
+  .intro.dim{
+    opacity:.10;
+    filter:blur(1.5px);
+    transform:scale(.98);
   }
 
   .introText{
@@ -407,24 +396,50 @@ body::before{
     max-height:72vh;
   }
 
-.voiceChoice{
-  left:14vw;
-  top:52%;
-}
+  /* もっと散らす */
+  .voiceChoice{
+    left:8vw;
+    top:56%;
+  }
 
-.signChoice{
-  right:8vw;
-  top:50%;
-}
+  .signChoice{
+    right:4vw;
+    top:49%;
+  }
 
-.paperChoice{
-  left:50%;
-  bottom:9vh;
-}
+  .paperChoice{
+    left:46%;
+    bottom:12vh;
+  }
+
+  .voiceShape{
+    width:40px;
+    height:78px;
+  }
+
+  .signShape{
+    width:70px;
+    height:72px;
+  }
+
+  .signShape::before{
+    height:28px;
+  }
+
+  .signShape::after{
+    width:64px;
+    height:36px;
+  }
 
   .paperShape{
-    width:54px;
-    height:70px;
+    width:58px;
+    height:74px;
+  }
+
+  .choice .label{
+    font-size:11px;
+    margin-top:10px;
+    letter-spacing:.10em;
   }
 
   .paperChoice .label{
