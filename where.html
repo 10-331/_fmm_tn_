@@ -13,7 +13,9 @@
   --muted:rgba(236,232,223,.66);
 }
 
-*{ box-sizing:border-box; }
+*{
+  box-sizing:border-box;
+}
 
 html,body{
   margin:0;
@@ -27,22 +29,43 @@ html,body{
   font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
 }
 
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,.03), transparent 20%, transparent 80%, rgba(255,255,255,.02)),
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,.03), transparent 24%);
+  opacity:.55;
+}
+
 .scene{
   position:relative;
   width:100%;
   height:100%;
   overflow:hidden;
+  isolation:isolate;
 }
 
-/* ===== 背景エフェクト ===== */
+.veil{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(circle at center, transparent 18%, rgba(0,0,0,.18) 72%, rgba(0,0,0,.45) 100%);
+  z-index:1;
+}
 
+/* 背景の這う影 */
 .serpent{
   position:absolute;
   pointer-events:none;
+  z-index:2;
   opacity:.12;
   filter:blur(24px);
   border-radius:999px;
-  background:linear-gradient(90deg,
+  background:linear-gradient(
+    90deg,
     transparent,
     rgba(110,125,160,.25),
     transparent
@@ -54,7 +77,7 @@ html,body{
   height:36px;
   left:-15vw;
   bottom:18vh;
-  animation:slither1 23s infinite;
+  animation:slither1 23s infinite linear;
 }
 
 .serpent2{
@@ -62,52 +85,169 @@ html,body{
   height:30px;
   right:-20vw;
   top:24vh;
-  animation:slither2 31s infinite;
+  animation:slither2 31s infinite linear;
 }
 
 @keyframes slither1{
-  0%{ transform:translateX(0) rotate(5deg);}
-  100%{ transform:translateX(32vw) rotate(6deg);}
+  0%{ transform:translateX(0) rotate(5deg); }
+  100%{ transform:translateX(32vw) rotate(6deg); }
 }
 
 @keyframes slither2{
-  0%{ transform:translateX(0) rotate(-6deg);}
-  100%{ transform:translateX(-30vw) rotate(-6deg);}
+  0%{ transform:translateX(0) rotate(-6deg); }
+  100%{ transform:translateX(-30vw) rotate(-6deg); }
 }
 
-/* ===== 本文 ===== */
-
+/* 本文 */
 .intro{
   position:absolute;
   inset:0;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:7vh 6vw;
+  padding:4vh 6vw;
+  z-index:3;
+  transition:opacity .55s ease, transform .55s ease, filter .55s ease;
+  pointer-events:none;
+}
+
+.intro.dim{
+  opacity:.18;
+  filter:blur(1px);
+  transform:scale(.985);
 }
 
 .introText{
   writing-mode:vertical-rl;
+  text-orientation:mixed;
   font-size:clamp(17px, 4vw, 25px);
   line-height:1.9;
   letter-spacing:.07em;
+  max-height:76vh;
+  white-space:pre-wrap;
+  text-shadow:0 0 12px rgba(255,255,255,.05);
   animation:breath 5s ease-in-out infinite;
 }
 
 @keyframes breath{
-  50%{ transform:translateY(-2px); opacity:.92; }
+  0%{
+    transform:translateY(0);
+    opacity:1;
+  }
+  50%{
+    transform:translateY(-2px);
+    opacity:.92;
+  }
+  100%{
+    transform:translateY(0);
+    opacity:1;
+  }
 }
 
-/* ===== 選択肢 ===== */
+/* 初回タップ誘導 */
+.tapStart{
+  position:absolute;
+  inset:0;
+  z-index:8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.tapStart.hidden{
+  pointer-events:none;
+}
+
+.tapGuide{
+  position:absolute;
+  bottom:9vh;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:11px;
+  letter-spacing:.12em;
+  color:rgba(236,232,223,.34);
+  transition:opacity .35s ease;
+  pointer-events:none;
+}
+
+.tapStart.hidden .tapGuide{
+  opacity:0;
+}
+
+.backZone{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  background:transparent;
+  border:none;
+  padding:0;
+  margin:0;
+  cursor:default;
+  -webkit-tap-highlight-color:transparent;
+}
+
+/* 説明 */
+.description{
+  position:absolute;
+  top:8vh;
+  left:50%;
+  transform:translateX(-50%);
+  width:min(88vw, 430px);
+  min-height:64px;
+  text-align:center;
+  z-index:7;
+  opacity:0;
+  transition:opacity .3s ease;
+  pointer-events:none;
+  padding:0 8px;
+}
+
+.description.show{
+  opacity:1;
+}
+
+.descriptionTitle{
+  font-size:14px;
+  letter-spacing:.12em;
+  color:var(--text);
+  margin-bottom:8px;
+}
+
+.descriptionText{
+  font-size:13px;
+  line-height:1.9;
+  letter-spacing:.06em;
+  color:var(--muted);
+}
+
+/* 選択肢 */
+.choiceObjects{
+  position:absolute;
+  inset:0;
+  z-index:4;
+  pointer-events:none;
+}
 
 .choice{
   position:absolute;
   opacity:0;
   transform:translateY(10px);
-  transition:.4s;
-  background:none;
+  transition:
+    opacity .45s ease,
+    transform .45s ease,
+    text-shadow .3s ease;
+  pointer-events:auto;
+  background:transparent;
   border:none;
   color:var(--text);
+  padding:0;
+  margin:0;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
 
 .choice.show{
@@ -115,91 +255,389 @@ html,body{
   transform:translateY(0);
 }
 
+.choice:focus-visible{
+  outline:1px solid rgba(255,255,255,.35);
+  outline-offset:6px;
+}
+
+.choice .shape{
+  position:relative;
+  display:block;
+  filter:drop-shadow(0 0 14px rgba(255,255,255,.03));
+}
+
 .choice .label{
   display:block;
   margin-top:16px;
   font-size:12px;
+  letter-spacing:.12em;
+  color:rgba(236,232,223,.72);
+  white-space:nowrap;
   text-align:center;
+  opacity:.9;
+  transition:opacity .35s ease, color .35s ease, text-shadow .35s ease;
 }
 
-/* 左 */
+.choice.active .label{
+  opacity:1;
+  color:#f3efe7;
+  text-shadow:0 0 8px rgba(255,255,255,.14);
+}
+
+/* 左：耳を澄ます */
 .voiceChoice{
-  left:15vw;
+  left:20vw;
   top:44%;
 }
 
-/* 右 */
+.voiceShape{
+  width:46px;
+  height:88px;
+}
+
+.voiceShape::before,
+.voiceShape::after{
+  content:"";
+  position:absolute;
+  border:1px solid rgba(255,255,255,.26);
+  border-left-color:transparent;
+  border-top-color:transparent;
+  border-bottom-color:transparent;
+  border-radius:50%;
+  top:50%;
+  transform:translateY(-50%);
+}
+
+.voiceShape::before{
+  width:16px;
+  height:28px;
+  left:8px;
+}
+
+.voiceShape::after{
+  width:28px;
+  height:46px;
+  left:14px;
+}
+
+/* 右：看板 */
 .signChoice{
-  right:14vw;
+  right:20vw;
   top:44%;
 }
 
-/* 下（紙） */
-.paperChoice{
+.signShape{
+  width:78px;
+  height:96px;
+  position:relative;
+}
+
+.signShape::before{
+  content:"";
+  position:absolute;
+  bottom:0;
   left:50%;
-  bottom:4vh;
+  width:2px;
+  height:42px;
+  background:rgba(255,255,255,.20);
   transform:translateX(-50%);
 }
 
-.paperChoice .label{
-  margin-top:26px; /* ←ここ触れば距離変わる */
+.signShape::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:50%;
+  width:72px;
+  height:42px;
+  border:1px solid rgba(255,255,255,.24);
+  transform:translateX(-50%) rotate(-2deg);
 }
 
-/* ===== モバイル ===== */
+/* 下：紙 */
+.paperChoice{
+  left:50%;
+  bottom:2vh;
+  transform:translateX(-50%) translateY(10px);
+}
 
+.paperChoice.show{
+  transform:translateX(-50%) translateY(0);
+}
+
+.paperShape{
+  width:74px;
+  height:94px;
+  border:1px solid rgba(255,255,255,.22);
+  background:linear-gradient(to bottom, rgba(255,255,255,.04), rgba(255,255,255,.015));
+  transform:rotate(-8deg);
+}
+
+.paperChoice .label{
+  margin-top:34px;
+}
+
+/* ページ遷移フェード */
+.pageFade{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,255,255,.16), rgba(255,255,255,.78) 58%, rgba(255,255,255,.98) 100%);
+  opacity:0;
+  pointer-events:none;
+  z-index:9999;
+  transition:opacity 1s ease;
+}
+
+.pageFade.show{
+  opacity:1;
+}
+
+/* モバイル */
 @media (max-width:640px){
+  .introText{
+    font-size:clamp(15px, 3.6vw, 20px);
+    line-height:1.75;
+    letter-spacing:.06em;
+    max-height:72vh;
+  }
 
   .voiceChoice{
     left:7vw;
+    top:46%;
   }
 
   .signChoice{
     right:7vw;
+    top:43%;
   }
 
   .paperChoice{
-    bottom:6vh;
+    bottom:8vh;
   }
 
   .paperChoice .label{
-    margin-top:24px;
+    margin-top:26px;
+  }
+
+  .description{
+    top:10vh;
+    width:min(90vw, 400px);
+  }
+
+  .descriptionText{
+    font-size:12.5px;
+    line-height:1.85;
+  }
+
+  .serpent1{
+    width:48vw;
+    bottom:22vh;
+  }
+
+  .serpent2{
+    width:38vw;
+    top:25vh;
   }
 }
 </style>
 </head>
 
 <body>
-<main class="scene">
+<main class="scene" aria-label="神隠しの後の入口">
+  <div class="veil"></div>
 
-<div class="serpent serpent1"></div>
-<div class="serpent serpent2"></div>
+  <div class="serpent serpent1"></div>
+  <div class="serpent serpent2"></div>
 
-<section class="intro">
-  <div class="introText">
-気が付くと、知らない場所に立っていた。
+  <button class="backZone" id="backZone" aria-label="初回状態に戻る"></button>
+
+  <section class="intro" id="intro">
+    <div class="introText">気が付くと、知らない場所に立っていた。
 
 「……此処は？」
 
-辺りを見回すと、いくつかの違和感がある。
+辺りを見回すと、いくつかの違和感がある。</div>
+  </section>
+
+  <button class="tapStart" id="tapStart" aria-label="画面に触れる">
+    <span class="tapGuide">目を凝らす</span>
+  </button>
+
+  <div class="description" id="description" aria-live="polite">
+    <div class="descriptionTitle" id="descriptionTitle"></div>
+    <div class="descriptionText" id="descriptionText"></div>
   </div>
-</section>
 
-<!-- 選択肢 -->
-<button class="choice voiceChoice show">
-  <div>))</div>
-  <span class="label">耳を澄ます</span>
-</button>
+  <div class="choiceObjects">
+    <button class="choice voiceChoice" id="storyChoice" aria-label="何かが聞こえる。自分ひとりではないらしい。">
+      <span class="shape voiceShape"></span>
+      <span class="label">耳を澄ます</span>
+    </button>
 
-<button class="choice signChoice show">
-  <div>|__|</div>
-  <span class="label">看板を見る</span>
-</button>
+    <button class="choice signChoice" id="worldChoice" aria-label="古びた看板だ。汚れていて読めない。">
+      <span class="shape signShape"></span>
+      <span class="label">看板を見る</span>
+    </button>
 
-<button class="choice paperChoice show">
-  <div style="width:60px;height:80px;border:1px solid #aaa;transform:rotate(-8deg);"></div>
-  <span class="label">紙を拾う</span>
-</button>
-
+    <button class="choice paperChoice" id="galleryChoice" aria-label="……誰かが写っているようだ。">
+      <span class="shape paperShape"></span>
+      <span class="label">紙を拾う</span>
+    </button>
+  </div>
 </main>
+
+<div class="pageFade" id="pageFade"></div>
+
+<script>
+const tapStart = document.getElementById('tapStart');
+const backZone = document.getElementById('backZone');
+const intro = document.getElementById('intro');
+const pageFade = document.getElementById('pageFade');
+
+const description = document.getElementById('description');
+const descriptionTitle = document.getElementById('descriptionTitle');
+const descriptionText = document.getElementById('descriptionText');
+
+const storyChoice = document.getElementById('storyChoice');
+const worldChoice = document.getElementById('worldChoice');
+const galleryChoice = document.getElementById('galleryChoice');
+
+const choices = [storyChoice, worldChoice, galleryChoice];
+
+let stage = 0;
+let activeChoice = null;
+
+const choiceData = {
+  storyChoice: {
+    title: '何かが聞こえる',
+    text: '自分ひとりではないらしい。物語を知る。',
+    href: 'story.html'
+  },
+  worldChoice: {
+    title: '古びた看板を読む',
+    text: 'この場所について知ることができそうだ。世界を覗く。',
+    href: 'worldbuilding.html'
+  },
+  galleryChoice: {
+    title: '落ちている紙を見る',
+    text: '……誰かが写っているようだ。イラストを眺める。',
+    href: 'gallery.html'
+  }
+};
+
+function resetChoiceStates() {
+  choices.forEach(choice => {
+    choice.classList.remove('active', 'show');
+  });
+}
+
+function showChoicesOnly() {
+  intro.classList.add('dim');
+  tapStart.classList.add('hidden');
+  description.classList.remove('show');
+
+  choices.forEach((choice, i) => {
+    setTimeout(() => {
+      choice.classList.add('show');
+    }, i * 120);
+  });
+
+  stage = 1;
+  activeChoice = null;
+}
+
+function showDescription(choice) {
+  const data = choiceData[choice.id];
+  descriptionTitle.textContent = data.title;
+  descriptionText.textContent = data.text;
+  description.classList.add('show');
+}
+
+function goInitialState() {
+  stage = 0;
+  activeChoice = null;
+
+  description.classList.remove('show');
+  resetChoiceStates();
+
+  intro.classList.remove('dim');
+  tapStart.classList.remove('hidden');
+  pageFade.classList.remove('show');
+}
+
+function transitionToPage(url) {
+  sessionStorage.setItem('fromEntrance', '1');
+  pageFade.classList.add('show');
+
+  setTimeout(() => {
+    window.location.href = url;
+  }, 900);
+}
+
+function handleChoiceClick(choice) {
+  if (stage === 1) {
+    activeChoice = choice;
+    choices.forEach(c => c.classList.remove('active'));
+    choice.classList.add('active');
+    showDescription(choice);
+    stage = 2;
+    return;
+  }
+
+  if (stage === 2) {
+    if (activeChoice !== choice) {
+      activeChoice = choice;
+      choices.forEach(c => c.classList.remove('active'));
+      choice.classList.add('active');
+      showDescription(choice);
+      return;
+    }
+
+    const data = choiceData[choice.id];
+    transitionToPage(data.href);
+  }
+}
+
+function resetEntrancePage() {
+  stage = 0;
+  activeChoice = null;
+
+  description.classList.remove('show');
+  resetChoiceStates();
+
+  intro.classList.remove('dim');
+  tapStart.classList.remove('hidden');
+  pageFade.classList.remove('show');
+}
+
+tapStart.addEventListener('click', (event) => {
+  event.stopPropagation();
+  if (stage === 0) {
+    showChoicesOnly();
+  }
+});
+
+choices.forEach(choice => {
+  choice.addEventListener('click', (event) => {
+    event.stopPropagation();
+    handleChoiceClick(choice);
+  });
+});
+
+backZone.addEventListener('click', () => {
+  if (stage === 1 || stage === 2) {
+    goInitialState();
+  }
+});
+
+window.addEventListener('pageshow', (event) => {
+  resetEntrancePage();
+
+  if (event.persisted) {
+    pageFade.classList.remove('show');
+  }
+});
+</script>
 </body>
 </html>
