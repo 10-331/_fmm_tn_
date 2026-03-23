@@ -383,19 +383,7 @@ body::before{
   .intro{
     padding:4vh 6vw 4vh 4vw;
   }
-  
-  .item.paper {
-    transform: translate(-20%, 60%);
-  }
 
-  .item.sign {
-    transform: translate(60%, -10%);
-  }
-
-  .item.ear {
-    transform: translate(-100%, 20%);
-  }
-}
   .voiceChoice{
     left:10vw;
     top:36%;
@@ -409,8 +397,6 @@ body::before{
   .paperChoice{
     bottom:8vh;
   }
-
-}
 
   .signShape::after{
     width:64px;
@@ -637,6 +623,7 @@ const worldChoice = document.getElementById('worldChoice');
 const galleryChoice = document.getElementById('galleryChoice');
 
 const choices = [storyChoice, worldChoice, galleryChoice];
+const scene = document.querySelector('.scene');
 
 let stage = 0;
 let activeChoice = null;
@@ -659,12 +646,6 @@ const choiceData = {
   }
 };
 
-function resetChoiceStates() {
-  choices.forEach(choice => {
-    choice.classList.remove('active', 'show');
-  });
-}
-
 function showChoicesOnly() {
   intro.classList.add('dim');
   tapStart.classList.add('hidden');
@@ -685,7 +666,7 @@ function showDescription(choice) {
   description.classList.add('show');
 }
 
-function goInitialState() {
+function resetEntrancePage() {
   stage = 0;
   activeChoice = null;
 
@@ -695,15 +676,26 @@ function goInitialState() {
   intro.classList.remove('dim');
   tapStart.classList.remove('hidden');
   pageFade.classList.remove('show');
+  scene.classList.remove('departing');
 }
 
 function transitionToPage(url) {
   sessionStorage.setItem('fromEntrance', '1');
+
+  choices.forEach(choice => {
+    if (choice === activeChoice) {
+      choice.classList.add('chosen');
+    } else {
+      choice.classList.add('fadingAway');
+    }
+  });
+
+  scene.classList.add('departing');
   pageFade.classList.add('show');
 
   setTimeout(() => {
     window.location.href = url;
-  }, 900);
+  }, 760);
 }
 
 function handleChoiceClick(choice) {
@@ -730,16 +722,10 @@ function handleChoiceClick(choice) {
   }
 }
 
-function resetEntrancePage() {
-  stage = 0;
-  activeChoice = null;
-
-  description.classList.remove('show');
-  resetChoiceStates();
-
-  intro.classList.remove('dim');
-  tapStart.classList.remove('hidden');
-  pageFade.classList.remove('show');
+function resetChoiceStates() {
+  choices.forEach(choice => {
+    choice.classList.remove('active', 'show', 'chosen', 'fadingAway');
+  });
 }
 
 tapStart.addEventListener('click', (event) => {
