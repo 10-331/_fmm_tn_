@@ -452,6 +452,127 @@ body::before{
     top:25vh;
   }
 }
+
+/* ===== 遷移演出 ===== */
+
+.pageFade{
+  position:fixed;
+  inset:0;
+  z-index:30;
+  pointer-events:none;
+  opacity:0;
+  background:
+    radial-gradient(circle at center, rgba(255,255,255,.04), transparent 24%),
+    linear-gradient(to bottom, rgba(8,10,14,0), rgba(8,10,14,.86) 55%, rgba(3,4,7,.98) 100%);
+  transition:opacity .7s ease;
+}
+
+.pageFade::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:0;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.03) 0px,
+      rgba(255,255,255,.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  mix-blend-mode:screen;
+}
+
+.pageFade::after{
+  content:"";
+  position:absolute;
+  inset:-6%;
+  opacity:0;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 42%, rgba(255,255,255,.05) 60%, transparent 74%);
+  filter:blur(10px);
+  transform:scale(1.02);
+}
+
+.pageFade.show{
+  opacity:1;
+}
+
+.pageFade.show::before{
+  opacity:.22;
+  animation:scanFlicker .55s steps(2,end) infinite;
+}
+
+.pageFade.show::after{
+  opacity:.32;
+  animation:veilPulse .7s ease-in forwards;
+}
+
+@keyframes scanFlicker{
+  0%{ transform:translateY(0); opacity:.10; }
+  50%{ transform:translateY(-1px); opacity:.28; }
+  100%{ transform:translateY(0); opacity:.14; }
+}
+
+@keyframes veilPulse{
+  0%{ transform:scale(1.03); opacity:0; }
+  40%{ transform:scale(1.00); opacity:.24; }
+  100%{ transform:scale(.995); opacity:.32; }
+}
+
+/* ===== 離脱時のズレ ===== */
+
+.scene.departing .intro,
+.scene.departing .choiceObjects,
+.scene.departing .description,
+.scene.departing .serpent{
+  animation:departureShift .72s ease forwards;
+}
+
+@keyframes departureShift{
+  0%{
+    transform:none;
+    filter:none;
+    opacity:1;
+  }
+  30%{
+    transform:translate(-1px, 0);
+    filter:blur(.6px);
+  }
+  60%{
+    transform:translate(1px, -2px) scale(.995);
+    filter:blur(1.4px);
+    opacity:.8;
+  }
+  100%{
+    transform:translate(0, -8px) scale(.985);
+    filter:blur(2px);
+    opacity:0;
+  }
+}
+
+/* ===== 選択したものだけ残す ===== */
+
+.choice.fadingAway{
+  opacity:.15 !important;
+  transition:opacity .3s ease;
+}
+
+.choice.chosen{
+  z-index:8;
+}
+
+.choice.chosen .shape,
+.choice.chosen .label{
+  animation:chosenPulse .5s ease forwards;
+}
+
+@keyframes chosenPulse{
+  0%{ opacity:1; filter:none; }
+  50%{ filter:drop-shadow(0 0 12px rgba(255,255,255,.12)); }
+  100%{ opacity:.9; filter:drop-shadow(0 0 18px rgba(255,255,255,.18)); }
+}
+  
 </style>
 </head>
 
