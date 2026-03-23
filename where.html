@@ -549,12 +549,13 @@ function showChoicesOnly() {
   tapStart.classList.add('hidden');
   description.classList.remove('show');
 
-  choices.forEach((choice, i) => {
-    setTimeout(() => {
-      choice.classList.add('show');
-    }, i * 120);
+  choices.forEach(choice => {
+    choice.classList.add('show');
   });
 
+  stage = 1;
+  activeChoice = null;
+}
   stage = 1;
   activeChoice = null;
 }
