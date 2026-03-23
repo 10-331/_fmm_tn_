@@ -2,180 +2,533 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>入口</title>
-
 <style>
-:root{
-  --bg:#0b0c10;
-  --text:#ece8df;
-}
+  :root{
+    --bg-1:#0b0c10;
+    --bg-2:#14161b;
+    --text:#ece8df;
+    --muted:rgba(236,232,223,.66);
+  }
 
-html,body{
-  margin:0;
-  height:100%;
-  overflow:hidden;
-  background:radial-gradient(circle,#1a1d24,#0b0c10);
-  color:var(--text);
-  font-family:"Yu Mincho",serif;
-}
+  *{
+    box-sizing:border-box;
+  }
 
-.scene{position:relative;height:100%;}
+  html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(95,105,120,.08), transparent 34%),
+      radial-gradient(circle at 50% 50%, #1a1d24 0%, var(--bg-2) 38%, var(--bg-1) 100%);
+    color:var(--text);
+    font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  }
 
-/* ▼ 縦書き */
-.intro{
-  position:absolute;inset:0;
-  display:flex;justify-content:center;align-items:center;
-  writing-mode:vertical-rl;
-  font-size:24px;line-height:2;
-  transition:.5s;
-}
-.intro.dim{opacity:.2;}
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      linear-gradient(to bottom, rgba(255,255,255,.03), transparent 20%, transparent 80%, rgba(255,255,255,.02)),
+      radial-gradient(circle at 50% 20%, rgba(255,255,255,.03), transparent 24%);
+    opacity:.55;
+  }
 
-/* ▼ タップ */
-.tap{
-  position:absolute;inset:0;
-  z-index:5;
-}
+  .scene{
+    position:relative;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    isolation:isolate;
+  }
 
-/* ▼ 選択肢 */
-.choice{
-  position:absolute;
-  opacity:0;
-  transition:.4s;
-}
-.choice.show{opacity:1}
+  .veil{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:radial-gradient(circle at center, transparent 18%, rgba(0,0,0,.18) 72%, rgba(0,0,0,.45) 100%);
+    z-index:1;
+  }
 
-/* 声 */
-.voice{left:10vw;top:50%;}
-.voice::before,.voice::after{
-  content:"";position:absolute;
-  border:1px solid rgba(255,255,255,.4);
-  border-left:transparent;border-top:transparent;border-bottom:transparent;
-  border-radius:50%;
-}
-.voice::before{width:20px;height:30px;left:-10px;}
-.voice::after{width:40px;height:60px;left:-20px;}
+  .intro{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:7vh 6vw;
+    z-index:3;
+    transition:opacity .55s ease, transform .55s ease, filter .55s ease;
+    pointer-events:none;
+  }
 
-/* 看板 */
-.sign{right:10vw;top:45%;border:1px solid #aaa;padding:10px;}
+  .intro.dim{
+    opacity:.18;
+    filter:blur(1px);
+    transform:scale(.985);
+  }
 
-/* 紙 */
-.paper{
-  left:50%;bottom:10%;
-  transform:translateX(-50%) rotate(-5deg);
-  border:1px solid #aaa;padding:10px;
-}
+  .introText{
+    writing-mode:vertical-rl;
+    text-orientation:mixed;
+    font-size:clamp(20px, 4.8vw, 30px);
+    line-height:2.15;
+    letter-spacing:.12em;
+    max-height:76vh;
+    white-space:pre-wrap;
+    text-shadow:0 0 12px rgba(255,255,255,.05);
+  }
 
-/* ▼ 説明 */
-.desc{
-  position:absolute;
-  top:5%;left:50%;transform:translateX(-50%);
-  opacity:0;transition:.3s;
-}
-.desc.show{opacity:1}
+  .tapStart{
+    position:absolute;
+    inset:0;
+    z-index:8;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
 
-/* ▼ 白フェード */
-.fade{
-  position:fixed;inset:0;
-  background:#fff;
-  opacity:0;
-  transition:1s;
-  pointer-events:none;
-}
-.fade.show{opacity:1}
+  .tapStart.hidden{
+    pointer-events:none;
+  }
 
+  .tapGuide{
+    position:absolute;
+    bottom:7vh;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:12px;
+    letter-spacing:.16em;
+    color:rgba(236,232,223,.52);
+    transition:opacity .35s ease;
+    pointer-events:none;
+  }
+
+  .tapStart.hidden .tapGuide{
+    opacity:0;
+  }
+
+  .backZone{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    background:transparent;
+    border:none;
+    padding:0;
+    margin:0;
+    cursor:default;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .description{
+    position:absolute;
+    top:7vh;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(88vw, 430px);
+    min-height:64px;
+    text-align:center;
+    z-index:7;
+    opacity:0;
+    transition:opacity .3s ease;
+    pointer-events:none;
+    padding:0 8px;
+  }
+
+  .description.show{
+    opacity:1;
+  }
+
+  .descriptionTitle{
+    font-size:14px;
+    letter-spacing:.12em;
+    color:var(--text);
+    margin-bottom:8px;
+  }
+
+  .descriptionText{
+    font-size:13px;
+    line-height:1.9;
+    letter-spacing:.06em;
+    color:var(--muted);
+  }
+
+  .choiceObjects{
+    position:absolute;
+    inset:0;
+    z-index:4;
+    pointer-events:none;
+  }
+
+  .choice{
+    position:absolute;
+    opacity:0;
+    transform:translateY(10px);
+    transition:
+      opacity .45s ease,
+      transform .45s ease,
+      text-shadow .3s ease;
+    pointer-events:auto;
+    background:transparent;
+    border:none;
+    color:var(--text);
+    padding:0;
+    margin:0;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .choice.show{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  .choice:focus-visible{
+    outline:1px solid rgba(255,255,255,.35);
+    outline-offset:6px;
+  }
+
+  .choice .shape{
+    position:relative;
+    display:block;
+    filter:drop-shadow(0 0 14px rgba(255,255,255,.03));
+  }
+
+  .choice .label{
+    margin-top:10px;
+    font-size:12px;
+    letter-spacing:.12em;
+    color:rgba(236,232,223,.72);
+    white-space:nowrap;
+    text-align:center;
+    opacity:.9;
+    transition:opacity .35s ease, color .35s ease, text-shadow .35s ease;
+  }
+
+  .choice.active .label{
+    opacity:1;
+    color:#f3efe7;
+    text-shadow:0 0 8px rgba(255,255,255,.14);
+  }
+
+  /* 声 */
+  .voiceChoice{
+    left:9vw;
+    top:45%;
+  }
+
+  .voiceShape{
+    width:46px;
+    height:88px;
+  }
+
+  .voiceShape::before,
+  .voiceShape::after{
+    content:"";
+    position:absolute;
+    border:1px solid rgba(255,255,255,.26);
+    border-left-color:transparent;
+    border-top-color:transparent;
+    border-bottom-color:transparent;
+    border-radius:50%;
+    top:50%;
+    transform:translateY(-50%);
+  }
+
+  .voiceShape::before{
+    width:16px;
+    height:28px;
+    left:8px;
+  }
+
+  .voiceShape::after{
+    width:28px;
+    height:46px;
+    left:14px;
+  }
+
+  /* 看板 */
+  .signChoice{
+    right:8vw;
+    top:42%;
+  }
+
+  .signShape{
+    width:78px;
+    height:124px;
+  }
+
+  .signShape::before{
+    content:"";
+    position:absolute;
+    bottom:0;
+    left:50%;
+    width:2px;
+    height:74px;
+    background:rgba(255,255,255,.20);
+    transform:translateX(-50%);
+  }
+
+  .signShape::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:50%;
+    width:72px;
+    height:46px;
+    border:1px solid rgba(255,255,255,.24);
+    transform:translateX(-50%) rotate(-2deg);
+  }
+
+  /* 紙 */
+  .paperChoice{
+    left:50%;
+    bottom:12vh;
+    transform:translateX(-50%) translateY(10px);
+  }
+
+  .paperChoice.show{
+    transform:translateX(-50%) translateY(0);
+  }
+
+  .paperShape{
+    width:74px;
+    height:94px;
+    border:1px solid rgba(255,255,255,.22);
+    background:linear-gradient(to bottom, rgba(255,255,255,.04), rgba(255,255,255,.015));
+    transform:rotate(-8deg);
+  }
+
+  /* 白フェード */
+  .pageFade{
+    position:fixed;
+    inset:0;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(255,255,255,.16), rgba(255,255,255,.78) 58%, rgba(255,255,255,.98) 100%);
+    opacity:0;
+    pointer-events:none;
+    z-index:9999;
+    transition:opacity 1s ease;
+  }
+
+  .pageFade.show{
+    opacity:1;
+  }
+
+  @media (max-width:640px){
+    .introText{
+      font-size:clamp(18px, 5vw, 24px);
+      line-height:2.05;
+      max-height:72vh;
+    }
+
+    .voiceChoice{
+      left:7vw;
+    }
+
+    .signChoice{
+      right:7vw;
+    }
+
+    .description{
+      top:6vh;
+      width:min(90vw, 400px);
+    }
+
+    .descriptionText{
+      font-size:12.5px;
+      line-height:1.85;
+    }
+  }
 </style>
 </head>
-
 <body>
+<main class="scene" aria-label="神隠しの後の入口">
+  <div class="veil"></div>
 
-<div class="scene">
+  <button class="backZone" id="backZone" aria-label="初回状態に戻る"></button>
 
-<div class="intro" id="intro">
-気づくと、知らない場所に立っていた。
-風はないのに、何かが揺れている。
-</div>
+  <section class="intro" id="intro">
+    <div class="introText">気づくと、知らない場所に立っていた。
 
-<div class="tap" id="tap"></div>
+風はないのに、
+どこかで何かが揺れている。
 
-<div class="choice voice" id="c1">声</div>
-<div class="choice sign" id="c2">看板</div>
-<div class="choice paper" id="c3">紙</div>
+「……ここ、どこ？」
 
-<div class="desc" id="desc"></div>
+視線の先に、
+いくつかの違和感がある。</div>
+  </section>
 
-</div>
+  <button class="tapStart" id="tapStart" aria-label="画面に触れる">
+    <span class="tapGuide">触れる</span>
+  </button>
 
-<div class="fade" id="fade"></div>
+  <div class="description" id="description" aria-live="polite">
+    <div class="descriptionTitle" id="descriptionTitle"></div>
+    <div class="descriptionText" id="descriptionText"></div>
+  </div>
+
+  <div class="choiceObjects">
+    <button class="choice voiceChoice" id="storyChoice" aria-label="声が聞こえる方へ">
+      <span class="shape voiceShape"></span>
+      <span class="label">声</span>
+    </button>
+
+    <button class="choice signChoice" id="worldChoice" aria-label="古びた看板を読む">
+      <span class="shape signShape"></span>
+      <span class="label">看板</span>
+    </button>
+
+    <button class="choice paperChoice" id="galleryChoice" aria-label="落ちている紙を見る">
+      <span class="shape paperShape"></span>
+      <span class="label">紙</span>
+    </button>
+  </div>
+</main>
+
+<div class="pageFade" id="pageFade"></div>
 
 <script>
-const tap=document.getElementById('tap');
-const intro=document.getElementById('intro');
-const desc=document.getElementById('desc');
-const fade=document.getElementById('fade');
+  const tapStart = document.getElementById('tapStart');
+  const backZone = document.getElementById('backZone');
+  const intro = document.getElementById('intro');
+  const pageFade = document.getElementById('pageFade');
 
-const data={
-c1:{t:'声',d:'物語へ',url:'story.html'},
-c2:{t:'看板',d:'世界観',url:'worldbuilding.html'},
-c3:{t:'紙',d:'展示',url:'gallery.html'}
-};
+  const description = document.getElementById('description');
+  const descriptionTitle = document.getElementById('descriptionTitle');
+  const descriptionText = document.getElementById('descriptionText');
 
-let stage=0;
-let active=null;
+  const storyChoice = document.getElementById('storyChoice');
+  const worldChoice = document.getElementById('worldChoice');
+  const galleryChoice = document.getElementById('galleryChoice');
 
-tap.onclick=()=>{
+  const choices = [storyChoice, worldChoice, galleryChoice];
 
-// 初回 → 選択肢表示
-if(stage===0){
-intro.classList.add('dim');
-document.querySelectorAll('.choice').forEach(c=>c.classList.add('show'));
-stage=1;
-return;
-}
+  let stage = 0;
+  let activeChoice = null;
+  // 0 = 初回起動
+  // 1 = 選択肢表示
+  // 2 = 説明表示（同じ選択肢をもう一度押すと遷移）
 
-// 説明状態 → リセット
-if(stage===2){
-stage=0;
-active=null;
-desc.classList.remove('show');
-intro.classList.remove('dim');
-document.querySelectorAll('.choice').forEach(c=>c.classList.remove('show'));
-}
-};
+  const choiceData = {
+    storyChoice: {
+      title: '声が聞こえる方へ',
+      text: 'かすかな声を追う。物語へ進む。',
+      href: 'story.html'
+    },
+    worldChoice: {
+      title: '古びた看板を読む',
+      text: 'この場所について知る。世界観や資料を見る。',
+      href: 'worldbuilding.html'
+    },
+    galleryChoice: {
+      title: '落ちている紙を見る',
+      text: '誰かが残したものに触れる。イラストや展示を見る。',
+      href: 'gallery.html'
+    }
+  };
 
-document.querySelectorAll('.choice').forEach(c=>{
-c.onclick=(e)=>{
-e.stopPropagation();
+  function resetChoiceStates() {
+    choices.forEach(choice => {
+      choice.classList.remove('active', 'show');
+    });
+  }
 
-if(stage===1){
-active=c.id;
-desc.textContent=data[c.id].d;
-desc.classList.add('show');
-stage=2;
-return;
-}
+  function showChoicesOnly() {
+    intro.classList.add('dim');
+    tapStart.classList.add('hidden');
+    description.classList.remove('show');
 
-if(stage===2){
+    choices.forEach((choice, i) => {
+      setTimeout(() => {
+        choice.classList.add('show');
+      }, i * 120);
+    });
 
-// 別選択
-if(active!==c.id){
-active=c.id;
-desc.textContent=data[c.id].d;
-return;
-}
+    stage = 1;
+    activeChoice = null;
+  }
 
-// 遷移
-sessionStorage.setItem('fromEntrance','1');
-fade.classList.add('show');
+  function showDescription(choice) {
+    const data = choiceData[choice.id];
+    descriptionTitle.textContent = data.title;
+    descriptionText.textContent = data.text;
+    description.classList.add('show');
+  }
 
-setTimeout(()=>{
-location.href=data[c.id].url;
-},800);
-}
-};
-});
+  function goInitialState() {
+    stage = 0;
+    activeChoice = null;
+
+    description.classList.remove('show');
+    resetChoiceStates();
+
+    intro.classList.remove('dim');
+    tapStart.classList.remove('hidden');
+  }
+
+  function transitionToPage(url) {
+    sessionStorage.setItem('fromEntrance', '1');
+    pageFade.classList.add('show');
+
+    setTimeout(() => {
+      window.location.href = url;
+    }, 900);
+  }
+
+  function handleChoiceClick(choice) {
+    if (stage === 1) {
+      activeChoice = choice;
+      choices.forEach(c => c.classList.remove('active'));
+      choice.classList.add('active');
+      showDescription(choice);
+      stage = 2;
+      return;
+    }
+
+    if (stage === 2) {
+      if (activeChoice !== choice) {
+        activeChoice = choice;
+        choices.forEach(c => c.classList.remove('active'));
+        choice.classList.add('active');
+        showDescription(choice);
+        return;
+      }
+
+      const data = choiceData[choice.id];
+      transitionToPage(data.href);
+    }
+  }
+
+  tapStart.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (stage === 0) {
+      showChoicesOnly();
+    }
+  });
+
+  choices.forEach(choice => {
+    choice.addEventListener('click', (event) => {
+      event.stopPropagation();
+      handleChoiceClick(choice);
+    });
+  });
+
+  backZone.addEventListener('click', () => {
+    if (stage === 1 || stage === 2) {
+      goInitialState();
+    }
+  });
 </script>
-
 </body>
 </html>
