@@ -402,10 +402,39 @@ body::before{
     top:46%;
   }
 
-  .signChoice{
-    right:7vw;
-    top:43%;
-  }
+/* 右：看板 */
+.signChoice{
+  right:20vw;
+  top:44%;
+}
+
+.signShape{
+  width:78px;
+  height:78px;
+  position:relative;
+}
+
+.signShape::before{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:50%;
+  width:2px;
+  height:32px;
+  background:rgba(255,255,255,.20);
+  transform:translateX(-50%);
+}
+
+.signShape::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:50%;
+  width:72px;
+  height:42px;
+  border:1px solid rgba(255,255,255,.24);
+  transform:translateX(-50%) rotate(-2deg);
+}
 
   .paperChoice{
     bottom:8vh;
