@@ -73,16 +73,19 @@
     transform:scale(.985);
   }
 
-  .introText{
-    writing-mode:vertical-rl;
-    text-orientation:mixed;
-    font-size:clamp(20px, 4.8vw, 30px);
-    line-height:2.15;
-    letter-spacing:.12em;
-    max-height:76vh;
-    white-space:pre-wrap;
-    text-shadow:0 0 12px rgba(255,255,255,.05);
-  }
+.introText{
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+
+  font-size:clamp(16px, 3.8vw, 24px); /* ← 小さく */
+  line-height:1.85; /* ← 横の間隔を詰める（重要） */
+  letter-spacing:.08em; /* ← 少しだけ締める */
+
+  max-height:76vh;
+  white-space:pre-wrap;
+
+  text-shadow:0 0 12px rgba(255,255,255,.05);
+}
 
   .tapStart{
     position:absolute;
