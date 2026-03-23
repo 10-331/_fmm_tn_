@@ -378,39 +378,19 @@ body::before{
 }
 
 /* モバイル */
-@media (max-width:640px){
-  .intro{
-    padding:2vh 6vw 10vh;
+@media (max-width: 768px) {
+  .item.paper {
+    transform: translate(-20%, 60%);
   }
 
-  .intro.dim{
-    opacity:.10;
-    filter:blur(1.5px);
-    transform:scale(.98);
+  .item.sign {
+    transform: translate(60%, -10%);
   }
 
-  .introText{
-    font-size:clamp(15px, 3.6vw, 20px);
-    line-height:1.75;
-    letter-spacing:.06em;
-    max-height:72vh;
+  .item.ear {
+    transform: translate(-100%, 20%);
   }
-
-  /* もっと散らす */
-  .voiceChoice{
-    left:8vw;
-    top:56%;
-  }
-
-  .signChoice{
-    right:4vw;
-    top:49%;
-  }
-
-  .paperChoice{
-    left:46%;
-    bottom:12vh;
-  }
+}
 
   .voiceShape{
     width:40px;
