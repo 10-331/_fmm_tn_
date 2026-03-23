@@ -475,6 +475,7 @@
 
     intro.classList.remove('dim');
     tapStart.classList.remove('hidden');
+    pageFade.classList.remove('show');
   }
 
   function transitionToPage(url) {
@@ -510,6 +511,18 @@
     }
   }
 
+  function resetEntrancePage() {
+    stage = 0;
+    activeChoice = null;
+
+    description.classList.remove('show');
+    resetChoiceStates();
+
+    intro.classList.remove('dim');
+    tapStart.classList.remove('hidden');
+    pageFade.classList.remove('show');
+  }
+
   tapStart.addEventListener('click', (event) => {
     event.stopPropagation();
     if (stage === 0) {
@@ -527,6 +540,14 @@
   backZone.addEventListener('click', () => {
     if (stage === 1 || stage === 2) {
       goInitialState();
+    }
+  });
+
+  window.addEventListener('pageshow', (event) => {
+    resetEntrancePage();
+
+    if (event.persisted) {
+      pageFade.classList.remove('show');
     }
   });
 </script>
