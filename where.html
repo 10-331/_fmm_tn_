@@ -2,267 +2,180 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>入口</title>
+
 <style>
 :root{
-  --bg-1:#0b0c10;
-  --bg-2:#14161b;
+  --bg:#0b0c10;
   --text:#ece8df;
-  --muted:rgba(236,232,223,.66);
 }
-
-*{ box-sizing:border-box; }
 
 html,body{
   margin:0;
-  width:100%;
   height:100%;
   overflow:hidden;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(95,105,120,.08), transparent 34%),
-    radial-gradient(circle at 50% 50%, #1a1d24 0%, var(--bg-2) 38%, var(--bg-1) 100%);
+  background:radial-gradient(circle,#1a1d24,#0b0c10);
   color:var(--text);
-  font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  font-family:"Yu Mincho",serif;
 }
 
-.scene{ position:relative; width:100%; height:100%; }
+.scene{position:relative;height:100%;}
 
+/* ▼ 縦書き */
 .intro{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:7vh 6vw;
-  z-index:3;
+  position:absolute;inset:0;
+  display:flex;justify-content:center;align-items:center;
+  writing-mode:vertical-rl;
+  font-size:24px;line-height:2;
   transition:.5s;
 }
+.intro.dim{opacity:.2;}
 
-.intro.dim{ opacity:.18; filter:blur(1px); }
-
-.introText{
-  writing-mode:vertical-rl;
-  font-size:clamp(20px, 4.8vw, 30px);
-  line-height:2.1;
-  letter-spacing:.12em;
-  white-space:pre-wrap;
+/* ▼ タップ */
+.tap{
+  position:absolute;inset:0;
+  z-index:5;
 }
 
-.tapStart{
-  position:absolute;
-  inset:0;
-  z-index:8;
-  background:transparent;
-  border:none;
-}
-
-.tapStart.hidden{ pointer-events:none; }
-
-.tapGuide{
-  position:absolute;
-  bottom:7vh;
-  left:50%;
-  transform:translateX(-50%);
-  font-size:12px;
-  color:rgba(236,232,223,.52);
-}
-
+/* ▼ 選択肢 */
 .choice{
   position:absolute;
   opacity:0;
   transition:.4s;
-  background:none;
-  border:none;
-  color:#fff;
+}
+.choice.show{opacity:1}
+
+/* 声 */
+.voice{left:10vw;top:50%;}
+.voice::before,.voice::after{
+  content:"";position:absolute;
+  border:1px solid rgba(255,255,255,.4);
+  border-left:transparent;border-top:transparent;border-bottom:transparent;
+  border-radius:50%;
+}
+.voice::before{width:20px;height:30px;left:-10px;}
+.voice::after{width:40px;height:60px;left:-20px;}
+
+/* 看板 */
+.sign{right:10vw;top:45%;border:1px solid #aaa;padding:10px;}
+
+/* 紙 */
+.paper{
+  left:50%;bottom:10%;
+  transform:translateX(-50%) rotate(-5deg);
+  border:1px solid #aaa;padding:10px;
 }
 
-.choice.show{ opacity:1; }
-
-.voiceChoice{ left:9vw; top:45%; }
-.signChoice{ right:8vw; top:42%; }
-.paperChoice{ left:50%; bottom:12vh; transform:translateX(-50%); }
-
-.description{
+/* ▼ 説明 */
+.desc{
   position:absolute;
-  top:6vh;
-  left:50%;
-  transform:translateX(-50%);
-  opacity:0;
-  transition:.3s;
+  top:5%;left:50%;transform:translateX(-50%);
+  opacity:0;transition:.3s;
 }
-
-.description.show{ opacity:1; }
+.desc.show{opacity:1}
 
 /* ▼ 白フェード */
-.pageFade{
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at 50% 42%, rgba(255,255,255,.18), rgba(255,255,255,.85) 60%, #fff 100%);
+.fade{
+  position:fixed;inset:0;
+  background:#fff;
   opacity:0;
+  transition:1s;
   pointer-events:none;
-  z-index:9999;
-  transition:opacity 1s ease;
 }
-.pageFade.show{ opacity:1; }
+.fade.show{opacity:1}
 
 </style>
 </head>
+
 <body>
 
-<main class="scene">
+<div class="scene">
 
-  <section class="intro" id="intro">
-    <div class="introText">
+<div class="intro" id="intro">
 気づくと、知らない場所に立っていた。
+風はないのに、何かが揺れている。
+</div>
 
-風はないのに、
-どこかで何かが揺れている。
+<div class="tap" id="tap"></div>
 
-「……ここ、どこ？」
+<div class="choice voice" id="c1">声</div>
+<div class="choice sign" id="c2">看板</div>
+<div class="choice paper" id="c3">紙</div>
 
-視線の先に、
-いくつかの違和感がある。
-    </div>
-  </section>
+<div class="desc" id="desc"></div>
 
-  <button class="tapStart" id="tapStart">
-    <span class="tapGuide">触れる</span>
-  </button>
+</div>
 
-  <div class="description" id="description">
-    <div id="title"></div>
-    <div id="text"></div>
-  </div>
-
-  <button class="choice voiceChoice" id="storyChoice">声</button>
-  <button class="choice signChoice" id="worldChoice">看板</button>
-  <button class="choice paperChoice" id="galleryChoice">紙</button>
-
-</main>
-
-<div class="pageFade" id="fade"></div>
+<div class="fade" id="fade"></div>
 
 <script>
-const tapStart = document.getElementById('tapStart');
-const intro = document.getElementById('intro');
-const description = document.getElementById('description');
-const fade = document.getElementById('fade');
+const tap=document.getElementById('tap');
+const intro=document.getElementById('intro');
+const desc=document.getElementById('desc');
+const fade=document.getElementById('fade');
 
-const title = document.getElementById('title');
-const text = document.getElementById('text');
-
-const choices = {
-  storyChoice: {
-    el: document.getElementById('storyChoice'),
-    title: '声が聞こえる方へ',
-    text: '物語へ進む',
-    url: 'story.html'
-  },
-  worldChoice: {
-    el: document.getElementById('worldChoice'),
-    title: '看板',
-    text: '世界観を見る',
-    url: 'worldbuilding.html'
-  },
-  galleryChoice: {
-    el: document.getElementById('galleryChoice'),
-    title: '紙',
-    text: '展示を見る',
-    url: 'gallery.html'
-  }
+const data={
+c1:{t:'声',d:'物語へ',url:'story.html'},
+c2:{t:'看板',d:'世界観',url:'worldbuilding.html'},
+c3:{t:'紙',d:'展示',url:'gallery.html'}
 };
 
-let stage = 0;
-let active = null;
+let stage=0;
+let active=null;
 
-tapStart.onclick = () => {
-  intro.classList.add('dim');
-  tapStart.classList.add('hidden');
+tap.onclick=()=>{
 
-  Object.values(choices).forEach(c => c.el.classList.add('show'));
-  stage = 1;
+// 初回 → 選択肢表示
+if(stage===0){
+intro.classList.add('dim');
+document.querySelectorAll('.choice').forEach(c=>c.classList.add('show'));
+stage=1;
+return;
+}
+
+// 説明状態 → リセット
+if(stage===2){
+stage=0;
+active=null;
+desc.classList.remove('show');
+intro.classList.remove('dim');
+document.querySelectorAll('.choice').forEach(c=>c.classList.remove('show'));
+}
 };
 
-Object.values(choices).forEach(c => {
-  c.el.onclick = (e) => {
-    e.stopPropagation();
+document.querySelectorAll('.choice').forEach(c=>{
+c.onclick=(e)=>{
+e.stopPropagation();
 
-    if(stage === 1){
-      active = c;
-      title.textContent = c.title;
-      text.textContent = c.text;
-      description.classList.add('show');
-      stage = 2;
-      return;
-    }
+if(stage===1){
+active=c.id;
+desc.textContent=data[c.id].d;
+desc.classList.add('show');
+stage=2;
+return;
+}
 
-    if(stage === 2){
-      if(active !== c){
-        active = c;
-        title.textContent = c.title;
-        text.textContent = c.text;
-        return;
-      }
+if(stage===2){
 
-      // ▼ フェードしてから遷移
-      fade.classList.add('show');
+// 別選択
+if(active!==c.id){
+active=c.id;
+desc.textContent=data[c.id].d;
+return;
+}
 
-      setTimeout(()=>{
-        window.location.href = c.url;
-      }, 900);
-    }
-  };
+// 遷移
+sessionStorage.setItem('fromEntrance','1');
+fade.classList.add('show');
+
+setTimeout(()=>{
+location.href=data[c.id].url;
+},800);
+}
+};
 });
-
-document.body.onclick = () => {
-  if(stage === 2){
-    stage = 0;
-    active = null;
-
-    description.classList.remove('show');
-    intro.classList.remove('dim');
-    tapStart.classList.remove('hidden');
-
-    Object.values(choices).forEach(c => c.el.classList.remove('show'));
-  }
-};
 </script>
-.voiceChoice::before,
-.voiceChoice::after{
-  content:"";
-  position:absolute;
-  border:1px solid rgba(255,255,255,.3);
-  border-left-color:transparent;
-  border-top-color:transparent;
-  border-bottom-color:transparent;
-  border-radius:50%;
-  top:50%;
-  transform:translateY(-50%);
-}
 
-.voiceChoice::before{
-  width:16px;
-  height:28px;
-  left:-10px;
-}
-
-.voiceChoice::after{
-  width:28px;
-  height:46px;
-  left:-18px;
-}
-
-.signChoice{
-  border:1px solid rgba(255,255,255,.3);
-  padding:10px;
-}
-
-.paperChoice{
-  border:1px solid rgba(255,255,255,.3);
-  transform:translateX(-50%) rotate(-6deg);
-  padding:10px;
-}
 </body>
 </html>
