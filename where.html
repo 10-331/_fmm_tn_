@@ -59,11 +59,11 @@
   position:absolute;
   pointer-events:none;
   z-index:2;
-  opacity:.20;
-  filter:blur(6px);
+
+  opacity:.12;
+  filter:blur(24px); /* ← 大事：一気に太くする */
   transform-origin:left center;
   mix-blend-mode:screen;
-  will-change:transform, opacity;
 }
 
 .serpent::before{
@@ -71,93 +71,62 @@
   position:absolute;
   inset:0;
   border-radius:999px;
+
   background:linear-gradient(
     90deg,
     rgba(0,0,0,0) 0%,
-    rgba(60,70,95,.08) 10%,
-    rgba(95,110,145,.20) 45%,
-    rgba(120,135,165,.26) 55%,
-    rgba(95,110,145,.16) 75%,
+    rgba(70,80,110,.08) 20%,
+    rgba(110,125,160,.22) 45%,
+    rgba(140,155,185,.28) 55%,
+    rgba(110,125,160,.16) 75%,
     rgba(0,0,0,0) 100%
   );
 }
 
-/* 左下：ゆっくり大きく動く */
 .serpent1{
-  width:48vw;
-  height:10px;
-  left:2vw;
+  width:75vw;
+  height:36px;
+  left:-15vw;
   bottom:18vh;
-  animation:slither1 16s cubic-bezier(.4,0,.2,1) infinite;
+  animation:slither1 23s infinite;
 }
 
-/* 右上：少し違う動き */
 .serpent2{
-  width:38vw;
-  height:9px;
-  right:4vw;
-  top:26vh;
-  animation:slither2 21s cubic-bezier(.45,0,.25,1) infinite;
-  opacity:.16;
+  width:65vw;
+  height:30px;
+  right:-20vw;
+  top:24vh;
+  animation:slither2 31s infinite;
 }
 
-/* 微妙に違う第三の動き（重要） */
 .serpent3{
-  width:30vw;
-  height:8px;
-  left:30vw;
+  width:55vw;
+  height:26px;
+  left:10vw;
   top:60vh;
-  animation:slither3 27s cubic-bezier(.42,0,.18,1) infinite;
-  opacity:.10;
+  animation:slither3 37s infinite;
 }
-
+  
 @keyframes slither1{
-  0%{
-    transform:translateX(0) translateY(0) rotate(6deg) scaleX(1);
-  }
-  25%{
-    transform:translateX(4vw) translateY(-1vh) rotate(-3deg) scaleX(1.08);
-  }
-  50%{
-    transform:translateX(9vw) translateY(.8vh) rotate(4deg) scaleX(.92);
-  }
-  75%{
-    transform:translateX(13vw) translateY(-.6vh) rotate(-5deg) scaleX(1.1);
-  }
-  100%{
-    transform:translateX(18vw) translateY(.5vh) rotate(7deg) scaleX(.95);
-  }
+  0%{ transform:translateX(0) rotate(5deg);}
+  40%{ transform:translateX(12vw) translateY(-1.2vh) rotate(-3deg);}
+  70%{ transform:translateX(20vw) translateY(.8vh) rotate(4deg);}
+  100%{ transform:translateX(32vw) rotate(6deg);}
 }
 
 @keyframes slither2{
-  0%{
-    transform:translateX(0) translateY(0) rotate(-6deg);
-  }
-  30%{
-    transform:translateX(-3vw) translateY(1vh) rotate(-2deg);
-  }
-  60%{
-    transform:translateX(-8vw) translateY(-1.2vh) rotate(3deg);
-  }
-  100%{
-    transform:translateX(-14vw) translateY(.6vh) rotate(-6deg);
-  }
+  0%{ transform:translateX(0) rotate(-6deg);}
+  25%{ transform:translateX(-6vw) translateY(1vh) rotate(-1deg);}
+  65%{ transform:translateX(-18vw) translateY(-1.4vh) rotate(5deg);}
+  100%{ transform:translateX(-30vw) rotate(-6deg);}
 }
 
 @keyframes slither3{
-  0%{
-    transform:translateX(0) translateY(0) rotate(4deg);
-  }
-  40%{
-    transform:translateX(5vw) translateY(-1.5vh) rotate(-4deg);
-  }
-  70%{
-    transform:translateX(9vw) translateY(1vh) rotate(5deg);
-  }
-  100%{
-    transform:translateX(14vw) translateY(-.4vh) rotate(-3deg);
-  }
+  0%{ transform:translateX(0) rotate(3deg);}
+  50%{ transform:translateX(10vw) translateY(-2vh) rotate(-5deg);}
+  100%{ transform:translateX(22vw) rotate(4deg);}
 }
+  
   .intro{
     position:absolute;
     inset:0;
@@ -176,6 +145,16 @@
     transform:scale(.985);
   }
 
+  .introText{
+  animation:breath 5s ease-in-out infinite;
+}
+
+@keyframes breath{
+  0%{ transform:translateY(0); opacity:1;}
+  50%{ transform:translateY(-2px); opacity:.92;}
+  100%{ transform:translateY(0); opacity:1;}
+}
+  
   .introText{
     writing-mode:vertical-rl;
     text-orientation:mixed;
