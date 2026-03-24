@@ -19,8 +19,10 @@
   --village1:#d9ddd7;
   --village2:#bfc5bf;
 
-  --hama1:#2f3d66;
-  --hama2:#0f1628;
+  --hama1:#8fc7dc;
+  --hama2:#94cde0;
+  --hama3:#a8d8e7;
+  --hama4:#c7e7ef;
 
   --s1:#677281;
   --s2:#1c222d;
@@ -126,8 +128,8 @@ body::before{
 
 .page[data-view="hama"] .sky{
   background:
-    radial-gradient(circle at 50% 18%, rgba(255,255,255,.16), transparent 20%),
-    linear-gradient(180deg, #a9d9e8 0%, #8fc9df 36%, #72b4d2 72%, #5aa0c4 100%);
+    radial-gradient(circle at 50% 16%, rgba(255,255,255,.10), transparent 18%),
+    linear-gradient(180deg, var(--hama1) 0%, var(--hama2) 28%, var(--hama3) 62%, var(--hama4) 100%);
 }
 
 .page[data-view="s"] .sky{
@@ -150,8 +152,8 @@ body::before{
   position:absolute;
   left:-8%;
   right:-8%;
-  bottom:-4vh;
-  height:38vh;
+  bottom:-2vh;
+  height:42vh;
   border-radius:50% 50% 0 0 / 24% 24% 0 0;
   transition:background .45s ease, transform .45s ease;
 }
@@ -164,8 +166,8 @@ body::before{
 
 .page[data-view="hama"] .ground{
   background:
-    linear-gradient(180deg, rgba(255,255,255,.04), transparent 24%),
-    linear-gradient(180deg, #1e2639 0%, #111722 100%);
+    linear-gradient(180deg, rgba(255,255,255,.06), transparent 24%),
+    linear-gradient(180deg, #334960 0%, #1d2d3f 100%);
 }
 
 .page[data-view="s"] .ground{
@@ -193,7 +195,8 @@ body::before{
 }
 
 .page[data-view="hama"] .hamaCity{
-  opacity:1;
+  opacity:.42;
+  transform:translateX(-50%) translateY(6px);
 }
 
 .page[data-view="village"] .villageTree{
@@ -207,6 +210,7 @@ body::before{
 .hamaCity{
   width:min(720px, 92vw);
   height:220px;
+  filter:blur(.2px);
 }
 
 .hamaCity::before,
@@ -214,8 +218,8 @@ body::before{
   content:"";
   position:absolute;
   bottom:0;
-  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.12);
 }
 
 .hamaCity::before{
@@ -223,9 +227,9 @@ body::before{
   width:120px;
   height:160px;
   box-shadow:
-    180px 22px 0 -8px rgba(255,255,255,.03),
-    315px 40px 0 -16px rgba(255,255,255,.03),
-    430px 10px 0 -6px rgba(255,255,255,.03);
+    180px 22px 0 -8px rgba(255,255,255,.05),
+    315px 40px 0 -16px rgba(255,255,255,.05),
+    430px 10px 0 -6px rgba(255,255,255,.05);
 }
 
 .hamaCity::after{
@@ -233,8 +237,8 @@ body::before{
   width:96px;
   height:126px;
   box-shadow:
-    -142px 18px 0 -8px rgba(255,255,255,.03),
-    -275px 32px 0 -14px rgba(255,255,255,.03);
+    -142px 18px 0 -8px rgba(255,255,255,.05),
+    -275px 32px 0 -14px rgba(255,255,255,.05);
 }
 
 .villageTree{
@@ -356,6 +360,7 @@ body::before{
   border:1px solid var(--line);
   background:var(--panel);
   backdrop-filter:blur(10px);
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
 }
 
 .dirBtn{
@@ -421,7 +426,7 @@ body::before{
   border:1px solid var(--line);
   background:var(--panel-strong);
   backdrop-filter:blur(12px);
-  box-shadow:0 18px 44px rgba(0,0,0,.24);
+  box-shadow:0 18px 44px rgba(0,0,0,.24), 0 0 0 1px rgba(255,255,255,.02) inset;
 }
 
 .infoKicker{
@@ -470,15 +475,15 @@ body::before{
   z-index:15;
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:8px;
   width:min(280px, calc(100vw - 40px));
 }
 
 .poiBtn{
   text-align:left;
   padding:12px 14px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(8,10,16,.46);
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(10,12,18,.32);
   backdrop-filter:blur(10px);
   color:var(--text);
   font:inherit;
@@ -486,6 +491,7 @@ body::before{
   letter-spacing:.08em;
   cursor:pointer;
   transition:background .25s ease, border-color .25s ease, transform .25s ease;
+  box-shadow:0 10px 24px rgba(0,0,0,.12);
 }
 
 .poiBtn:hover,
@@ -522,7 +528,6 @@ body::before{
   opacity:1;
 }
 
-/* 方向ごとの微調整 */
 .page[data-view="village"] .signpost{
   transform:translateX(-50%) rotate(-1deg);
 }
@@ -540,7 +545,7 @@ body::before{
     top:auto;
     right:14px;
     left:14px;
-    bottom:100px;
+    bottom:120px;
     width:auto;
     min-height:160px;
   }
@@ -549,7 +554,7 @@ body::before{
     left:14px;
     right:14px;
     width:auto;
-    bottom:166px;
+    bottom:194px;
   }
 
   .pcArrow{
@@ -588,7 +593,7 @@ body::before{
   }
 
   .poiList{
-    bottom:188px;
+    bottom:198px;
     gap:8px;
   }
 
