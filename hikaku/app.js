@@ -334,11 +334,10 @@ function createCharacterElement(character) {
 
   const ageText = character.age ? `${escapeHtml(character.age)}` : "―";
 
-  label.innerHTML = `
-    <span class="cm">${escapeHtml(character.height)}cm</span>
-    <span class="name">${escapeHtml(character.name)}</span>
-    <span class="age">${ageText}</span>
-  `;
+label.innerHTML = `
+  <span class="cm">${character.height}cm</span>
+  <span class="age">${character.age ? `AGE ${character.age}` : ""}</span>
+`;
 
   const scale = Number(character.correction.scale ?? 1);
   const visualHeight = character.height * PX_PER_CM * scale;
