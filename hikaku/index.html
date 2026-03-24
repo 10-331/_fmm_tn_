@@ -30,7 +30,7 @@
           
           <label class="field">
             <span>年齢</span>
-            <input id="ageInput" type="text" placeholder="" />
+            <input id="ageInput" type="number" min="0" max="999" placeholder="" />
           </label>
           
           <label class="field">
@@ -100,12 +100,12 @@
           </div>
 
           <label class="field compact">
-  <span>ラベル表示</span>
-  <select id="labelToggle">
-    <option value="show" selected>表示</option>
-    <option value="hide">非表示</option>
-  </select>
-</label>
+            <span>ラベル表示</span>
+            <select id="labelToggle">
+              <option value="show" selected>表示</option>
+              <option value="hide">非表示</option>
+            </select>
+          </label>
           
           <div class="stage-scroll">
             <div id="compareStage" class="compare-stage"></div>
