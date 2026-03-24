@@ -10,26 +10,26 @@
   --bg1:#0b0c10;
   --bg2:#151821;
   --text:#ece8df;
-  --muted:rgba(236,232,223,.66);
+  --muted:rgba(236,232,223,.68);
   --line:rgba(255,255,255,.12);
-  --panel:rgba(10,12,18,.62);
-  --panel-strong:rgba(10,12,18,.82);
+  --panel:rgba(10,12,18,.58);
+  --panel-strong:rgba(10,12,18,.80);
 
-  --village1:#d9ddd7;
-  --village2:#bfc5bf;
+  --village-sky-1:#dde2dc;
+  --village-sky-2:#c6cdc6;
+  --village-sky-3:#98a297;
 
-  --hama1:#8fc7dc;
-  --hama2:#94cde0;
-  --hama3:#a8d8e7;
-  --hama4:#d4edf3;
+  --hama-sky-1:#8fc7dc;
+  --hama-sky-2:#96cee0;
+  --hama-sky-3:#a9dae7;
+  --hama-sky-4:#d7eef4;
 
-  --s1:#677281;
-  --s2:#1c222d;
+  --s-sky-1:#808995;
+  --s-sky-2:#5d6674;
+  --s-sky-3:#202631;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{ box-sizing:border-box; }
 
 html,body{
   margin:0;
@@ -37,7 +37,7 @@ html,body{
   height:100%;
   overflow:hidden;
   background:
-    radial-gradient(circle at 50% 20%, rgba(110,120,145,.10), transparent 24%),
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,.04), transparent 22%),
     linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 100%);
   color:var(--text);
   font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
@@ -49,9 +49,8 @@ body::before{
   inset:0;
   pointer-events:none;
   background:
-    linear-gradient(to bottom, rgba(255,255,255,.025), transparent 14%, transparent 86%, rgba(255,255,255,.012)),
-    radial-gradient(circle at 50% 18%, rgba(255,255,255,.025), transparent 22%);
-  opacity:.72;
+    linear-gradient(to bottom, rgba(255,255,255,.02), transparent 14%, transparent 86%, rgba(255,255,255,.012));
+  opacity:.75;
 }
 
 .page{
@@ -67,7 +66,7 @@ body::before{
   top:0;
   left:0;
   right:0;
-  z-index:20;
+  z-index:30;
   display:flex;
   justify-content:space-between;
   align-items:flex-start;
@@ -112,6 +111,7 @@ body::before{
   z-index:1;
 }
 
+/* 背景 */
 .sky{
   position:absolute;
   inset:0;
@@ -120,252 +120,121 @@ body::before{
 
 .page[data-view="village"] .sky{
   background:
-    radial-gradient(circle at 50% 22%, rgba(255,255,255,.22), transparent 20%),
-    linear-gradient(180deg, var(--village1) 0%, var(--village2) 38%, #8e978f 100%);
-  filter:saturate(.68) brightness(.94);
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,.18), transparent 18%),
+    linear-gradient(180deg, var(--village-sky-1) 0%, var(--village-sky-2) 44%, var(--village-sky-3) 100%);
+  filter:saturate(.72) brightness(.95);
 }
 
 .page[data-view="hama"] .sky{
   background:
-    radial-gradient(circle at 50% 16%, rgba(255,255,255,.10), transparent 18%),
-    linear-gradient(180deg, var(--hama1) 0%, var(--hama2) 28%, var(--hama3) 62%, var(--hama4) 100%);
+    radial-gradient(circle at 50% 15%, rgba(255,255,255,.08), transparent 18%),
+    linear-gradient(180deg, var(--hama-sky-1) 0%, var(--hama-sky-2) 28%, var(--hama-sky-3) 64%, var(--hama-sky-4) 100%);
 }
 
 .page[data-view="s"] .sky{
   background:
-    radial-gradient(circle at 50% 18%, rgba(235,245,255,.10), transparent 18%),
-    linear-gradient(180deg, #7e8794 0%, var(--s1) 34%, var(--s2) 100%);
+    radial-gradient(circle at 50% 16%, rgba(255,255,255,.08), transparent 18%),
+    linear-gradient(180deg, var(--s-sky-1) 0%, var(--s-sky-2) 36%, var(--s-sky-3) 100%);
 }
 
-.mist{
+.atmosphere{
   position:absolute;
   inset:0;
   pointer-events:none;
-  opacity:.16;
-  background:
-    radial-gradient(circle at 24% 66%, rgba(255,255,255,.16), transparent 18%),
-    radial-gradient(circle at 70% 74%, rgba(255,255,255,.10), transparent 16%);
+  transition:opacity .35s ease;
 }
 
-/* 地面ベース */
+.page[data-view="hama"] .atmosphere{
+  background:
+    radial-gradient(circle at 50% 72%, rgba(255,255,255,.12), transparent 30%),
+    radial-gradient(circle at 24% 66%, rgba(255,255,255,.10), transparent 16%),
+    radial-gradient(circle at 74% 70%, rgba(255,255,255,.08), transparent 18%);
+  opacity:.9;
+}
+
+.page[data-view="village"] .atmosphere{
+  background:
+    radial-gradient(circle at 50% 64%, rgba(255,255,255,.10), transparent 30%),
+    radial-gradient(circle at 22% 68%, rgba(255,255,255,.08), transparent 18%);
+  opacity:.85;
+}
+
+.page[data-view="s"] .atmosphere{
+  background:
+    radial-gradient(circle at 50% 68%, rgba(255,255,255,.05), transparent 28%);
+  opacity:.7;
+}
+
+/* 地面 */
 .ground{
   position:absolute;
-  left:-2%;
-  right:-2%;
-  bottom:-1vh;
-  height:30vh;
-  transition:background .45s ease, transform .45s ease;
+  left:0;
+  right:0;
+  bottom:0;
+  height:27vh;
+  transition:background .45s ease;
 }
 
-/* 村は少し自然地形寄り */
 .page[data-view="village"] .ground{
-  left:-8%;
-  right:-8%;
-  bottom:-3vh;
-  height:38vh;
-  border-radius:50% 50% 0 0 / 24% 24% 0 0;
   background:
-    radial-gradient(circle at 50% 20%, rgba(255,255,255,.08), transparent 28%),
-    linear-gradient(180deg, #6d736f 0%, #505650 100%);
+    linear-gradient(180deg, rgba(255,255,255,.06), transparent 20%),
+    linear-gradient(180deg, #6f766f 0%, #4d534d 100%);
 }
 
-/* HAMAは平らな都市基盤 */
 .page[data-view="hama"] .ground{
-  border-radius:0;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0) 24%),
-    linear-gradient(180deg, #37506a 0%, #223446 52%, #162231 100%);
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,0) 20%),
+    linear-gradient(180deg, #3e5871 0%, #24374a 52%, #172332 100%);
 }
 
-/* S局は硬い床面 */
 .page[data-view="s"] .ground{
-  border-radius:0;
   background:
-    linear-gradient(180deg, rgba(255,255,255,.05), transparent 20%),
-    linear-gradient(180deg, #444d59 0%, #262d37 100%);
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent 16%),
+    linear-gradient(180deg, #48515d 0%, #2a313b 100%);
 }
 
-/* 遠景 */
-.backdrop{
+/* 風景の見せ場を中央に寄せる */
+.landmarkStage{
   position:absolute;
-  inset:0;
+  left:50%;
+  bottom:14vh;
+  width:min(920px, 90vw);
+  height:min(340px, 34vh);
+  transform:translateX(-50%);
+  z-index:6;
   pointer-events:none;
 }
 
-.hamaCity,
-.villageTree,
-.sRoom{
+.landmark{
   position:absolute;
-  left:50%;
-  transition:opacity .35s ease, transform .45s ease;
+  inset:0;
   opacity:0;
+  transition:opacity .4s ease, transform .4s ease;
+  transform:translateY(6px) scale(.985);
 }
 
-.page[data-view="hama"] .hamaCity{
-  opacity:.55;
-  transform:translateX(-50%) translateY(0);
-}
-
-.page[data-view="village"] .villageTree{
+.page[data-view="village"] .landmark.village,
+.page[data-view="hama"] .landmark.hama,
+.page[data-view="s"] .landmark.s{
   opacity:1;
+  transform:translateY(0) scale(1);
 }
 
-.page[data-view="s"] .sRoom{
-  opacity:1;
-}
-
-/* HAMAの都市遠景 */
-.hamaCity{
-  bottom:18vh;
-  width:min(760px, 96vw);
-  height:210px;
-}
-
-.hamaCity::before,
-.hamaCity::after{
-  content:"";
-  position:absolute;
-  bottom:0;
-  background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.03));
-  border:1px solid rgba(255,255,255,.14);
-}
-
-.hamaCity::before{
-  left:6%;
-  width:110px;
-  height:150px;
-  box-shadow:
-    130px 18px 0 -10px rgba(255,255,255,.06),
-    240px 34px 0 -18px rgba(255,255,255,.06),
-    340px 10px 0 -8px rgba(255,255,255,.06),
-    460px 26px 0 -14px rgba(255,255,255,.06);
-}
-
-.hamaCity::after{
-  right:8%;
-  width:82px;
-  height:118px;
-  box-shadow:
-    -110px 20px 0 -8px rgba(255,255,255,.05),
-    -215px 30px 0 -14px rgba(255,255,255,.05);
-}
-
-/* 観覧車っぽい円を薄く足す */
-.hamaCity .wheel{
-  position:absolute;
-  right:22%;
-  bottom:18px;
-  width:92px;
-  height:92px;
-  border-radius:50%;
-  border:1px solid rgba(255,255,255,.16);
-  opacity:.35;
-}
-
-.hamaCity .wheel::before,
-.hamaCity .wheel::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:50%;
-  background:rgba(255,255,255,.12);
-  transform:translate(-50%, -50%);
-}
-
-.hamaCity .wheel::before{
-  width:1px;
-  height:92px;
-}
-
-.hamaCity .wheel::after{
-  width:92px;
-  height:1px;
-}
-
-/* 村 */
-.villageTree{
-  bottom:20vh;
-  width:min(560px, 84vw);
-  height:280px;
-  transform:translateX(-50%);
-  filter:saturate(.72);
-}
-
-.villageTree::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:0;
-  width:18px;
-  height:126px;
-  background:linear-gradient(180deg, #6b5645, #413228);
-  transform:translateX(-50%);
-}
-
-.villageTree::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:18px;
-  width:240px;
-  height:180px;
-  border-radius:50%;
-  transform:translateX(-50%);
-  background:
-    radial-gradient(circle at 50% 44%, rgba(255,255,255,.28), transparent 22%),
-    radial-gradient(circle at 34% 50%, rgba(255,255,255,.18), transparent 22%),
-    radial-gradient(circle at 66% 54%, rgba(255,255,255,.14), transparent 20%),
-    linear-gradient(180deg, #e7ebe5 0%, #b8c0b8 100%);
-  box-shadow:
-    -92px 36px 0 -26px rgba(207,214,207,.82),
-    88px 28px 0 -24px rgba(207,214,207,.82);
-}
-
-/* S局 */
-.sRoom{
-  bottom:18vh;
-  width:min(720px, 92vw);
-  height:250px;
-  transform:translateX(-50%);
-}
-
-.sRoom::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:8px;
-  width:380px;
-  height:180px;
-  transform:translateX(-50%);
-  border:1px solid rgba(255,255,255,.12);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
-  box-shadow:0 0 40px rgba(255,255,255,.04) inset;
-}
-
-.sRoom::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:42px;
-  width:120px;
-  height:70px;
-  transform:translateX(-50%);
-  border-radius:999px 999px 20px 20px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
-  border:1px solid rgba(255,255,255,.12);
+.landmark svg{
+  width:100%;
+  height:100%;
+  display:block;
 }
 
 /* 看板 */
 .signpost{
   position:absolute;
   left:50%;
-  bottom:18vh;
+  bottom:12.5vh;
   transform:translateX(-50%);
-  width:140px;
-  height:170px;
-  z-index:4;
+  width:132px;
+  height:150px;
+  z-index:9;
   pointer-events:none;
 }
 
@@ -375,7 +244,7 @@ body::before{
   left:50%;
   bottom:0;
   width:6px;
-  height:92px;
+  height:86px;
   background:rgba(255,255,255,.20);
   transform:translateX(-50%);
 }
@@ -385,55 +254,39 @@ body::before{
   position:absolute;
   left:50%;
   top:8px;
-  width:120px;
-  height:52px;
+  width:112px;
+  height:50px;
   transform:translateX(-50%) rotate(-2deg);
   border:1px solid rgba(255,255,255,.18);
   background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
   box-shadow:0 8px 18px rgba(0,0,0,.12);
 }
 
-/* 視点UI */
-.directionUI{
+/* 補助メモ */
+.traceNote{
   position:absolute;
   left:50%;
-  bottom:6.4vh;
+  bottom:23.5vh;
   transform:translateX(-50%);
-  z-index:12;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border:1px solid var(--line);
-  background:var(--panel);
-  backdrop-filter:blur(10px);
-  box-shadow:0 12px 28px rgba(0,0,0,.18);
+  z-index:10;
+  color:rgba(255,255,255,.24);
+  font-size:11px;
+  letter-spacing:.18em;
+  opacity:0;
+  transition:opacity .3s ease;
+  pointer-events:none;
 }
 
-.dirBtn{
-  min-width:86px;
-  padding:10px 12px;
-  border:1px solid rgba(255,255,255,.08);
-  background:transparent;
-  color:var(--muted);
-  font:inherit;
-  font-size:12px;
-  letter-spacing:.12em;
-  cursor:pointer;
-  transition:background .25s ease, color .25s ease, border-color .25s ease;
+.page[data-view="village"] .traceNote{
+  opacity:1;
 }
 
-.dirBtn.active{
-  color:var(--text);
-  background:rgba(255,255,255,.06);
-  border-color:rgba(255,255,255,.16);
-}
-
+/* 左右矢印 */
 .dirArrows{
   position:absolute;
   inset:0;
+  z-index:12;
   pointer-events:none;
-  z-index:8;
 }
 
 .pcArrow{
@@ -444,30 +297,25 @@ body::before{
   height:46px;
   border-radius:999px;
   border:1px solid rgba(255,255,255,.10);
-  background:rgba(10,12,18,.34);
+  background:rgba(10,12,18,.28);
   color:rgba(255,255,255,.38);
   font:inherit;
   font-size:18px;
-  pointer-events:auto;
   cursor:pointer;
+  pointer-events:auto;
   backdrop-filter:blur(6px);
 }
 
-.pcArrow.left{
-  left:18px;
-}
-
-.pcArrow.right{
-  right:18px;
-}
+.pcArrow.left{ left:16px; }
+.pcArrow.right{ right:16px; }
 
 /* 情報パネル */
 .infoPanel{
   position:absolute;
-  top:88px;
-  right:20px;
-  z-index:16;
-  width:min(360px, calc(100vw - 40px));
+  top:72px;
+  right:16px;
+  z-index:20;
+  width:min(360px, 27vw);
   min-height:180px;
   padding:18px 18px 16px;
   border:1px solid var(--line);
@@ -514,16 +362,16 @@ body::before{
   background:rgba(255,255,255,.03);
 }
 
-/* 項目一覧 */
+/* 項目ボタン */
 .poiList{
   position:absolute;
-  left:20px;
-  bottom:18vh;
-  z-index:15;
+  left:16px;
+  bottom:14vh;
+  z-index:18;
   display:flex;
   flex-direction:column;
   gap:8px;
-  width:min(280px, calc(100vw - 40px));
+  width:min(280px, 24vw);
 }
 
 .poiBtn{
@@ -556,52 +404,69 @@ body::before{
   color:var(--muted);
 }
 
-/* 村の人物は立ち絵なし */
-.traceNote{
+/* 方向切替 */
+.directionUI{
   position:absolute;
   left:50%;
-  bottom:25.4vh;
+  bottom:14px;
   transform:translateX(-50%);
-  z-index:6;
-  color:rgba(255,255,255,.22);
-  font-size:11px;
-  letter-spacing:.18em;
-  opacity:0;
-  transition:opacity .3s ease;
-  pointer-events:none;
+  z-index:22;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  background:var(--panel);
+  backdrop-filter:blur(10px);
+  box-shadow:0 12px 28px rgba(0,0,0,.18);
 }
 
-.page[data-view="village"] .traceNote{
-  opacity:1;
+.dirBtn{
+  min-width:86px;
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,.08);
+  background:transparent;
+  color:var(--muted);
+  font:inherit;
+  font-size:12px;
+  letter-spacing:.12em;
+  cursor:pointer;
+  transition:background .25s ease, color .25s ease, border-color .25s ease;
 }
 
-.page[data-view="village"] .signpost{
-  transform:translateX(-50%) rotate(-1deg);
+.dirBtn.active{
+  color:var(--text);
+  background:rgba(255,255,255,.06);
+  border-color:rgba(255,255,255,.16);
 }
 
-.page[data-view="hama"] .signpost{
-  transform:translateX(-50%);
-}
+/* モバイル */
+@media (max-width: 980px){
+  .pageLead{
+    display:none;
+  }
 
-.page[data-view="s"] .signpost{
-  transform:translateX(-50%) rotate(1deg);
-}
-
-@media (max-width: 900px){
   .infoPanel{
-    top:auto;
-    right:14px;
-    left:14px;
-    bottom:120px;
     width:auto;
-    min-height:160px;
+    left:14px;
+    right:14px;
+    top:auto;
+    bottom:96px;
+    min-height:150px;
+    padding:15px 14px 14px;
   }
 
   .poiList{
     left:14px;
     right:14px;
     width:auto;
-    bottom:194px;
+    bottom:192px;
+  }
+
+  .landmarkStage{
+    width:min(92vw, 760px);
+    height:min(240px, 25vh);
+    bottom:21vh;
   }
 
   .pcArrow{
@@ -614,29 +479,38 @@ body::before{
     padding:14px 14px 0;
   }
 
-  .titleWrap{
-    text-align:right;
-  }
-
-  .pageLead{
-    display:none;
-  }
-
-  .directionUI{
-    left:14px;
-    right:14px;
-    bottom:14px;
-    transform:none;
-    justify-content:space-between;
-    gap:8px;
-    padding:10px;
-  }
-
-  .dirBtn{
-    min-width:0;
-    flex:1 1 auto;
+  .backLink{
     font-size:11px;
-    padding:10px 8px;
+  }
+
+  .pageTitle{
+    font-size:14px;
+  }
+
+  .signpost{
+    width:110px;
+    height:128px;
+    bottom:18vh;
+  }
+
+  .signpost::after{
+    width:94px;
+    height:42px;
+  }
+
+  .landmarkStage{
+    width:94vw;
+    height:200px;
+    bottom:22vh;
+  }
+
+  .ground{
+    height:23vh;
+  }
+
+  .traceNote{
+    bottom:31vh;
+    font-size:10px;
   }
 
   .poiList{
@@ -649,12 +523,6 @@ body::before{
     font-size:11px;
   }
 
-  .infoPanel{
-    bottom:96px;
-    min-height:150px;
-    padding:15px 14px 14px;
-  }
-
   .infoTitle{
     font-size:16px;
   }
@@ -664,26 +532,20 @@ body::before{
     line-height:1.85;
   }
 
-  .signpost{
-    bottom:22vh;
-    width:120px;
-    height:150px;
+  .directionUI{
+    left:14px;
+    right:14px;
+    transform:none;
+    justify-content:space-between;
+    gap:8px;
+    padding:10px;
   }
 
-  .signpost::after{
-    width:102px;
-    height:46px;
-  }
-
-  .traceNote{
-    bottom:29vh;
-    font-size:10px;
-  }
-
-  .hamaCity{
-    bottom:20vh;
-    width:96vw;
-    height:170px;
+  .dirBtn{
+    min-width:0;
+    flex:1 1 auto;
+    font-size:11px;
+    padding:10px 8px;
   }
 }
 </style>
@@ -702,15 +564,99 @@ body::before{
 
   <main class="scene">
     <div class="sky"></div>
-    <div class="mist"></div>
+    <div class="atmosphere"></div>
     <div class="ground"></div>
 
-    <div class="backdrop">
-      <div class="hamaCity">
-        <div class="wheel"></div>
+    <div class="landmarkStage" aria-hidden="true">
+      <!-- VILLAGE -->
+      <div class="landmark village">
+        <svg viewBox="0 0 1000 360" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="vBlur" x="-10%" y="-10%" width="120%" height="120%">
+              <feGaussianBlur stdDeviation="1.8"/>
+            </filter>
+          </defs>
+
+          <ellipse cx="500" cy="320" rx="240" ry="18" fill="rgba(0,0,0,.12)"/>
+          <rect x="486" y="170" width="28" height="135" rx="8" fill="#544438"/>
+          <g filter="url(#vBlur)">
+            <circle cx="500" cy="118" r="98" fill="#dfe4dd"/>
+            <circle cx="430" cy="142" r="62" fill="#d2d8d1"/>
+            <circle cx="570" cy="140" r="60" fill="#d2d8d1"/>
+            <circle cx="500" cy="72" r="52" fill="#edf1ea"/>
+          </g>
+          <g opacity=".55">
+            <circle cx="466" cy="100" r="3" fill="#ffffff"/>
+            <circle cx="520" cy="128" r="3" fill="#ffffff"/>
+            <circle cx="542" cy="88" r="2.5" fill="#ffffff"/>
+            <circle cx="432" cy="142" r="2.5" fill="#ffffff"/>
+            <circle cx="575" cy="143" r="2.5" fill="#ffffff"/>
+          </g>
+
+          <rect x="612" y="228" width="78" height="46" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.18)"/>
+          <rect x="624" y="206" width="54" height="24" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.16)"/>
+          <line x1="651" y1="203" x2="651" y2="170" stroke="rgba(255,255,255,.16)" stroke-width="3"/>
+          <line x1="632" y1="182" x2="670" y2="182" stroke="rgba(255,255,255,.16)" stroke-width="3"/>
+        </svg>
       </div>
-      <div class="villageTree"></div>
-      <div class="sRoom"></div>
+
+      <!-- HAMA -->
+      <div class="landmark hama">
+        <svg viewBox="0 0 1000 360" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="bld1" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="rgba(255,255,255,.18)"/>
+              <stop offset="100%" stop-color="rgba(255,255,255,.05)"/>
+            </linearGradient>
+          </defs>
+
+          <ellipse cx="500" cy="326" rx="310" ry="16" fill="rgba(0,0,0,.10)"/>
+
+          <!-- skyline -->
+          <rect x="172" y="168" width="62" height="120" fill="url(#bld1)" stroke="rgba(255,255,255,.16)"/>
+          <rect x="248" y="188" width="82" height="106" fill="rgba(255,255,255,.08)"/>
+          <rect x="354" y="176" width="76" height="114" fill="rgba(255,255,255,.07)"/>
+          <rect x="450" y="160" width="120" height="132" fill="rgba(255,255,255,.06)"/>
+          <rect x="488" y="130" width="76" height="34" fill="rgba(255,255,255,.10)" stroke="rgba(255,255,255,.16)"/>
+          <rect x="586" y="194" width="52" height="84" fill="rgba(255,255,255,.06)"/>
+          <rect x="680" y="170" width="60" height="118" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.16)"/>
+
+          <!-- bridge-ish line -->
+          <line x1="120" y1="262" x2="880" y2="262" stroke="rgba(255,255,255,.10)" stroke-width="3"/>
+          <line x1="220" y1="262" x2="260" y2="216" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+          <line x1="420" y1="262" x2="462" y2="214" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+          <line x1="610" y1="262" x2="650" y2="222" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+
+          <!-- ferris wheel -->
+          <g transform="translate(708 138)" opacity=".45">
+            <circle cx="0" cy="0" r="46" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
+            <line x1="-46" y1="0" x2="46" y2="0" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+            <line x1="0" y1="-46" x2="0" y2="46" stroke="rgba(255,255,255,.12)" stroke-width="1.5"/>
+            <line x1="-32" y1="-32" x2="32" y2="32" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+            <line x1="32" y1="-32" x2="-32" y2="32" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+            <line x1="0" y1="46" x2="0" y2="92" stroke="rgba(255,255,255,.12)" stroke-width="3"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- S -->
+      <div class="landmark s">
+        <svg viewBox="0 0 1000 360" preserveAspectRatio="xMidYMid meet">
+          <ellipse cx="500" cy="325" rx="260" ry="18" fill="rgba(0,0,0,.12)"/>
+
+          <rect x="310" y="102" width="380" height="182" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.14)"/>
+          <rect x="452" y="78" width="96" height="30" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.16)"/>
+
+          <ellipse cx="500" cy="212" rx="74" ry="36" fill="rgba(255,255,255,.12)" stroke="rgba(255,255,255,.16)"/>
+          <rect x="480" y="176" width="40" height="90" rx="12" fill="rgba(255,255,255,.08)"/>
+          <rect x="440" y="230" width="120" height="18" rx="8" fill="rgba(255,255,255,.10)"/>
+
+          <rect x="372" y="148" width="54" height="18" fill="rgba(255,255,255,.08)"/>
+          <rect x="578" y="148" width="54" height="18" fill="rgba(255,255,255,.08)"/>
+          <line x1="399" y1="166" x2="399" y2="236" stroke="rgba(255,255,255,.10)" stroke-width="3"/>
+          <line x1="605" y1="166" x2="605" y2="236" stroke="rgba(255,255,255,.10)" stroke-width="3"/>
+        </svg>
+      </div>
     </div>
 
     <div class="traceNote">……誰かがいたはずだ</div>
