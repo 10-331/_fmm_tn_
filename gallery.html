@@ -51,6 +51,12 @@ body::before{
   opacity:.75;
 }
 
+img{
+  -webkit-user-drag:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+
 .stage{
   position:relative;
   width:100%;
@@ -151,7 +157,6 @@ body::before{
   position:absolute;
   inset:0;
   pointer-events:auto;
-  cursor:pointer;
   border-radius:2px;
   background:linear-gradient(180deg, var(--paper-1), var(--paper-2));
   border:1px solid var(--paper-edge);
@@ -227,6 +232,45 @@ body::before{
   z-index:3;
 }
 
+/* 左右タップ領域 */
+.navZone{
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:30%;
+  z-index:4;
+  cursor:pointer;
+  background:transparent;
+}
+
+.navLeft{
+  left:0;
+}
+
+.navRight{
+  right:0;
+}
+
+.navLeft::before,
+.navRight::before{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  color:rgba(255,255,255,.14);
+  font-size:16px;
+  pointer-events:none;
+}
+
+.navLeft::before{
+  content:"←";
+  left:12px;
+}
+
+.navRight::before{
+  content:"→";
+  right:12px;
+}
+
 .paperInner{
   position:relative;
   width:100%;
@@ -242,6 +286,8 @@ body::before{
   border:1px solid rgba(60,48,40,.14);
   background:#d7d0c4;
   overflow:hidden;
+  z-index:5;
+  cursor:zoom-in;
 }
 
 .visualWrap img{
@@ -537,6 +583,10 @@ body::before{
     grid-template-columns:repeat(3, minmax(0, 1fr));
     gap:10px;
   }
+
+  .navZone{
+    width:28%;
+  }
 }
 </style>
 </head>
@@ -555,9 +605,12 @@ body::before{
       <div class="sheetBack back3"></div>
     </div>
 
-    <div class="paper" id="paper" role="button" tabindex="0" aria-label="紙をめくる">
+    <div class="paper" id="paper" tabindex="0" aria-label="左右で記録を送る">
       <div class="clip"></div>
       <div class="pin"></div>
+
+      <div class="navZone navLeft" id="navLeft" aria-hidden="true"></div>
+      <div class="navZone navRight" id="navRight" aria-hidden="true"></div>
 
       <div class="paperInner">
         <div class="visualWrap" id="visualWrap">
@@ -579,12 +632,11 @@ body::before{
   <div class="flash" id="flash"></div>
 
   <div class="subHint" aria-hidden="true">
-    触れて、めくる<br>
-    一覧から辿ることもできる
+    左で戻る / 右で進む<br>
+    画像を押すと拡大
   </div>
 </main>
 
-<!-- 一覧 -->
 <div class="listOverlay" id="listOverlay" aria-hidden="true">
   <div class="listPanel" role="dialog" aria-label="記録一覧">
     <div class="listHeader">
@@ -595,7 +647,6 @@ body::before{
   </div>
 </div>
 
-<!-- 原寸表示 -->
 <div class="lightbox" id="lightbox" aria-hidden="true">
   <img id="lightboxImg" src="" alt="">
 </div>
@@ -608,6 +659,8 @@ let currentIndex = 0;
 let isTurning = false;
 
 const paper = document.getElementById("paper");
+const navLeft = document.getElementById("navLeft");
+const navRight = document.getElementById("navRight");
 const visualWrap = document.getElementById("visualWrap");
 const recordImage = document.getElementById("recordImage");
 const recordTitle = document.getElementById("recordTitle");
@@ -622,12 +675,6 @@ const thumbGrid = document.getElementById("thumbGrid");
 
 const lightbox = document.getElementById("lightbox");
 const lightboxImg = document.getElementById("lightboxImg");
-
-let pointerX = 0;
-let pointerY = 0;
-let currentX = 0;
-let currentY = 0;
-const baseRotate = -1.8;
 
 function safeTitle(item){
   return item.title || item.file || "記録";
@@ -654,90 +701,57 @@ function applyRecord(index){
   updateActiveThumb();
 }
 
-function updatePointerTarget(clientX, clientY){
-  const x = (clientX / window.innerWidth) - 0.5;
-  const y = (clientY / window.innerHeight) - 0.5;
+function moveToIndex(nextIndex){
+  if (isTurning || !records.length) return;
+  if (nextIndex < 0 || nextIndex >= records.length) return;
+  if (nextIndex === currentIndex) return;
 
-  pointerX = x * 4.6;
-  pointerY = y * 3.0;
-}
-
-window.addEventListener("mousemove", (e) => {
-  updatePointerTarget(e.clientX, e.clientY);
-}, { passive:true });
-
-window.addEventListener("touchmove", (e) => {
-  if (!e.touches || !e.touches[0]) return;
-  updatePointerTarget(e.touches[0].clientX, e.touches[0].clientY);
-}, { passive:true });
-
-window.addEventListener("touchend", () => {
-  pointerX = 0;
-  pointerY = 0;
-}, { passive:true });
-
-window.addEventListener("mouseleave", () => {
-  pointerX = 0;
-  pointerY = 0;
-});
-
-function animatePaper(){
-  currentX += (pointerX - currentX) * 0.08;
-  currentY += (pointerY - currentY) * 0.08;
-
-  const t = Date.now() * 0.001;
-  const swayX = Math.sin(t * 0.95) * 1.1;
-  const swayY = Math.cos(t * 0.78) * 0.9;
-  const rotate = baseRotate + currentX * 0.18 + Math.sin(t * 0.72) * 0.28;
-
-  if (!paper.classList.contains("leaving")) {
-    paper.style.transform =
-      `translate(${currentX + swayX}px, ${currentY + swayY}px) rotate(${rotate}deg)`;
-  }
-
-  requestAnimationFrame(animatePaper);
-}
-
-function turnPaper(){
-  if (isTurning || records.length <= 1) return;
   isTurning = true;
 
   flash.classList.remove("show");
   void flash.offsetWidth;
   flash.classList.add("show");
 
-  paper.classList.add("leaving");
-  paper.style.transform = `
-    translate(-14%, -3%)
-    rotate(-6deg)
-    scale(.988)
-  `;
+  const goingForward = nextIndex > currentIndex;
+
+  paper.style.transition = "transform .36s ease, opacity .28s ease";
+  paper.style.transform = goingForward
+    ? "translate(-14%, -3%) rotate(-6deg) scale(.988)"
+    : "translate(14%, -3%) rotate(6deg) scale(.988)";
   paper.style.opacity = "0.18";
 
   setTimeout(() => {
-    currentIndex = (currentIndex + 1) % records.length;
+    currentIndex = nextIndex;
     applyRecord(currentIndex);
 
     paper.style.transition = "none";
-    paper.style.transform = `
-      translate(5%, 2%)
-      rotate(1.8deg)
-      scale(.994)
-    `;
+    paper.style.transform = goingForward
+      ? "translate(5%, 2%) rotate(1.8deg) scale(.994)"
+      : "translate(-5%, 2%) rotate(-1.8deg) scale(.994)";
     paper.style.opacity = "0";
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        paper.classList.remove("leaving");
-        paper.style.transition = "";
+        paper.style.transition = "transform .32s ease, opacity .22s ease";
+        paper.style.transform = "translate(0,0) rotate(0deg) scale(1)";
         paper.style.opacity = "1";
       });
     });
 
     setTimeout(() => {
       isTurning = false;
-    }, 170);
-  }, 180);
+    }, 120);
+  }, 150);
+}
+
+function nextRecord(){
+  if (currentIndex >= records.length - 1) return;
+  moveToIndex(currentIndex + 1);
+}
+
+function prevRecord(){
+  if (currentIndex <= 0) return;
+  moveToIndex(currentIndex - 1);
 }
 
 function buildThumbs(){
@@ -811,19 +825,34 @@ listOverlay.addEventListener("click", (e) => {
   }
 });
 
-paper.addEventListener("click", turnPaper);
-paper.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" || e.key === " ") {
-    e.preventDefault();
-    turnPaper();
-  }
+navLeft.addEventListener("click", (e) => {
+  e.stopPropagation();
+  prevRecord();
 });
 
-/* 紙の画像部分をダブルクリック / ダブルタップ感覚で原寸表示したい時向けにシングルクリックでも開けると邪魔なので、
-   ここでは画像部分だけ別で開く */
+navRight.addEventListener("click", (e) => {
+  e.stopPropagation();
+  nextRecord();
+});
+
 visualWrap.addEventListener("click", (e) => {
   e.stopPropagation();
   openLightbox();
+});
+
+paper.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight") {
+    e.preventDefault();
+    nextRecord();
+  }
+  if (e.key === "ArrowLeft") {
+    e.preventDefault();
+    prevRecord();
+  }
+  if (e.key === "Enter") {
+    e.preventDefault();
+    openLightbox();
+  }
 });
 
 lightbox.addEventListener("click", closeLightbox);
@@ -850,7 +879,6 @@ fetch(BASE_PATH + "data.json")
 
     buildThumbs();
     applyRecord(currentIndex);
-    animatePaper();
   })
   .catch(err => {
     console.error("JSON読み込みエラー:", err);
