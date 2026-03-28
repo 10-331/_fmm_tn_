@@ -119,6 +119,7 @@ function renderCharacterSelect() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "characterBtn";
+
     if (character.status !== "playable") {
       button.classList.add("is-coming-soon");
     }
@@ -128,15 +129,12 @@ function renderCharacterSelect() {
     });
 
     const imageHtml = character.image
-      ? `<img src="${character.image}" alt="${character.label}">`
+      ? `<img src="${character.image}" alt="${character.label}" class="characterImage">`
       : "";
 
     button.innerHTML = `
       <div class="characterVisual">
         ${imageHtml}
-        <div class="characterOverlay">
-          <span class="overlayName">${character.label}</span>
-        </div>
       </div>
       <div class="characterInfo">
         <span class="name">${character.label}</span>
@@ -146,6 +144,8 @@ function renderCharacterSelect() {
 
     characterListEl.appendChild(button);
   });
+
+  trimCharacterImages();
 }
 
 function renderConversation() {
@@ -292,3 +292,76 @@ resetBtn.addEventListener("click", () => {
 });
 
 render();
+
+function trimCharacterImages() {
+  const images = document.querySelectorAll(".characterImage");
+
+  images.forEach((img) => {
+    if (img.dataset.trimmed === "true") return;
+
+    const runTrim = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+
+        if (!w || !h || !ctx) return;
+
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(img, 0, 0);
+
+        const { data } = ctx.getImageData(0, 0, w, h);
+
+        let top = h;
+        let left = w;
+        let right = 0;
+        let bottom = 0;
+        let found = false;
+
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const alpha = data[(y * w + x) * 4 + 3];
+            if (alpha > 0) {
+              found = true;
+              if (x < left) left = x;
+              if (x > right) right = x;
+              if (y < top) top = y;
+              if (y > bottom) bottom = y;
+            }
+          }
+        }
+
+        if (!found) return;
+
+        const trimWidth = right - left + 1;
+        const trimHeight = bottom - top + 1;
+
+        const trimCanvas = document.createElement("canvas");
+        const trimCtx = trimCanvas.getContext("2d");
+
+        trimCanvas.width = trimWidth;
+        trimCanvas.height = trimHeight;
+
+        trimCtx.drawImage(
+          canvas,
+          left, top, trimWidth, trimHeight,
+          0, 0, trimWidth, trimHeight
+        );
+
+        img.src = trimCanvas.toDataURL("image/png");
+        img.dataset.trimmed = "true";
+      } catch (e) {
+        console.error("trim failed:", e);
+      }
+    };
+
+    if (img.complete) {
+      runTrim();
+    } else {
+      img.addEventListener("load", runTrim, { once: true });
+    }
+  });
+}
