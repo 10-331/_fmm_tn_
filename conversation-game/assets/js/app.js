@@ -276,7 +276,7 @@ function clearPending() {
 }
 
 function showTapPrompt() {
-  questionAreaEl.innerHTML = `<div class="emptyState">タップして進む</div>`;
+  questionAreaEl.innerHTML = `<div class="tapHint">▼</div>`;
 }
 
 function startConversation() {
