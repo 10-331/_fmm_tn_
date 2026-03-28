@@ -558,22 +558,53 @@ img{
     padding:12px;
   }
 
-  .msg{
-    font-size:14px;
-  }
+.msg{
+  width:100%;
+  text-align:left;
+  padding:0;
+  border-radius:0;
+  line-height:1.9;
+  font-size:15px;
+  background:none;
+  border:none;
+  white-space:pre-wrap;
+  word-break:break-word;
+  position:relative;
+}
 
-  .questionArea{
-    padding:10px 12px 12px;
-  }
+.msg.character{
+  align-self:stretch;
+  background:none;
+  border:none;
+}
 
-  .questionBtn{
-    padding:10px 12px;
-    font-size:13px;
-    min-height:44px;
-  }
+.msg.user{
+  display:none;
+}
 
-  .emptyState{
-    font-size:13px;
+.msgText{
+  display:block;
+  padding-right:18px;
+}
+
+.tapHintInline{
+  position:absolute;
+  right:0;
+  bottom:0;
+  font-size:12px;
+  color:rgba(120,130,160,.62);
+  animation:tapBlink 1.4s ease-in-out infinite;
+  user-select:none;
+}
+
+@keyframes tapBlink{
+  0%,100%{
+    opacity:.25;
+    transform:translateY(0);
+  }
+  50%{
+    opacity:.9;
+    transform:translateY(3px);
   }
 }
 
