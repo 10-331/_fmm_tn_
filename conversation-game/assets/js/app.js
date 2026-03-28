@@ -341,7 +341,7 @@ function renderQuestions(characterId) {
   if (progress.ended) {
     questionAreaEl.innerHTML = `
       <div class="emptyState">
-        会話はここで一区切りです。別のキャラクターを選ぶか、最初からやり直してください。
+        会話はここで一区切りです。
       </div>
     `;
     return;
@@ -362,17 +362,12 @@ function renderQuestions(characterId) {
       selectQuestion(characterId, question.id);
     });
 
-    let metaText = "未読";
-    if (count === 1) metaText = "1回";
-    if (count >= 2) metaText = `${count}回`;
-
     const label = count >= 1
       ? `${question.label}（もう一度聞く）`
       : question.label;
 
     button.innerHTML = `
       <span class="questionLabel">${label}</span>
-      <span class="meta">${metaText}</span>
     `;
 
     questionAreaEl.appendChild(button);
