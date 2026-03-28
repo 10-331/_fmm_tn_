@@ -9,8 +9,17 @@
 <body>
   <main class="app">
 <header class="topbar compactTopbar">
-  <button id="menuBtn" class="menuBtn" type="button" aria-label="メニューを開く">☰</button>
+  <button id="menuBtn" class="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
 </header>
+
+<div id="menuSheet" class="menuSheet" hidden>
+  <button id="backBtn" class="menuAction" type="button">キャラクター選択へ戻る</button>
+  <button id="resetBtn" class="menuAction danger" type="button">最初から</button>
+</div>
 
 <div id="menuSheet" class="menuSheet" hidden>
   <button id="backBtn" class="menuAction" type="button">キャラクター選択へ戻る</button>
