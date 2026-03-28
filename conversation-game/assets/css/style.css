@@ -443,6 +443,21 @@ img{
   padding:4px 0 0;
 }
 
+.tapHint{
+  width:100%;
+  text-align:center;
+  font-size:14px;
+  color:rgba(120,130,160,.55);
+  letter-spacing:.2em;
+  animation:tapBlink 1.4s ease-in-out infinite;
+  user-select:none;
+}
+
+@keyframes tapBlink{
+  0%,100%{ opacity:.2; transform:translateY(0); }
+  50%{ opacity:.85; transform:translateY(4px); }
+}
+
 /* =========================
    PC / tablet
 ========================= */
