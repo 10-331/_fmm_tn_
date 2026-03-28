@@ -1,43 +1,181 @@
-function renderCharacterSelect() {
-  characterListEl.innerHTML = "";
+:root{
+  --bg1:#0f1116;
+  --bg2:#171b24;
+  --panel:rgba(13,16,22,.84);
+  --line:rgba(255,255,255,.12);
+  --text:#f3f1ec;
+  --muted:rgba(243,241,236,.62);
+  --accent:#bcc8db;
+  --danger:#c98d8d;
+}
 
-  characters.forEach(character => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "characterBtn";
-    if (character.status !== "playable") {
-      button.classList.add("is-coming-soon");
-    }
+*{
+  box-sizing:border-box;
+}
 
-    button.addEventListener("click", () => {
-      selectCharacter(character.id);
-    });
+html{
+  -webkit-text-size-adjust:100%;
+}
 
-    const imageHtml = character.image
-      ? `<img src="${character.image}" alt="${character.label}">`
-      : "";
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  background:
+    radial-gradient(circle at top, rgba(160,180,220,.10), transparent 28%),
+    linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 100%);
+  color:var(--text);
+  font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+}
 
-    button.innerHTML = `
-      <div class="characterVisual">
-        ${imageHtml}
-        <div class="characterOverlay">
-          <span class="overlayName">${character.label}</span>
-        </div>
-      </div>
-      <div class="characterInfo">
-        <span class="name">${character.label}</span>
-        <span class="status">${character.statusLabel}</span>
-      </div>
-    `;
+body{
+  min-height:100vh;
+  padding-bottom:env(safe-area-inset-bottom, 0);
+}
 
-    characterListEl.appendChild(button);
-  });
+button{
+  font:inherit;
+}
+
+img{
+  max-width:100%;
+}
+
+.app{
+  width:min(1080px, calc(100vw - 20px));
+  min-height:100dvh;
+  margin:0 auto;
+  padding:18px 0 26px;
+  padding-left:max(10px, env(safe-area-inset-left, 0));
+  padding-right:max(10px, env(safe-area-inset-right, 0));
+  padding-bottom:max(20px, env(safe-area-inset-bottom, 0));
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.siteTitle{
+  margin:0;
+  font-size:18px;
+  font-weight:500;
+  letter-spacing:.08em;
+  color:var(--muted);
+}
+
+.topbarButtons{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.subBtn{
+  appearance:none;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:999px;
+  cursor:pointer;
+}
+
+.subBtn.danger{
+  border-color:rgba(201,141,141,.35);
+  color:#f0dede;
+}
+
+.screen{
+  width:100%;
+}
+
+.panel{
+  border:1px solid var(--line);
+  border-radius:24px;
+  background:var(--panel);
+  backdrop-filter:blur(10px);
+  box-shadow:0 18px 40px rgba(0,0,0,.24);
+  padding:22px;
+}
+
+.lead{
+  margin:0 0 18px;
+  font-size:18px;
+  line-height:1.9;
+}
+
+.note{
+  margin:18px 0 0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.8;
+}
+
+/* =========================
+   キャラクター選択
+========================= */
+
+.characterList{
+  display:grid;
+  grid-template-columns:repeat(6, 1fr);
+  gap:16px;
+  align-items:end;
+}
+
+.characterBtn{
+  appearance:none;
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:24px;
+  background:rgba(255,255,255,.05);
+  color:var(--text);
+  cursor:pointer;
+  padding:0;
+  overflow:hidden;
+  text-align:left;
+  transition:
+    transform .18s ease,
+    background .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    opacity .18s ease;
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
+}
+
+.characterBtn:hover{
+  transform:translateY(-4px);
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.22);
+  box-shadow:0 16px 30px rgba(0,0,0,.24);
+}
+
+.characterList .characterBtn:nth-child(1){
+  grid-column:1 / 3;
+  transform:translateY(30px);
+}
+
+.characterList .characterBtn:nth-child(2){
+  grid-column:3 / 5;
+  z-index:2;
+}
+
+.characterList .characterBtn:nth-child(3){
+  grid-column:5 / 7;
+  transform:translateY(30px);
+}
+
+.characterList .characterBtn:nth-child(1):hover,
+.characterList .characterBtn:nth-child(3):hover{
+  transform:translateY(26px);
 }
 
 .characterVisual{
   position:relative;
   width:100%;
-  height:260px; /* ←ここで高さ固定 */
+  height:320px;
   overflow:hidden;
   background:#111;
 }
@@ -45,6 +183,325 @@ function renderCharacterSelect() {
 .characterVisual img{
   width:100%;
   height:100%;
-  object-fit:cover; /* ←これが命 */
+  object-fit:cover;
   object-position:center top;
+  display:block;
+}
+
+.characterVisual::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0) 34%, rgba(0,0,0,.48) 100%);
+  pointer-events:none;
+}
+
+.characterOverlay{
+  position:absolute;
+  inset:auto 0 0 0;
+  z-index:1;
+  padding:14px 14px 16px;
+}
+
+.overlayName{
+  display:inline-block;
+  font-size:18px;
+  letter-spacing:.08em;
+}
+
+.characterInfo{
+  padding:14px;
+}
+
+.characterBtn .name{
+  display:block;
+  font-size:17px;
+  margin-bottom:6px;
+}
+
+.characterBtn .status{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.characterBtn.is-coming-soon{
+  opacity:.84;
+}
+
+.characterBtn.is-coming-soon .characterVisual img{
+  filter:grayscale(.16) brightness(.84);
+}
+
+/* =========================
+   会話画面
+========================= */
+
+.conversationPanel{
+  display:flex;
+  flex-direction:column;
+  height:80dvh;
+  min-height:560px;
+  justify-content:space-between;
+  gap:0;
+  overflow:hidden;
+}
+
+.conversationHeader{
+  padding:0 0 12px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.characterName{
+  font-size:16px;
+  color:var(--accent);
+  letter-spacing:.08em;
+}
+
+.messageArea{
+  flex:1;
+  overflow-y:auto;
+  border:none;
+  background:transparent;
+  padding:18px 4px 18px;
+  line-height:2.05;
+  font-size:15px;
+  white-space:pre-wrap;
+  animation:fadeIn .24s ease;
+}
+
+.questionArea{
+  position:sticky;
+  bottom:0;
+  background:rgba(9,11,16,.78);
+  backdrop-filter:blur(8px);
+  padding:12px 0 0;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+
+.questionBtn{
+  appearance:none;
+  width:100%;
+  margin:0 0 8px;
+  text-align:left;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  padding:14px 16px;
+  cursor:pointer;
+  line-height:1.75;
+  transition:background .16s ease, border-color .16s ease, transform .12s ease;
+}
+
+.questionBtn:hover{
+  background:rgba(255,255,255,.09);
+  border-color:rgba(255,255,255,.22);
+}
+
+.questionBtn:active{
+  transform:scale(.985);
+}
+
+.questionBtn .questionLabel{
+  display:block;
+}
+
+.questionBtn .meta{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.emptyState{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.8;
+  padding:8px 2px 0;
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(6px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =========================
+   タブレット
+========================= */
+
+@media (max-width: 900px){
+  .characterList{
+    grid-template-columns:repeat(3, 1fr);
+  }
+
+  .characterList .characterBtn:nth-child(1),
+  .characterList .characterBtn:nth-child(2),
+  .characterList .characterBtn:nth-child(3){
+    grid-column:auto;
+    transform:none;
+  }
+
+  .characterList .characterBtn:nth-child(1):hover,
+  .characterList .characterBtn:nth-child(2):hover,
+  .characterList .characterBtn:nth-child(3):hover{
+    transform:translateY(-4px);
+  }
+
+  .characterVisual{
+    height:280px;
+  }
+}
+
+/* =========================
+   モバイル
+========================= */
+
+@media (max-width: 768px){
+  .app{
+    width:100%;
+    padding-top:10px;
+  }
+
+  .topbar{
+    gap:10px;
+    margin-bottom:12px;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .siteTitle{
+    font-size:16px;
+  }
+
+  .topbarButtons{
+    width:100%;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .subBtn{
+    min-height:44px;
+    padding:12px 10px;
+    font-size:13px;
+    border-radius:14px;
+  }
+
+  .panel{
+    padding:16px;
+    border-radius:18px;
+  }
+
+  .lead{
+    font-size:16px;
+    line-height:1.8;
+    margin-bottom:14px;
+  }
+
+  .note{
+    font-size:12px;
+    line-height:1.7;
+  }
+
+  .characterList{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .characterBtn{
+    border-radius:16px;
+  }
+
+  .characterVisual{
+    height:220px;
+  }
+
+  .characterOverlay{
+    padding:12px 12px 14px;
+  }
+
+  .overlayName{
+    font-size:16px;
+  }
+
+  .characterInfo{
+    padding:12px;
+  }
+
+  .characterBtn .name{
+    font-size:16px;
+    margin-bottom:4px;
+  }
+
+  .characterBtn .status{
+    font-size:11px;
+  }
+
+  .conversationPanel{
+    height:calc(100dvh - 130px);
+    min-height:auto;
+  }
+
+  .conversationHeader{
+    padding-bottom:10px;
+  }
+
+  .characterName{
+    font-size:14px;
+  }
+
+  .messageArea{
+    padding:14px 2px 14px;
+    font-size:14px;
+    line-height:2;
+  }
+
+  .questionArea{
+    padding-top:10px;
+  }
+
+  .questionBtn{
+    min-height:52px;
+    padding:12px 13px;
+    font-size:14px;
+    line-height:1.75;
+    border-radius:12px;
+  }
+
+  .questionBtn .meta{
+    font-size:11px;
+    margin-top:3px;
+  }
+
+  .emptyState{
+    font-size:13px;
+    line-height:1.8;
+    padding-top:4px;
+  }
+}
+
+@media (max-width: 420px){
+  .topbarButtons{
+    grid-template-columns:1fr;
+  }
+
+  .characterVisual{
+    height:190px;
+  }
+
+  .messageArea{
+    font-size:13.5px;
+    line-height:1.95;
+  }
+
+  .questionBtn{
+    font-size:13.5px;
+  }
 }
