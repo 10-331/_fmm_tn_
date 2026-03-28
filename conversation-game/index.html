@@ -3,25 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Conversation Game</title>
+  <title>Conversation</title>
   <link rel="stylesheet" href="./assets/css/style.css" />
 </head>
 <body>
   <main class="app">
-<header class="topbar compactTopbar">
-  <button id="menuBtn" class="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-</header>
+    <header class="topbar">
+      <button id="menuBtn" class="menuBtn" type="button" aria-label="メニューを開く" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </header>
 
-<div id="menuSheet" class="menuSheet" hidden>
-  <button id="backBtn" class="menuAction" type="button">キャラクター選択へ戻る</button>
-  <button id="resetBtn" class="menuAction danger" type="button">最初から</button>
-</div>
+    <div id="menuSheet" class="menuSheet" hidden>
+      <button id="backBtn" class="menuAction" type="button">キャラクター選択へ戻る</button>
+      <button id="resetBtn" class="menuAction danger" type="button">最初から</button>
+    </div>
 
-    <!-- キャラクター選択画面 -->
     <section id="characterSelectScreen" class="screen">
       <div class="panel selectPanel">
         <p class="lead">誰と話しますか？</p>
@@ -30,27 +29,22 @@
       </div>
     </section>
 
-    <!-- 会話画面 -->
-<section id="conversationScreen" class="screen" hidden>
-  <div class="panel conversationPanel">
-    <div class="visualArea">
-      <div id="bgArea" class="bgArea"></div>
-      <img id="characterSprite" class="characterSprite" src="./assets/img/filler-face.png " alt="">
-    </div>
+    <section id="conversationScreen" class="screen" hidden>
+      <div class="panel conversationPanel">
+        <div class="conversationHeader">
+          <div id="characterName" class="characterName"></div>
+        </div>
 
-    <div class="conversationHeader">
-      <div id="characterName" class="characterName"></div>
-    </div>
+        <div id="messageArea" class="messageArea"></div>
 
-    <div id="messageArea" class="messageArea"></div>
-
-    <div id="questionArea" class="questionArea"></div>
-  </div>
-</section>
+        <div id="questionArea" class="questionArea"></div>
+      </div>
+    </section>
+  </main>
 
   <script src="./assets/data/characters.js"></script>
-  <script src="./assets/data/filler-data.js"></script>
   <script src="./assets/data/child-data.js"></script>
+  <script src="./assets/data/filler-data.js"></script>
   <script src="./assets/data/aya-data.js"></script>
   <script src="./assets/js/app.js"></script>
 </body>
