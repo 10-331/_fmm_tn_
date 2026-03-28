@@ -482,7 +482,6 @@ img{
   .menuBtn{
     width:42px;
     height:42px;
-    font-size:19px;
     border-radius:11px;
   }
 
@@ -535,7 +534,7 @@ img{
   }
 
   .characterList .characterBtn:nth-child(3){
-    grid-column:2 / 6;
+    grid-column:3 / 5;
     grid-row:2;
     margin-top:-6px;
     transform:none;
@@ -600,39 +599,5 @@ img{
 
   .emptyState{
     font-size:12px;
-  }
-}
-
-@media (max-width: 420px){
-  .menuBtn{
-    width:40px;
-    height:40px;
-    font-size:18px;
-    border-radius:10px;
-  }
-
-  .characterVisual{
-    height:118px;
-  }
-
-  .characterVisual img{
-    height:128%;
-    bottom:-8px;
-  }
-
-  .characterBtn .name{
-    font-size:11px;
-  }
-
-  .characterBtn .status{
-    font-size:8px;
-  }
-
-  .messageArea{
-    font-size:13px;
-  }
-
-  .questionBtn{
-    font-size:12.5px;
   }
 }
