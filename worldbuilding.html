@@ -1,1239 +1,926 @@
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Worldbuilding</title>
-
-<style>
-:root{
-  --bg1:#f6f7fb;
-  --bg2:#eef1f7;
-  --bg3:#e9edf4;
-  --card:rgba(255,255,255,.82);
-    --card2:rgba(255,255,255,.56);
-    --shadow:0 14px 40px rgba(60,40,80,.12);
-    --line:rgba(120,110,150,.18);
-    --line2:rgba(120,110,150,.28);
-    --text:#2f2f2f;
-    --muted:#6a6a6a;
-    --accent:#7d748d;
-    --accent-soft:rgba(125,116,141,.12);
-  }
-  --bg1:#0b0c10;
-  --bg2:#151821;
-  --text:#ece8df;
-  --muted:rgba(236,232,223,.66);
-  --line:rgba(255,255,255,.12);
-  --panel:rgba(10,12,18,.62);
-  --panel-strong:rgba(10,12,18,.82);
-  --accent:rgba(255,255,255,.14);
-
-  --village1:#d9ddd7;
-  --village2:#bfc5bf;
-
-  --hama1:#2f3d66;
-  --hama2:#0f1628;
-
-  --s1:#677281;
-  --s2:#1c222d;
-}
-
-  html,body{
-    margin:0;
-    padding:0;
-    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-    color:var(--text);
-    background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 42%,var(--bg3) 100%);
-    overflow-x:hidden;
-  }
-*{
-  box-sizing:border-box;
-}
-
-  .page{
-    min-height:100vh;
-    padding:72px 16px 60px;
-    display:grid;
-    place-items:center;
-  }
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(110,120,145,.10), transparent 24%),
-    linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 100%);
-  color:var(--text);
-  font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
-}
-
-  .wrap{
-    width:min(1100px, 94vw);
-    display:grid;
-    grid-template-columns: 320px 1fr;
-    gap:24px;
-    align-items:start;
-  }
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,.025), transparent 14%, transparent 86%, rgba(255,255,255,.012)),
-    radial-gradient(circle at 50% 18%, rgba(255,255,255,.025), transparent 22%);
-  opacity:.72;
-}
-
-  .panel,
-  .detail{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:18px;
-    box-shadow:var(--shadow);
-    overflow:hidden;
-  }
-.page{
-  position:relative;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  isolation:isolate;
-}
-
-  .panel-head,
-  .detail-head{
-    padding:16px 18px 14px;
-    border-bottom:1px solid var(--line2);
-    background:rgba(255,255,255,.36);
-  }
-.topbar{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  z-index:20;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  padding:18px 20px 0;
-}
-
-  .panel-head h1,
-  .detail-head h2{
-    margin:0;
-    font-size:1rem;
-    letter-spacing:.14em;
-    font-weight:600;
-  }
-.backLink{
-  color:var(--muted);
-  text-decoration:none;
-  font-size:12px;
-  letter-spacing:.12em;
-  transition:opacity .25s ease, transform .25s ease;
-}
-
-  .panel-head p,
-  .detail-head p{
-    margin:.5em 0 0;
-    color:var(--muted);
-    font-size:.82rem;
-    line-height:1.8;
-    letter-spacing:.04em;
-  }
-.backLink:hover{
-  opacity:1;
-  transform:translateX(-2px);
-}
-
-  .list{
-    display:flex;
-    flex-direction:column;
-    padding:10px;
-    gap:8px;
-  }
-.titleWrap{
-  text-align:right;
-}
-
-  .item-btn{
-    width:100%;
-    text-align:left;
-    border:1px solid transparent;
-    background:var(--card2);
-    color:var(--text);
-    border-radius:12px;
-    padding:14px 14px 12px;
-    cursor:pointer;
-    transition:background .2s ease, border-color .2s ease, transform .2s ease;
-  }
-.pageTitle{
-  margin:0;
-  font-size:15px;
-  letter-spacing:.14em;
-  font-weight:500;
-}
-
-  .item-btn:hover{
-    background:rgba(255,255,255,.76);
-    border-color:var(--line2);
-    transform:translateY(-1px);
-  }
-.pageLead{
-  margin:6px 0 0;
-  font-size:11px;
-  line-height:1.8;
-  letter-spacing:.08em;
-  color:var(--muted);
-}
-
-  .item-btn.is-active{
-    background:rgba(255,255,255,.90);
-    border-color:rgba(125,116,141,.34);
-    box-shadow: inset 0 0 0 1px rgba(125,116,141,.10);
-  }
-.scene{
-  position:absolute;
-  inset:0;
-  z-index:1;
-}
-
-  .item-title{
-    display:block;
-    font-size:.95rem;
-    letter-spacing:.08em;
-    margin-bottom:.3em;
-  }
-.sky{
-  position:absolute;
-  inset:0;
-  transition:background .45s ease, filter .45s ease;
-}
-
-  .item-sub{
-    display:block;
-    color:var(--muted);
-    font-size:.76rem;
-    line-height:1.7;
-    letter-spacing:.03em;
-  }
-.page[data-view="village"] .sky{
-  background:
-    radial-gradient(circle at 50% 22%, rgba(255,255,255,.22), transparent 20%),
-    linear-gradient(180deg, var(--village1) 0%, var(--village2) 38%, #8e978f 100%);
-  filter:saturate(.68) brightness(.94);
-}
-
-  .detail-body{
-    padding:22px 22px 26px;
-  }
-.page[data-view="hama"] .sky{
-  background:
-    radial-gradient(circle at 50% 18%, rgba(174,192,255,.14), transparent 18%),
-    linear-gradient(180deg, #445686 0%, var(--hama1) 36%, var(--hama2) 100%);
-}
-
-  .entry{
-    display:none;
-    animation:fade .22s ease;
-  }
-.page[data-view="s"] .sky{
-  background:
-    radial-gradient(circle at 50% 18%, rgba(235,245,255,.10), transparent 18%),
-    linear-gradient(180deg, #7e8794 0%, var(--s1) 34%, var(--s2) 100%);
-}
-
-.mist{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  opacity:.18;
-  background:
-    radial-gradient(circle at 24% 66%, rgba(255,255,255,.18), transparent 18%),
-    radial-gradient(circle at 70% 74%, rgba(255,255,255,.12), transparent 16%);
-}
-
-.ground{
-  position:absolute;
-  left:-8%;
-  right:-8%;
-  bottom:-4vh;
-  height:38vh;
-  border-radius:50% 50% 0 0 / 24% 24% 0 0;
-  transition:background .45s ease, transform .45s ease;
-}
-
-  .entry.is-active{
-    display:block;
-.page[data-view="village"] .ground{
-  background:
-    radial-gradient(circle at 50% 20%, rgba(255,255,255,.08), transparent 28%),
-    linear-gradient(180deg, #6d736f 0%, #505650 100%);
-}
-
-.page[data-view="hama"] .ground{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.04), transparent 24%),
-    linear-gradient(180deg, #1e2639 0%, #111722 100%);
-}
-
-.page[data-view="s"] .ground{
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.05), transparent 20%),
-    linear-gradient(180deg, #444d59 0%, #262d37 100%);
-}
-
-/* 遠景 */
-.backdrop{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-}
-
-.hamaCity,
-.villageTree,
-.sRoom{
-  position:absolute;
-  left:50%;
-  bottom:20vh;
-  transform:translateX(-50%);
-  transition:opacity .35s ease, transform .45s ease;
-  opacity:0;
-}
-
-.page[data-view="hama"] .hamaCity{
-  opacity:1;
-}
-
-.page[data-view="village"] .villageTree{
-  opacity:1;
-}
-
-.page[data-view="s"] .sRoom{
-  opacity:1;
-}
-
-.hamaCity{
-  width:min(720px, 92vw);
-  height:220px;
-}
-
-.hamaCity::before,
-.hamaCity::after{
-  content:"";
-  position:absolute;
-  bottom:0;
-  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-  border:1px solid rgba(255,255,255,.08);
-}
-
-.hamaCity::before{
-  left:8%;
-  width:120px;
-  height:160px;
-  box-shadow:
-    180px 22px 0 -8px rgba(255,255,255,.03),
-    315px 40px 0 -16px rgba(255,255,255,.03),
-    430px 10px 0 -6px rgba(255,255,255,.03);
-}
-
-.hamaCity::after{
-  right:12%;
-  width:96px;
-  height:126px;
-  box-shadow:
-    -142px 18px 0 -8px rgba(255,255,255,.03),
-    -275px 32px 0 -14px rgba(255,255,255,.03);
-}
-
-.villageTree{
-  width:min(560px, 84vw);
-  height:280px;
-  filter:saturate(.72);
-}
-
-.villageTree::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:0;
-  width:18px;
-  height:126px;
-  background:linear-gradient(180deg, #6b5645, #413228);
-  transform:translateX(-50%);
-}
-
-.villageTree::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:18px;
-  width:240px;
-  height:180px;
-  border-radius:50%;
-  transform:translateX(-50%);
-  background:
-    radial-gradient(circle at 50% 44%, rgba(255,255,255,.28), transparent 22%),
-    radial-gradient(circle at 34% 50%, rgba(255,255,255,.18), transparent 22%),
-    radial-gradient(circle at 66% 54%, rgba(255,255,255,.14), transparent 20%),
-    linear-gradient(180deg, #e7ebe5 0%, #b8c0b8 100%);
-  box-shadow:
-    -92px 36px 0 -26px rgba(207,214,207,.82),
-    88px 28px 0 -24px rgba(207,214,207,.82);
-}
-
-.sRoom{
-  width:min(720px, 92vw);
-  height:250px;
-}
-
-.sRoom::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:8px;
-  width:380px;
-  height:180px;
-  transform:translateX(-50%);
-  border:1px solid rgba(255,255,255,.12);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
-  box-shadow:0 0 40px rgba(255,255,255,.04) inset;
-}
-
-.sRoom::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:42px;
-  width:120px;
-  height:70px;
-  transform:translateX(-50%);
-  border-radius:999px 999px 20px 20px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
-  border:1px solid rgba(255,255,255,.12);
-}
-
-/* 看板 */
-.signpost{
-  position:absolute;
-  left:50%;
-  bottom:18vh;
-  transform:translateX(-50%);
-  width:140px;
-  height:170px;
-  z-index:4;
-  pointer-events:none;
-}
-
-.signpost::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:0;
-  width:6px;
-  height:92px;
-  background:rgba(255,255,255,.20);
-  transform:translateX(-50%);
-}
-
-.signpost::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:8px;
-  width:120px;
-  height:52px;
-  transform:translateX(-50%) rotate(-2deg);
-  border:1px solid rgba(255,255,255,.18);
-  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-  box-shadow:0 8px 18px rgba(0,0,0,.12);
-}
-
-/* 視点UI */
-.directionUI{
-  position:absolute;
-  left:50%;
-  bottom:6.4vh;
-  transform:translateX(-50%);
-  z-index:12;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border:1px solid var(--line);
-  background:var(--panel);
-  backdrop-filter:blur(10px);
-}
-
-.dirBtn{
-  min-width:86px;
-  padding:10px 12px;
-  border:1px solid rgba(255,255,255,.08);
-  background:transparent;
-  color:var(--muted);
-  font:inherit;
-  font-size:12px;
-  letter-spacing:.12em;
-  cursor:pointer;
-  transition:background .25s ease, color .25s ease, border-color .25s ease;
-}
-
-.dirBtn.active{
-  color:var(--text);
-  background:rgba(255,255,255,.06);
-  border-color:rgba(255,255,255,.16);
-}
-
-.dirArrows{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  z-index:8;
-}
-
-.pcArrow{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  width:46px;
-  height:46px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(10,12,18,.34);
-  color:rgba(255,255,255,.38);
-  font:inherit;
-  font-size:18px;
-  pointer-events:auto;
-  cursor:pointer;
-  backdrop-filter:blur(6px);
-}
-
-.pcArrow.left{
-  left:18px;
-}
-
-.pcArrow.right{
-  right:18px;
-}
-
-/* 情報パネル */
-.infoPanel{
-  position:absolute;
-  top:88px;
-  right:20px;
-  z-index:16;
-  width:min(360px, calc(100vw - 40px));
-  min-height:180px;
-  padding:18px 18px 16px;
-  border:1px solid var(--line);
-  background:var(--panel-strong);
-  backdrop-filter:blur(12px);
-  box-shadow:0 18px 44px rgba(0,0,0,.24);
-}
-
-.infoKicker{
-  font-size:10px;
-  letter-spacing:.18em;
-  color:rgba(236,232,223,.42);
-  margin-bottom:8px;
-}
-
-.infoTitle{
-  font-size:18px;
-  line-height:1.6;
-  letter-spacing:.08em;
-  margin-bottom:8px;
-}
-
-.infoText{
-  font-size:12px;
-  line-height:1.95;
-  letter-spacing:.04em;
-  color:var(--muted);
-  margin-bottom:14px;
-}
-
-.infoMeta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-
-.tag{
-  display:inline-block;
-  padding:6px 8px;
-  font-size:10px;
-  letter-spacing:.12em;
-  color:var(--muted);
-  border:1px solid rgba(255,255,255,.08);
-  background:rgba(255,255,255,.03);
-}
-
-/* 項目一覧 */
-.poiList{
-  position:absolute;
-  left:20px;
-  bottom:18vh;
-  z-index:15;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  width:min(280px, calc(100vw - 40px));
-}
-
-.poiBtn{
-  text-align:left;
-  padding:12px 14px;
-  border:1px solid rgba(255,255,255,.10);
-  background:rgba(8,10,16,.46);
-  backdrop-filter:blur(10px);
-  color:var(--text);
-  font:inherit;
-  font-size:12px;
-  letter-spacing:.08em;
-  cursor:pointer;
-  transition:background .25s ease, border-color .25s ease, transform .25s ease;
-}
-
-.poiBtn:hover,
-.poiBtn.active{
-  background:rgba(255,255,255,.07);
-  border-color:rgba(255,255,255,.20);
-  transform:translateX(2px);
-}
-
-.poiSub{
-  display:block;
-  margin-top:6px;
-  font-size:10px;
-  letter-spacing:.12em;
-  color:var(--muted);
-}
-
-/* 村の人物は立ち絵なし */
-.traceNote{
-  position:absolute;
-  left:50%;
-  bottom:25.4vh;
-  transform:translateX(-50%);
-  z-index:6;
-  color:rgba(255,255,255,.22);
-  font-size:11px;
-  letter-spacing:.18em;
-  opacity:0;
-  transition:opacity .3s ease;
-  pointer-events:none;
-}
-
-.page[data-view="village"] .traceNote{
-  opacity:1;
-}
-
-/* 方向ごとの微調整 */
-.page[data-view="village"] .signpost{
-  transform:translateX(-50%) rotate(-1deg);
-}
-
-.page[data-view="hama"] .signpost{
-  transform:translateX(-50%);
-}
-
-.page[data-view="s"] .signpost{
-  transform:translateX(-50%) rotate(1deg);
-}
-
-@media (max-width: 900px){
-  .infoPanel{
-    top:auto;
-    right:14px;
-    left:14px;
-    bottom:100px;
-    width:auto;
-    min-height:160px;
-}
-
-  .entry-meta{
-    display:inline-block;
-    margin-bottom:12px;
-    font-size:.72rem;
-    letter-spacing:.12em;
-    color:var(--accent);
-    background:var(--accent-soft);
-    border:1px solid rgba(125,116,141,.16);
-    border-radius:999px;
-    padding:6px 10px;
-  .poiList{
-    left:14px;
-    right:14px;
-    width:auto;
-    bottom:166px;
-}
-
-  .entry h3{
-    margin:0 0 12px;
-    font-size:1.1rem;
-    letter-spacing:.08em;
-    font-weight:600;
-  .pcArrow{
-    display:none;
-}
-}
-
-  .entry p{
-    margin:0;
-    font-size:.92rem;
-    line-height:2;
-    letter-spacing:.03em;
-    white-space:pre-line;
-@media (max-width: 768px){
-  .topbar{
-    padding:14px 14px 0;
-}
-
-  .entry .note{
-    margin-top:18px;
-    padding-top:14px;
-    border-top:1px solid var(--line2);
-    color:var(--muted);
-    font-size:.8rem;
-    line-height:1.9;
-  .titleWrap{
-    text-align:right;
-}
-
-  footer{
-    text-align:center;
-    font-size:.8rem;
-    color:#888;
-    margin-top:22px;
-    letter-spacing:.1em;
-  .pageLead{
-    display:none;
-}
-
-  .menu-button{
-    position:fixed;
-    top:18px; right:22px;
-    width:30px; height:22px;
-    display:flex;
-    flex-direction:column;
-  .directionUI{
-    left:14px;
-    right:14px;
-    bottom:14px;
-    transform:none;
-justify-content:space-between;
-    cursor:pointer;
-    z-index:1001;
-    gap:8px;
-    padding:10px;
-}
-
-  .menu-button span{
-    height:3px;
-    width:100%;
-    background:rgba(70,70,70,0.6);
-    border-radius:2px;
-    transition:all .3s ease;
-  .dirBtn{
-    min-width:0;
-    flex:1 1 auto;
-    font-size:11px;
-    padding:10px 8px;
-}
-
-  .menu-button:hover span{
-    background:rgba(70,70,70,0.9);
-  .poiList{
-    bottom:188px;
-    gap:8px;
-}
-
-  .menu-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(240,240,240,0.4);
-    backdrop-filter:blur(10px);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:1000;
-  .poiBtn{
-    padding:11px 12px;
-    font-size:11px;
-}
-
-  .menu-content{
-    background:rgba(255,255,255,0.85);
-    border-radius:12px;
-    padding:30px 50px;
-    box-shadow:0 0 25px rgba(180,180,180,0.3);
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-    gap:1em;
-    animation:fadeIn .3s ease;
-  .infoPanel{
-    bottom:96px;
-    min-height:150px;
-    padding:15px 14px 14px;
-}
-
-  .menu-content a{
-    text-decoration:none;
-    color:#444;
-    font-size:.95em;
-    letter-spacing:.05em;
-    transition:.3s;
-  .infoTitle{
-    font-size:16px;
-}
-
-  .menu-content a:hover{
-    color:#666;
-    text-shadow:0 0 8px rgba(200,200,200,0.6);
-  .infoText{
-    font-size:11.5px;
-    line-height:1.85;
-}
-
-  @keyframes fade{
-    from{ opacity:0; transform:translateY(4px); }
-    to{ opacity:1; transform:translateY(0); }
-  .signpost{
-    bottom:22vh;
-    width:120px;
-    height:150px;
-}
-
-  @keyframes fadeIn{
-    from{ opacity:0; transform:scale(.95); }
-    to{ opacity:1; transform:scale(1); }
-  .signpost::after{
-    width:102px;
-    height:46px;
-}
-
-  @media (max-width: 860px){
-    .wrap{
-      grid-template-columns:1fr;
-      gap:16px;
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Worldbuilding</title>
+  <style>
+    :root{
+      --bg1:#0b0c10;
+      --bg2:#151821;
+      --text:#ece8df;
+      --muted:rgba(236,232,223,.66);
+      --line:rgba(255,255,255,.12);
+      --panel:rgba(10,12,18,.62);
+      --panel-strong:rgba(10,12,18,.82);
+
+      --village1:#d9ddd7;
+      --village2:#bfc5bf;
+
+      --hama1:#2f3d66;
+      --hama2:#0f1628;
+
+      --s1:#677281;
+      --s2:#1c222d;
     }
 
-    .panel-head h1,
-    .detail-head h2{
-      font-size:.95rem;
+    *{
+      box-sizing:border-box;
     }
 
-    .detail-body{
-      padding:18px 16px 22px;
+    html,body{
+      margin:0;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(110,120,145,.10), transparent 24%),
+        linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 100%);
+      color:var(--text);
+      font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
     }
 
-    .entry h3{
-      font-size:1rem;
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,.025), transparent 14%, transparent 86%, rgba(255,255,255,.012)),
+        radial-gradient(circle at 50% 18%, rgba(255,255,255,.025), transparent 22%);
+      opacity:.72;
     }
 
-    .entry p{
-      font-size:.9rem;
+    .page{
+      position:relative;
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      isolation:isolate;
+    }
+
+    .topbar{
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      z-index:20;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      padding:18px 20px 0;
+    }
+
+    .backLink{
+      color:var(--muted);
+      text-decoration:none;
+      font-size:12px;
+      letter-spacing:.12em;
+      transition:opacity .25s ease, transform .25s ease;
+    }
+
+    .backLink:hover{
+      opacity:1;
+      transform:translateX(-2px);
+    }
+
+    .titleWrap{
+      text-align:right;
+      margin-left:auto;
+      margin-right:18px;
+    }
+
+    .pageTitle{
+      margin:0;
+      font-size:15px;
+      letter-spacing:.14em;
+      font-weight:500;
+    }
+
+    .pageLead{
+      margin:6px 0 0;
+      font-size:11px;
+      line-height:1.8;
+      letter-spacing:.08em;
+      color:var(--muted);
+    }
+
+    .menu-button{
+      position:fixed;
+      top:18px;
+      right:22px;
+      width:30px;
+      height:22px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      cursor:pointer;
+      z-index:1001;
+    }
+
+    .menu-button span{
+      height:3px;
+      width:100%;
+      background:rgba(236,232,223,0.75);
+      border-radius:2px;
+      transition:all .3s ease;
+    }
+
+    .menu-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(8,10,16,.48);
+      backdrop-filter:blur(10px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:1000;
+    }
+
+    .menu-overlay.open{
+      display:flex;
+    }
+
+    .menu-content{
+      background:rgba(255,255,255,0.88);
+      border-radius:16px;
+      padding:28px 34px;
+      box-shadow:0 0 25px rgba(0,0,0,0.2);
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:1em;
+      animation:fadeIn .3s ease;
+    }
+
+    .menu-content a{
+      text-decoration:none;
+      color:#444;
+      font-size:.95em;
+      letter-spacing:.05em;
+      transition:.3s;
+    }
+
+    .menu-content a:hover{
+      color:#666;
+      text-shadow:0 0 8px rgba(200,200,200,0.6);
+    }
+
+    .scene{
+      position:absolute;
+      inset:0;
+      z-index:1;
+    }
+
+    .sky{
+      position:absolute;
+      inset:0;
+      transition:background .45s ease, filter .45s ease;
+    }
+
+    .page[data-view="village"] .sky{
+      background:
+        radial-gradient(circle at 50% 22%, rgba(255,255,255,.22), transparent 20%),
+        linear-gradient(180deg, var(--village1) 0%, var(--village2) 38%, #8e978f 100%);
+      filter:saturate(.68) brightness(.94);
+    }
+
+    .page[data-view="hama"] .sky{
+      background:
+        radial-gradient(circle at 50% 18%, rgba(174,192,255,.14), transparent 18%),
+        linear-gradient(180deg, #445686 0%, var(--hama1) 36%, var(--hama2) 100%);
+    }
+
+    .page[data-view="s"] .sky{
+      background:
+        radial-gradient(circle at 50% 18%, rgba(235,245,255,.10), transparent 18%),
+        linear-gradient(180deg, #7e8794 0%, var(--s1) 34%, var(--s2) 100%);
+    }
+
+    .mist{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:.18;
+      background:
+        radial-gradient(circle at 24% 66%, rgba(255,255,255,.18), transparent 18%),
+        radial-gradient(circle at 70% 74%, rgba(255,255,255,.12), transparent 16%);
+    }
+
+    .ground{
+      position:absolute;
+      left:-8%;
+      right:-8%;
+      bottom:-4vh;
+      height:38vh;
+      border-radius:50% 50% 0 0 / 24% 24% 0 0;
+      transition:background .45s ease, transform .45s ease;
+    }
+
+    .page[data-view="village"] .ground{
+      background:
+        radial-gradient(circle at 50% 20%, rgba(255,255,255,.08), transparent 28%),
+        linear-gradient(180deg, #6d736f 0%, #505650 100%);
+    }
+
+    .page[data-view="hama"] .ground{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.04), transparent 24%),
+        linear-gradient(180deg, #1e2639 0%, #111722 100%);
+    }
+
+    .page[data-view="s"] .ground{
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), transparent 20%),
+        linear-gradient(180deg, #444d59 0%, #262d37 100%);
+    }
+
+    .backdrop{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+    }
+
+    .hamaCity,
+    .villageTree,
+    .sRoom{
+      position:absolute;
+      left:50%;
+      bottom:20vh;
+      transform:translateX(-50%);
+      transition:opacity .35s ease, transform .45s ease;
+      opacity:0;
+    }
+
+    .page[data-view="hama"] .hamaCity{ opacity:1; }
+    .page[data-view="village"] .villageTree{ opacity:1; }
+    .page[data-view="s"] .sRoom{ opacity:1; }
+
+    .hamaCity{
+      width:min(720px, 92vw);
+      height:220px;
+    }
+
+    .hamaCity::before,
+    .hamaCity::after{
+      content:"";
+      position:absolute;
+      bottom:0;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .hamaCity::before{
+      left:8%;
+      width:120px;
+      height:160px;
+      box-shadow:
+        180px 22px 0 -8px rgba(255,255,255,.03),
+        315px 40px 0 -16px rgba(255,255,255,.03),
+        430px 10px 0 -6px rgba(255,255,255,.03);
+    }
+
+    .hamaCity::after{
+      right:12%;
+      width:96px;
+      height:126px;
+      box-shadow:
+        -142px 18px 0 -8px rgba(255,255,255,.03),
+        -275px 32px 0 -14px rgba(255,255,255,.03);
+    }
+
+    .villageTree{
+      width:min(560px, 84vw);
+      height:280px;
+      filter:saturate(.72);
+    }
+
+    .villageTree::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:0;
+      width:18px;
+      height:126px;
+      background:linear-gradient(180deg, #6b5645, #413228);
+      transform:translateX(-50%);
+    }
+
+    .villageTree::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:18px;
+      width:240px;
+      height:180px;
+      border-radius:50%;
+      transform:translateX(-50%);
+      background:
+        radial-gradient(circle at 50% 44%, rgba(255,255,255,.28), transparent 22%),
+        radial-gradient(circle at 34% 50%, rgba(255,255,255,.18), transparent 22%),
+        radial-gradient(circle at 66% 54%, rgba(255,255,255,.14), transparent 20%),
+        linear-gradient(180deg, #e7ebe5 0%, #b8c0b8 100%);
+      box-shadow:
+        -92px 36px 0 -26px rgba(207,214,207,.82),
+        88px 28px 0 -24px rgba(207,214,207,.82);
+    }
+
+    .sRoom{
+      width:min(720px, 92vw);
+      height:250px;
+    }
+
+    .sRoom::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:8px;
+      width:380px;
+      height:180px;
+      transform:translateX(-50%);
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
+      box-shadow:0 0 40px rgba(255,255,255,.04) inset;
+    }
+
+    .sRoom::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:42px;
+      width:120px;
+      height:70px;
+      transform:translateX(-50%);
+      border-radius:999px 999px 20px 20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .traceNote{
+      position:absolute;
+      left:50%;
+      bottom:25.4vh;
+      transform:translateX(-50%);
+      z-index:6;
+      color:rgba(255,255,255,.22);
+      font-size:11px;
+      letter-spacing:.18em;
+      opacity:0;
+      transition:opacity .3s ease;
+      pointer-events:none;
+    }
+
+    .page[data-view="village"] .traceNote{
+      opacity:1;
+    }
+
+    .signpost{
+      position:absolute;
+      left:50%;
+      bottom:18vh;
+      transform:translateX(-50%);
+      width:140px;
+      height:170px;
+      z-index:4;
+      pointer-events:none;
+    }
+
+    .signpost::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:0;
+      width:6px;
+      height:92px;
+      background:rgba(255,255,255,.20);
+      transform:translateX(-50%);
+    }
+
+    .signpost::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:8px;
+      width:120px;
+      height:52px;
+      transform:translateX(-50%) rotate(-2deg);
+      border:1px solid rgba(255,255,255,.18);
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow:0 8px 18px rgba(0,0,0,.12);
+    }
+
+    .dirArrows{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:8;
+    }
+
+    .pcArrow{
+      position:absolute;
+      top:50%;
+      transform:translateY(-50%);
+      width:46px;
+      height:46px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(10,12,18,.34);
+      color:rgba(255,255,255,.38);
+      font:inherit;
+      font-size:18px;
+      pointer-events:auto;
+      cursor:pointer;
+      backdrop-filter:blur(6px);
+    }
+
+    .pcArrow.left{ left:18px; }
+    .pcArrow.right{ right:18px; }
+
+    .infoPanel{
+      position:absolute;
+      top:88px;
+      right:20px;
+      z-index:16;
+      width:min(360px, calc(100vw - 40px));
+      min-height:180px;
+      padding:18px 18px 16px;
+      border:1px solid var(--line);
+      background:var(--panel-strong);
+      backdrop-filter:blur(12px);
+      box-shadow:0 18px 44px rgba(0,0,0,.24);
+    }
+
+    .infoKicker{
+      font-size:10px;
+      letter-spacing:.18em;
+      color:rgba(236,232,223,.42);
+      margin-bottom:8px;
+    }
+
+    .infoTitle{
+      font-size:18px;
+      line-height:1.6;
+      letter-spacing:.08em;
+      margin-bottom:8px;
+    }
+
+    .infoText{
+      font-size:12px;
       line-height:1.95;
+      letter-spacing:.04em;
+      color:var(--muted);
+      margin-bottom:14px;
     }
-  .traceNote{
-    bottom:29vh;
-    font-size:10px;
-}
-.item-btn{
-  font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-}
-</style>
+
+    .infoMeta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .tag{
+      display:inline-block;
+      padding:6px 8px;
+      font-size:10px;
+      letter-spacing:.12em;
+      color:var(--muted);
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+    }
+
+    .poiList{
+      position:absolute;
+      left:20px;
+      bottom:18vh;
+      z-index:15;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      width:min(280px, calc(100vw - 40px));
+    }
+
+    .poiBtn{
+      text-align:left;
+      padding:12px 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(8,10,16,.46);
+      backdrop-filter:blur(10px);
+      color:var(--text);
+      font:inherit;
+      font-size:12px;
+      letter-spacing:.08em;
+      cursor:pointer;
+      transition:background .25s ease, border-color .25s ease, transform .25s ease;
+    }
+
+    .poiBtn:hover,
+    .poiBtn.active{
+      background:rgba(255,255,255,.07);
+      border-color:rgba(255,255,255,.20);
+      transform:translateX(2px);
+    }
+
+    .poiSub{
+      display:block;
+      margin-top:6px;
+      font-size:10px;
+      letter-spacing:.12em;
+      color:var(--muted);
+    }
+
+    .directionUI{
+      position:absolute;
+      left:50%;
+      bottom:6.4vh;
+      transform:translateX(-50%);
+      z-index:12;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      background:var(--panel);
+      backdrop-filter:blur(10px);
+    }
+
+    .dirBtn{
+      min-width:86px;
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:transparent;
+      color:var(--muted);
+      font:inherit;
+      font-size:12px;
+      letter-spacing:.12em;
+      cursor:pointer;
+      transition:background .25s ease, color .25s ease, border-color .25s ease;
+    }
+
+    .dirBtn.active{
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      border-color:rgba(255,255,255,.16);
+    }
+
+    @media (max-width: 900px){
+      .infoPanel{
+        top:auto;
+        right:14px;
+        left:14px;
+        bottom:100px;
+        width:auto;
+        min-height:160px;
+      }
+
+      .poiList{
+        left:14px;
+        right:14px;
+        width:auto;
+        bottom:166px;
+      }
+
+      .pcArrow{
+        display:none;
+      }
+    }
+
+    @media (max-width: 768px){
+      .topbar{
+        padding:14px 14px 0;
+      }
+
+      .titleWrap{
+        text-align:right;
+      }
+
+      .pageLead{
+        display:none;
+      }
+
+      .directionUI{
+        left:14px;
+        right:14px;
+        bottom:14px;
+        transform:none;
+        justify-content:space-between;
+        gap:8px;
+        padding:10px;
+      }
+
+      .dirBtn{
+        min-width:0;
+        flex:1 1 auto;
+        font-size:11px;
+        padding:10px 8px;
+      }
+
+      .poiList{
+        bottom:188px;
+        gap:8px;
+      }
+
+      .poiBtn{
+        padding:11px 12px;
+        font-size:11px;
+      }
+
+      .infoPanel{
+        bottom:96px;
+        min-height:150px;
+        padding:15px 14px 14px;
+      }
+
+      .infoTitle{
+        font-size:16px;
+      }
+
+      .infoText{
+        font-size:11.5px;
+        line-height:1.85;
+      }
+
+      .signpost{
+        bottom:22vh;
+        width:120px;
+        height:150px;
+      }
+
+      .signpost::after{
+        width:102px;
+        height:46px;
+      }
+
+      .traceNote{
+        bottom:29vh;
+        font-size:10px;
+      }
+    }
+
+    @keyframes fadeIn{
+      from{ opacity:0; transform:scale(.95); }
+      to{ opacity:1; transform:scale(1); }
+    }
+  </style>
 </head>
 
 <body>
-  <div class="page">
-    <div class="wrap">
+  <div class="page" id="page" data-view="hama">
+    <div class="topbar">
+      <a class="backLink" href="./where.html">← 入口へ戻る</a>
 
-      <!-- 左：一覧 -->
-      <section class="panel">
-        <div class="panel-head">
-          <h1>WORLDBUILDING</h1>
-        </div>
+      <div class="titleWrap">
+        <h1 class="pageTitle">Worldbuilding</h1>
+        <div class="pageLead">看板の前で立ち止まり、向きを変える。</div>
+      </div>
 
-        <div class="list">
-          <button class="item-btn is-active" data-target="hama18">
-            <span class="item-title">HAMA18区</span>
-            <span class="item-sub">綾が最近引っ越してきた観光特区の一角。</span>
-          </button>
-
-          <button class="item-btn" data-target="starducks">
-            <span class="item-title">スターダックス</span>
-            <span class="item-sub">綾と添が初めて出会ったコーヒーショップ。</span>
-          </button>
-
-          <button class="item-btn" data-target="mutant">
-            <span class="item-title">変異体</span>
-            <span class="item-sub">自我と感情を持った、例外的なアンドロイド個体。</span>
-          </button>
-
-          <button class="item-btn" data-target="s-kyoku">
-            <span class="item-title">防衛省 地方支分部局</span>
-            <span class="item-sub">通称S局。対アンドロイド任務を行う新生部隊。</span>
-          </button>
-
-          <button class="item-btn" data-target="missing">
-            <span class="item-title">■■村集団失踪事件</span>
-            <span class="item-sub">2051年1月、とある集落が消失した未解決事件。</span>
-          </button>
-
-          <button class="item-btn" data-target="kami-sama">
-            <span class="item-title">かみさま</span>
-            <span class="item-sub">■■村が信仰していたとされる■■■。</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- 右：詳細 -->
-      <section class="detail">
-        <div class="detail-head">
-          <p>選択中の項目に対応する記録を表示しています。</p>
-        </div>
-
-        <div class="detail-body">
-
-          <article class="entry is-active" id="hama18">
-            <span class="entry-meta">LOCATION RECORD</span>
-            <h3>HAMA18区</h3>
-            <p>かつて国内有数の観光地だったが、現在は残念な状態にある観光特区。
-近年は再開発の噂もあるものの、表通りの華やかさに比べ、少し奥へ入れば古びた建物や人の気配の薄い通りも残っている。
-
-最近、綾が引っ越してきた地域でもある。</p>
-            <div class="note">NOTE：生活圏としての顔と、衰退した観光地としての顔を併せ持つ。</div>
-          </article>
-
-          <article class="entry" id="starducks">
-            <span class="entry-meta">FACILITY RECORD</span>
-            <h3>スターダックス</h3>
-            <p>綾と添が初めて出会ったコーヒーショップ。
-全国展開している有名チェーン店だが、地域によって店舗数にかなり差がある。
-
-HAMA18区周辺では、街の賑わいに対してやや不釣り合いなほど静かな空気を保っている店舗もある。</p>
-            <div class="note">NOTE：日常の起点であり、関係性の始点でもある場所。</div>
-          </article>
-
-          <article class="entry" id="mutant">
-            <span class="entry-meta">ENTITY RECORD</span>
-            <h3>変異体</h3>
-            <p>何らかの理由により、本来アンドロイドが持ちえない自我と感情が芽生えた個体。
-近年、人間に容姿を寄せた違法アンドロイドの増加とあわせ、業界内でも深刻な課題とされている。
-
-単なる機械故障として処理できない例もあり、その定義や危険性は未だ揺れている。</p>
-            <div class="note">NOTE：技術の逸脱か、生命の発生か。その解釈は立場によって異なる。</div>
-          </article>
-
-          <article class="entry" id="s-kyoku">
-            <span class="entry-meta">ORGANIZATION RECORD</span>
-            <h3>防衛省 地方支分部局</h3>
-            <p>対アンドロイドに特化した新生部隊。通称S局（Security Bureau）。
-変異体の回収および初期化を行い、危険因子の排除と平穏の維持を掲げている。
-
-全国各地に基地を構えており、国家が数億円を投下したと囁かれている。</p>
-            <div class="note">NOTE：表向きは治安維持組織だが、その実態には不明点も多い。</div>
-          </article>
-
-          <article class="entry" id="missing">
-            <span class="entry-meta">INCIDENT RECORD</span>
-            <h3>■■村集団失踪事件</h3>
-            <p>2051年1月、■■のとある集落が■■ごと■■してしまった事件。
-当時の詳細を知る者は■■いことから、その■■を証明する■はない。
-
-一部では都市伝説として語られ、オカルトマニアの間でだけ断片的に知られているともされる。</p>
-            <div class="note">NOTE：記録そのものが欠けているため、事件の存在自体を疑う声もある。</div>
-          </article>
-
-          <article class="entry" id="kami-sama">
-            <span class="entry-meta">FAITH RECORD</span>
-            <h3>かみさま</h3>
-            <p>■■村が信仰していたとされる■■■。
-■の■■期、■■に■■を■えたことで■を手にした。
-
-現存する資料は少なく、信仰対象そのものが実在したかどうかも明確ではない。</p>
-            <div class="note">NOTE：信仰、伝承、現象。そのどこまでが現実に属するのか判別が難しい。</div>
-          </article>
-
-        </div>
-      </section>
+      <div class="menu-button" id="menuButton" aria-label="menu">
+        <span></span><span></span><span></span>
+      </div>
     </div>
 
-    <footer>#溶けて、そのまま雲隠れ</footer>
-  </div>
-<div class="page" id="page" data-view="hama">
-  <div class="topbar">
-    <a class="backLink" href="./where.html">← 入口へ戻る</a>
-
-  <!-- メニューUI -->
-  <div class="menu-button" id="menuButton" aria-label="menu">
-    <span></span><span></span><span></span>
-    <div class="titleWrap">
-      <h1 class="pageTitle">Worldbuilding</h1>
-      <div class="pageLead">看板の前で立ち止まり、向きを変える。</div>
+    <div class="menu-overlay" id="menuOverlay">
+      <div class="menu-content">
+        <a href="home.html">home</a>
+        <a href="Character.html">Character</a>
+        <a href="works/select.html">Story</a>
+        <a href="Media.html">Media</a>
+      </div>
     </div>
-</div>
 
-  <div class="menu-overlay" id="menuOverlay">
-    <div class="menu-content">
-      <a href="home.html">home</a>
-      <a href="Character.html">Character</a>
-      <a href="works/select.html">Story</a>
-      <a href="Media.html">Media</a>
-  <main class="scene">
-    <div class="sky"></div>
-    <div class="mist"></div>
-    <div class="ground"></div>
+    <main class="scene">
+      <div class="sky"></div>
+      <div class="mist"></div>
+      <div class="ground"></div>
 
-    <div class="backdrop">
-      <div class="hamaCity"></div>
-      <div class="villageTree"></div>
-      <div class="sRoom"></div>
-</div>
+      <div class="backdrop">
+        <div class="hamaCity"></div>
+        <div class="villageTree"></div>
+        <div class="sRoom"></div>
+      </div>
+
+      <div class="traceNote">……誰かがいたはずだ</div>
+      <div class="signpost"></div>
+
+      <div class="dirArrows" aria-hidden="true">
+        <button class="pcArrow left" id="leftArrow" type="button">←</button>
+        <button class="pcArrow right" id="rightArrow" type="button">→</button>
+      </div>
+
+      <section class="infoPanel" aria-live="polite">
+        <div class="infoKicker" id="infoKicker">VIEW / HAMA</div>
+        <div class="infoTitle" id="infoTitle">HAMA / 現在</div>
+        <div class="infoText" id="infoText">都市の光と、生活の手触り。失ったものを抱えたまま、いま現在の輪郭だけはたしかにある。</div>
+        <div class="infoMeta" id="infoMeta"></div>
+      </section>
+
+      <div class="poiList" id="poiList"></div>
+
+      <nav class="directionUI" aria-label="向きを選ぶ">
+        <button class="dirBtn" data-view="village" type="button">左を見る</button>
+        <button class="dirBtn active" data-view="hama" type="button">正面を見る</button>
+        <button class="dirBtn" data-view="s" type="button">右を見る</button>
+      </nav>
+    </main>
   </div>
 
   <script>
-    const buttons = document.querySelectorAll('.item-btn');
-    const entries = document.querySelectorAll('.entry');
-    <div class="traceNote">……誰かがいたはずだ</div>
+    const page = document.getElementById('page');
+    const infoKicker = document.getElementById('infoKicker');
+    const infoTitle = document.getElementById('infoTitle');
+    const infoText = document.getElementById('infoText');
+    const infoMeta = document.getElementById('infoMeta');
+    const poiList = document.getElementById('poiList');
 
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.target;
-    <div class="signpost"></div>
+    const dirButtons = [...document.querySelectorAll('.dirBtn')];
+    const leftArrow = document.getElementById('leftArrow');
+    const rightArrow = document.getElementById('rightArrow');
 
-        buttons.forEach(b => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-    <div class="dirArrows" aria-hidden="true">
-      <button class="pcArrow left" id="leftArrow" type="button">←</button>
-      <button class="pcArrow right" id="rightArrow" type="button">→</button>
-    </div>
+    const menuButton = document.getElementById('menuButton');
+    const menuOverlay = document.getElementById('menuOverlay');
 
-        entries.forEach(entry => {
-          entry.classList.toggle('is-active', entry.id === target);
-        });
+    const viewOrder = ['village', 'hama', 's'];
+
+    const views = {
+      village: {
+        kicker: 'VIEW / VILLAGE',
+        title: '因習村 / 過去',
+        text: '白く抜けたような景色。場所の輪郭はあるのに、そこにいた人だけがうまく定まらない。',
+        tags: ['記憶', '神様', '欠落'],
+        items: [
+          {
+            label: 'かみさまのおうち',
+            sub: '大きな木のそば',
+            title: 'かみさまのおうち',
+            text: '幼い綾が小さな宝物を供えていた場所。祠の中身が空だったという感覚だけが妙に残る。',
+            tags: ['祠', '供物', '鈴の音']
+          },
+          {
+            label: '蔵',
+            sub: '罰と沈黙',
+            title: '蔵',
+            text: '目隠しと宙吊り、濃い匂い。記憶の輪郭は曖昧なのに、不快だけが異様にはっきりしている。',
+            tags: ['拘束', '香', '空白']
+          },
+          {
+            label: '影',
+            sub: '人物は見えない',
+            title: '綾の痕跡',
+            text: 'ここには本来、人の姿があったはずだ。けれど村の中では、彼女は立ち絵として現れない。残るのは気配と断片だけ。',
+            tags: ['不在', '幼少', '断片']
+          }
+        ]
+      },
+
+      hama: {
+        kicker: 'VIEW / HAMA',
+        title: 'HAMA / 現在',
+        text: '都市の光と、生活の手触り。失ったものを抱えたまま、いま現在の輪郭だけはたしかにある。',
+        tags: ['現在', '都市', '日常'],
+        items: [
+          {
+            label: '綾',
+            sub: '現在の姿',
+            title: '笹井綾',
+            text: '明るく見える現在の綾。けれどその輪郭の裏側には、忘れられた過去と監視された日常が折り重なっている。',
+            tags: ['145cm', '現在', '記憶改変後']
+          },
+          {
+            label: '添',
+            sub: '曖昧な距離',
+            title: '叢雲添',
+            text: '大学生としての顔と、別の名で生きる裏側。綾にとっては今に繋がる存在だが、全部はまだ見えていない。',
+            tags: ['叢雲添', '二曲輪貂', 'HAMA']
+          },
+          {
+            label: 'mahorova / 街',
+            sub: '都市の輪郭',
+            title: 'HAMAの現在',
+            text: '働く場所、通る場所、日常が続いていく場所。明るさそのものが、逆に不自然なくらい穏やかに見えることがある。',
+            tags: ['mahorova', '18区', '生活']
+          }
+        ]
+      },
+
+      s: {
+        kicker: 'VIEW / S局',
+        title: 'S局 / かつて',
+        text: '冷たく記録される側の場所。ここでは人も記憶も、部品のように処理される。',
+        tags: ['S局', '変異体', '記録'],
+        items: [
+          {
+            label: 'Filler',
+            sub: '綾 / S局時代',
+            title: 'Filler',
+            text: '綾が与えられていた蔑称めいた呼び名。役に立つことだけが存在理由になっていく、冷たい実務の側面。',
+            tags: ['Filler', '綾', '処理']
+          },
+          {
+            label: '変異体',
+            sub: '例外個体',
+            title: '変異体',
+            text: '本来持ちえないはずの自我や感情を持ち始めたアンドロイド。回収と初期化の対象であり、境界を揺らがせる存在でもある。',
+            tags: ['自我', '違法改造', '初期化']
+          },
+          {
+            label: '回収',
+            sub: '任務記録',
+            title: '回収任務',
+            text: '現物回収、停止確認、再初期化。感情ではなく手順の側から塗りつぶされていく。',
+            tags: ['回収', '任務', '再配備']
+          }
+        ]
+      }
+    };
+
+    function renderMeta(tags){
+      infoMeta.innerHTML = '';
+      tags.forEach(tag => {
+        const span = document.createElement('span');
+        span.className = 'tag';
+        span.textContent = tag;
+        infoMeta.appendChild(span);
       });
-    <section class="infoPanel" aria-live="polite">
-      <div class="infoKicker" id="infoKicker">VIEW / HAMA</div>
-      <div class="infoTitle" id="infoTitle">HAMA / 現在</div>
-      <div class="infoText" id="infoText">都市の光と、日常の輪郭。いま立っている場所に最も近い視点。</div>
-      <div class="infoMeta" id="infoMeta"></div>
-    </section>
+    }
 
-    <div class="poiList" id="poiList"></div>
+    function renderPoiList(viewKey){
+      const view = views[viewKey];
+      poiList.innerHTML = '';
 
-    <nav class="directionUI" aria-label="向きを選ぶ">
-      <button class="dirBtn" data-view="village" type="button">左を見る</button>
-      <button class="dirBtn active" data-view="hama" type="button">正面を見る</button>
-      <button class="dirBtn" data-view="s" type="button">右を見る</button>
-    </nav>
-  </main>
-</div>
+      view.items.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'poiBtn' + (index === 0 ? ' active' : '');
+        btn.innerHTML = `${item.label}<span class="poiSub">${item.sub}</span>`;
+        btn.type = 'button';
 
-<script>
-const page = document.getElementById('page');
-const infoKicker = document.getElementById('infoKicker');
-const infoTitle = document.getElementById('infoTitle');
-const infoText = document.getElementById('infoText');
-const infoMeta = document.getElementById('infoMeta');
-const poiList = document.getElementById('poiList');
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.poiBtn').forEach(el => el.classList.remove('active'));
+          btn.classList.add('active');
 
-const dirButtons = [...document.querySelectorAll('.dirBtn')];
-const leftArrow = document.getElementById('leftArrow');
-const rightArrow = document.getElementById('rightArrow');
+          infoKicker.textContent = view.kicker;
+          infoTitle.textContent = item.title;
+          infoText.textContent = item.text;
+          renderMeta(item.tags);
+        });
 
-const viewOrder = ['village', 'hama', 's'];
+        poiList.appendChild(btn);
+      });
 
-const views = {
-  village: {
-    kicker: 'VIEW / VILLAGE',
-    title: '因習村 / 過去',
-    text: '白く抜けたような景色。場所の輪郭はあるのに、そこにいた人だけがうまく定まらない。',
-    tags: ['記憶', '神様', '欠落'],
-    items: [
-      {
-        label: 'かみさまのおうち',
-        sub: '大きな木のそば',
-        title: 'かみさまのおうち',
-        text: '幼い綾が小さな宝物を供えていた場所。祠の中身が空だったという感覚だけが妙に残る。',
-        tags: ['祠', '供物', '鈴の音']
-      },
-      {
-        label: '蔵',
-        sub: '罰と沈黙',
-        title: '蔵',
-        text: '目隠しと宙吊り、濃い匂い。記憶の輪郭は曖昧なのに、不快だけが異様にはっきりしている。',
-        tags: ['拘束', '香', '空白']
-      },
-      {
-        label: '影',
-        sub: '人物は見えない',
-        title: '綾の痕跡',
-        text: 'ここには本来、人の姿があったはずだ。けれど村の中では、彼女は立ち絵として現れない。残るのは気配と断片だけ。',
-        tags: ['不在', '幼少', '断片']
+      if (view.items.length > 0) {
+        infoKicker.textContent = view.kicker;
+        infoTitle.textContent = view.items[0].title;
+        infoText.textContent = view.items[0].text;
+        renderMeta(view.items[0].tags);
+      } else {
+        infoKicker.textContent = view.kicker;
+        infoTitle.textContent = view.title;
+        infoText.textContent = view.text;
+        renderMeta(view.tags);
       }
-    ]
-  },
+    }
 
-  hama: {
-    kicker: 'VIEW / HAMA',
-    title: 'HAMA / 現在',
-    text: '都市の光と、生活の手触り。失ったものを抱えたまま、いま現在の輪郭だけはたしかにある。',
-    tags: ['現在', '都市', '日常'],
-    items: [
-      {
-        label: '綾',
-        sub: '現在の姿',
-        title: '笹井綾',
-        text: '明るく見える現在の綾。けれどその輪郭の裏側には、忘れられた過去と監視された日常が折り重なっている。',
-        tags: ['145cm', '現在', '記憶改変後']
-      },
-      {
-        label: '添',
-        sub: '曖昧な距離',
-        title: '叢雲添',
-        text: '大学生としての顔と、別の名で生きる裏側。綾にとっては今に繋がる存在だが、全部はまだ見えていない。',
-        tags: ['叢雲添', '二曲輪貂', 'HAMA']
-      },
-      {
-        label: 'mahorova / 街',
-        sub: '都市の輪郭',
-        title: 'HAMAの現在',
-        text: '働く場所、通る場所、日常が続いていく場所。明るさそのものが、逆に不自然なくらい穏やかに見えることがある。',
-        tags: ['mahorova', '18区', '生活']
-      }
-    ]
-  },
+    function setView(viewKey){
+      page.dataset.view = viewKey;
 
-  s: {
-    kicker: 'VIEW / S局',
-    title: 'S局 / かつて',
-    text: '冷たく記録される側の場所。ここでは人も記憶も、部品のように処理される。',
-    tags: ['S局', '変異体', '記録'],
-    items: [
-      {
-        label: 'Filler',
-        sub: '綾 / S局時代',
-        title: 'Filler',
-        text: '綾が与えられていた蔑称めいた呼び名。役に立つことだけが存在理由になっていく、冷たい実務の側面。',
-        tags: ['Filler', '綾', '処理']
-      },
-      {
-        label: '破壊装置',
-        sub: '記憶の消去',
-        title: '口腔投入型デバイス',
-        text: '小さな球状デバイス。アンドロイドの記憶を破壊するための、個人的で冷たい方法。',
-        tags: ['記憶破壊', 'アンドロイド', '冷却媒体']
-      },
-      {
-        label: '収容室',
-        sub: '記録と管理',
-        title: 'S局の空間',
-        text: '記録、収容、初期化。誰かの人生や自己同一性が、ただの運用手順みたいに扱われる場所。',
-        tags: ['収容', '初期化', '管理']
-      }
-    ]
-  }
-};
+      dirButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === viewKey);
+      });
 
-let currentView = 'hama';
-let currentItemIndex = 0;
+      renderPoiList(viewKey);
+    }
 
-function renderMeta(tags){
-  infoMeta.innerHTML = '';
-  tags.forEach(tag => {
-    const span = document.createElement('span');
-    span.className = 'tag';
-    span.textContent = tag;
-    infoMeta.appendChild(span);
-  });
-}
-
-function renderItemList(viewKey){
-  poiList.innerHTML = '';
-  const view = views[viewKey];
-
-  view.items.forEach((item, index) => {
-    const btn = document.createElement('button');
-    btn.className = 'poiBtn' + (index === currentItemIndex ? ' active' : '');
-    btn.type = 'button';
-    btn.innerHTML = `
-      ${item.label}
-      <span class="poiSub">${item.sub}</span>
-    `;
-
-    btn.addEventListener('click', () => {
-      currentItemIndex = index;
-      renderContent();
-});
-
-    const menuBtn = document.getElementById('menuButton');
-    const overlay = document.getElementById('menuOverlay');
-    poiList.appendChild(btn);
-  });
-}
-
-function renderContent(){
-  const view = views[currentView];
-  const item = view.items[currentItemIndex];
-
-    menuBtn.addEventListener('click', () => {
-      overlay.style.display = (overlay.style.display === 'flex') ? 'none' : 'flex';
-      if (overlay.style.display !== 'none') overlay.style.display = 'flex';
+    dirButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setView(btn.dataset.view);
+      });
     });
-  infoKicker.textContent = view.kicker;
-  infoTitle.textContent = item.title || view.title;
-  infoText.textContent = item.text || view.text;
 
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) overlay.style.display = 'none';
+    leftArrow.addEventListener('click', () => {
+      const current = page.dataset.view;
+      const index = viewOrder.indexOf(current);
+      const next = viewOrder[(index - 1 + viewOrder.length) % viewOrder.length];
+      setView(next);
     });
+
+    rightArrow.addEventListener('click', () => {
+      const current = page.dataset.view;
+      const index = viewOrder.indexOf(current);
+      const next = viewOrder[(index + 1) % viewOrder.length];
+      setView(next);
+    });
+
+    menuButton.addEventListener('click', () => {
+      menuOverlay.classList.add('open');
+    });
+
+    menuOverlay.addEventListener('click', (e) => {
+      if (e.target === menuOverlay) {
+        menuOverlay.classList.remove('open');
+      }
+    });
+
+    setView('hama');
   </script>
-  renderMeta(item.tags || view.tags);
-  renderItemList(currentView);
-
-  dirButtons.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.view === currentView);
-  });
-
-  page.dataset.view = currentView;
-}
-
-function setView(viewKey){
-  if (!views[viewKey]) return;
-  currentView = viewKey;
-  currentItemIndex = 0;
-  renderContent();
-}
-
-function moveView(direction){
-  const currentIndex = viewOrder.indexOf(currentView);
-  const nextIndex = currentIndex + direction;
-  if (nextIndex < 0 || nextIndex >= viewOrder.length) return;
-  setView(viewOrder[nextIndex]);
-}
-
-dirButtons.forEach(btn => {
-  btn.addEventListener('click', () => {
-    setView(btn.dataset.view);
-  });
-});
-
-leftArrow.addEventListener('click', () => moveView(-1));
-rightArrow.addEventListener('click', () => moveView(1));
-
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') moveView(-1);
-  if (e.key === 'ArrowRight') moveView(1);
-});
-
-renderContent();
-</script>
 </body>
-</html>
 </html>
