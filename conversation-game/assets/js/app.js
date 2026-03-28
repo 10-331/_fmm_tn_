@@ -1,4 +1,4 @@
-const STORAGE_KEY = "conversation_game_state_v3";
+const STORAGE_KEY = "conversation_game_state_v4";
 
 const allData = {
   child: childData,
@@ -36,8 +36,8 @@ const questionAreaEl = document.getElementById("questionArea");
 
 const menuBtn = document.getElementById("menuBtn");
 const menuSheet = document.getElementById("menuSheet");
-const backBtn = document.querySelector("#menuSheet #backBtn") || document.getElementById("backBtn");
-const resetBtn = document.querySelector("#menuSheet #resetBtn") || document.getElementById("resetBtn");
+const backBtn = document.getElementById("backBtn");
+const resetBtn = document.getElementById("resetBtn");
 
 let state = loadState();
 
@@ -180,8 +180,19 @@ function getProgress(characterId) {
 }
 
 /* =========================
-   メニュー制御
+   メニュー
 ========================= */
+
+function setupMenuIcon() {
+  if (!menuBtn) return;
+  if (menuBtn.querySelector("span")) return;
+
+  menuBtn.textContent = "";
+  for (let i = 0; i < 3; i++) {
+    const line = document.createElement("span");
+    menuBtn.appendChild(line);
+  }
+}
 
 function closeMenu() {
   if (!menuSheet || !menuBtn) return;
@@ -205,6 +216,8 @@ function toggleMenu(event) {
   else closeMenu();
 }
 
+setupMenuIcon();
+
 if (menuBtn && menuSheet) {
   closeMenu();
 
@@ -224,7 +237,7 @@ if (menuBtn && menuSheet) {
 }
 
 /* =========================
-   画面表示
+   画面切り替え
 ========================= */
 
 function showCharacterSelect() {
@@ -237,6 +250,10 @@ function showConversationScreen() {
   if (characterSelectScreen) characterSelectScreen.hidden = true;
   if (conversationScreen) conversationScreen.hidden = false;
 }
+
+/* =========================
+   描画
+========================= */
 
 async function renderCharacterSelect() {
   if (!characterListEl) return;
