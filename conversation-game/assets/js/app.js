@@ -1,4 +1,4 @@
-const STORAGE_KEY = "conversation_game_state_v7";
+const STORAGE_KEY = "conversation_game_state_v8";
 
 const characterSelectScreen = document.getElementById("characterSelectScreen");
 const conversationScreen = document.getElementById("conversationScreen");
@@ -255,23 +255,34 @@ function startConversation() {
   state.conversation.currentSceneIndex = 0;
   state.conversation.askedInScene = [];
   saveState();
-  renderConversation();
-}
 
-function renderConversation() {
   showConversationScreen();
   setConversationVisual("filler");
   characterNameEl.textContent = fillerData.meta.displayName;
   clearConversationArea();
 
   const scene = getCurrentScene();
-
   if (!scene) {
-    appendMessage(fillerData.meta.endingMessage, "character");
+    questionAreaEl.innerHTML = `<div class="emptyState">${fillerData.meta.endingMessage}</div>`;
     return;
   }
 
   scene.intro.forEach(line => appendMessage(line, "character"));
+  renderTopics(scene);
+}
+
+function renderConversation() {
+  showConversationScreen();
+  setConversationVisual("filler");
+  characterNameEl.textContent = fillerData.meta.displayName;
+
+  const scene = getCurrentScene();
+
+  if (!scene) {
+    questionAreaEl.innerHTML = `<div class="emptyState">${fillerData.meta.endingMessage}</div>`;
+    return;
+  }
+
   renderTopics(scene);
 }
 
@@ -293,8 +304,6 @@ function renderTopics(scene) {
     btn.textContent = topic.label;
 
     btn.addEventListener("click", () => {
-      appendMessage(topic.label, "user");
-
       const answer = topic.answers[Math.floor(Math.random() * topic.answers.length)];
       appendMessage(answer, "character");
 
@@ -329,11 +338,14 @@ function proceedScene() {
 
   setTimeout(() => {
     const nextScene = getCurrentScene();
+
     if (!nextScene) {
       questionAreaEl.innerHTML = `<div class="emptyState">${fillerData.meta.endingMessage}</div>`;
       return;
     }
-    renderConversation();
+
+    nextScene.intro.forEach(line => appendMessage(line, "character"));
+    renderTopics(nextScene);
   }, 350);
 }
 
@@ -391,7 +403,7 @@ async function render() {
   }
 
   if (state.selectedCharacter === "filler") {
-    renderConversation();
+    startConversation();
   } else {
     showConversationScreen();
     setConversationVisual(state.selectedCharacter);
