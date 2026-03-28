@@ -1,4 +1,4 @@
-const STORAGE_KEY = "conversation_game_state_v1";
+const STORAGE_KEY = "conversation_game_state_v2";
 
 const allData = {
   child: childData,
@@ -38,6 +38,115 @@ const resetBtn = document.getElementById("resetBtn");
 
 let state = loadState();
 
+/* =========================
+   画像最適化まわり
+========================= */
+
+const imageCache = new Map();
+
+async function createOptimizedImageUrl(src, options = {}) {
+  const {
+    maxWidth = 800,
+    maxHeight = 1200,
+    type = "image/webp",
+    quality = 0.92
+  } = options;
+
+  const cacheKey = `${src}__${maxWidth}x${maxHeight}__${type}__${quality}`;
+  if (imageCache.has(cacheKey)) {
+    return imageCache.get(cacheKey);
+  }
+
+  const img = await loadImage(src);
+
+  const fitted = fitSize(img.naturalWidth, img.naturalHeight, maxWidth, maxHeight);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = fitted.width;
+  canvas.height = fitted.height;
+
+  const ctx = canvas.getContext("2d", { alpha: true });
+  if (!ctx) {
+    return src;
+  }
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, 0, 0, fitted.width, fitted.height);
+
+  try {
+    const blob = await canvasToBlob(canvas, type, quality);
+    const url = URL.createObjectURL(blob);
+    imageCache.set(cacheKey, url);
+    return url;
+  } catch (error) {
+    console.error("画像最適化に失敗:", error);
+    return src;
+  }
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function fitSize(srcWidth, srcHeight, maxWidth, maxHeight) {
+  const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight, 1);
+  return {
+    width: Math.max(1, Math.round(srcWidth * ratio)),
+    height: Math.max(1, Math.round(srcHeight * ratio))
+  };
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("Blob化に失敗しました"));
+      }
+    }, type, quality);
+  });
+}
+
+/* 将来用：背景に流用できる */
+async function setOptimizedBackground(element, src) {
+  if (!element || !src) return;
+
+  const optimizedSrc = await createOptimizedImageUrl(src, {
+    maxWidth: 1280,
+    maxHeight: 720,
+    type: "image/webp",
+    quality: 0.86
+  });
+
+  element.style.backgroundImage = `url("${optimizedSrc}")`;
+}
+
+/* 将来用：会話画面の立ち絵に流用できる */
+async function setOptimizedSprite(imgElement, src) {
+  if (!imgElement || !src) return;
+
+  const optimizedSrc = await createOptimizedImageUrl(src, {
+    maxWidth: 720,
+    maxHeight: 1280,
+    type: "image/webp",
+    quality: 0.92
+  });
+
+  imgElement.src = optimizedSrc;
+}
+
+/* =========================
+   状態管理
+========================= */
+
 function cloneDefaultState() {
   return JSON.parse(JSON.stringify(defaultState));
 }
@@ -70,6 +179,7 @@ function loadState() {
       }
     };
   } catch (error) {
+    console.error("状態読み込み失敗:", error);
     return cloneDefaultState();
   }
 }
@@ -112,10 +222,14 @@ function showConversationScreen() {
   backBtn.hidden = false;
 }
 
-function renderCharacterSelect() {
+/* =========================
+   描画
+========================= */
+
+async function renderCharacterSelect() {
   characterListEl.innerHTML = "";
 
-  characters.forEach(character => {
+  for (const character of characters) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "characterBtn";
@@ -128,9 +242,31 @@ function renderCharacterSelect() {
       selectCharacter(character.id);
     });
 
-    const imageHtml = character.image
-      ? `<img src="${character.image}" alt="${character.label}" class="characterImage">`
-      : "";
+    let imageHtml = "";
+    if (character.image) {
+      let optimizedSrc = character.image;
+
+      try {
+        optimizedSrc = await createOptimizedImageUrl(character.image, {
+          maxWidth: 420,
+          maxHeight: 720,
+          type: "image/webp",
+          quality: 0.90
+        });
+      } catch (error) {
+        console.error("キャラ画像軽量化失敗:", error);
+      }
+
+      imageHtml = `
+        <img
+          src="${optimizedSrc}"
+          alt="${character.label}"
+          class="characterImage"
+          loading="lazy"
+          decoding="async"
+        >
+      `;
+    }
 
     button.innerHTML = `
       <div class="characterVisual">
@@ -143,9 +279,7 @@ function renderCharacterSelect() {
     `;
 
     characterListEl.appendChild(button);
-  });
-
-  trimCharacterImages();
+  }
 }
 
 function renderConversation() {
@@ -168,6 +302,10 @@ function renderConversation() {
   messageAreaEl.textContent = message;
 
   renderQuestions(characterId);
+
+  requestAnimationFrame(() => {
+    messageAreaEl.scrollTop = 0;
+  });
 }
 
 function getCurrentMessage(characterId, progress) {
@@ -201,7 +339,11 @@ function renderQuestions(characterId) {
   questionAreaEl.innerHTML = "";
 
   if (progress.ended) {
-    questionAreaEl.innerHTML = `<div class="emptyState">会話はここで一区切りです。別のキャラクターを選ぶか、最初からやり直してください。</div>`;
+    questionAreaEl.innerHTML = `
+      <div class="emptyState">
+        会話はここで一区切りです。別のキャラクターを選ぶか、最初からやり直してください。
+      </div>
+    `;
     return;
   }
 
@@ -229,13 +371,17 @@ function renderQuestions(characterId) {
       : question.label;
 
     button.innerHTML = `
-      <span>${label}</span>
+      <span class="questionLabel">${label}</span>
       <span class="meta">${metaText}</span>
     `;
 
     questionAreaEl.appendChild(button);
   });
 }
+
+/* =========================
+   イベント
+========================= */
 
 function selectCharacter(characterId) {
   state.selectedCharacter = characterId;
@@ -270,8 +416,12 @@ function checkEnding(characterId) {
   return uniqueCount >= data.meta.endingCondition.minUniqueQuestions;
 }
 
-function render() {
-  renderCharacterSelect();
+/* =========================
+   全体描画
+========================= */
+
+async function render() {
+  await renderCharacterSelect();
 
   if (!state.selectedCharacter) {
     showCharacterSelect();
@@ -292,143 +442,3 @@ resetBtn.addEventListener("click", () => {
 });
 
 render();
-
-function trimCharacterImages() {
-  const images = document.querySelectorAll(".characterImage");
-
-  images.forEach((img) => {
-    if (img.dataset.trimmed === "true") return;
-
-    const runTrim = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d", { willReadFrequently: true });
-
-        const w = img.naturalWidth;
-        const h = img.naturalHeight;
-
-        if (!w || !h || !ctx) return;
-
-        canvas.width = w;
-        canvas.height = h;
-        ctx.drawImage(img, 0, 0);
-
-        const { data } = ctx.getImageData(0, 0, w, h);
-
-        let top = h;
-        let left = w;
-        let right = 0;
-        let bottom = 0;
-        let found = false;
-
-        for (let y = 0; y < h; y++) {
-          for (let x = 0; x < w; x++) {
-            const alpha = data[(y * w + x) * 4 + 3];
-            if (alpha > 0) {
-              found = true;
-              if (x < left) left = x;
-              if (x > right) right = x;
-              if (y < top) top = y;
-              if (y > bottom) bottom = y;
-            }
-          }
-        }
-
-        if (!found) return;
-
-        const trimWidth = right - left + 1;
-        const trimHeight = bottom - top + 1;
-
-        const trimCanvas = document.createElement("canvas");
-        const trimCtx = trimCanvas.getContext("2d");
-
-        trimCanvas.width = trimWidth;
-        trimCanvas.height = trimHeight;
-
-        trimCtx.drawImage(
-          canvas,
-          left, top, trimWidth, trimHeight,
-          0, 0, trimWidth, trimHeight
-        );
-
-        img.src = trimCanvas.toDataURL("image/png");
-        img.dataset.trimmed = "true";
-      } catch (e) {
-        console.error("trim failed:", e);
-      }
-    };
-
-    if (img.complete) {
-      runTrim();
-    } else {
-      img.addEventListener("load", runTrim, { once: true });
-    }
-  });
-}
-
-const imageCache = new Map();
-
-/**
- * 画像を指定サイズに縮小して Blob URL を返す
- * - 元画像は壊さない
- * - 同じ画像・同じ条件ならキャッシュ再利用
- */
-async function createOptimizedImageUrl(src, options = {}) {
-  const {
-    maxWidth = 800,
-    maxHeight = 1200,
-    type = "image/webp",
-    quality = 0.92
-  } = options;
-
-  const cacheKey = `${src}__${maxWidth}x${maxHeight}__${type}__${quality}`;
-  if (imageCache.has(cacheKey)) {
-    return imageCache.get(cacheKey);
-  }
-
-  const img = await loadImage(src);
-
-  const { width, height } = fitSize(img.naturalWidth, img.naturalHeight, maxWidth, maxHeight);
-
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext("2d", { alpha: true });
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(img, 0, 0, width, height);
-
-  const blob = await canvasToBlob(canvas, type, quality);
-  const url = URL.createObjectURL(blob);
-
-  imageCache.set(cacheKey, url);
-  return url;
-}
-
-function loadImage(src) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.decoding = "async";
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
-}
-
-function fitSize(srcWidth, srcHeight, maxWidth, maxHeight) {
-  const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight, 1);
-  return {
-    width: Math.round(srcWidth * ratio),
-    height: Math.round(srcHeight * ratio)
-  };
-}
-
-function canvasToBlob(canvas, type, quality) {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error("画像のBlob化に失敗しました"));
-    }, type, quality);
-  });
-}
