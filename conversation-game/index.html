@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Conversation Game</title>
   <link rel="stylesheet" href="./assets/css/style.css" />
 </head>
@@ -10,6 +10,7 @@
   <main class="app">
     <header class="topbar">
       <h1 class="siteTitle">Conversation</h1>
+
       <div class="topbarButtons">
         <button id="backBtn" class="subBtn" type="button" hidden>キャラクター選択へ戻る</button>
         <button id="resetBtn" class="subBtn danger" type="button">最初から</button>
@@ -18,7 +19,7 @@
 
     <!-- キャラクター選択画面 -->
     <section id="characterSelectScreen" class="screen">
-      <div class="panel">
+      <div class="panel selectPanel">
         <p class="lead">誰と話しますか？</p>
         <div id="characterList" class="characterList"></div>
         <p class="note">※ 現在はフィラーのみ会話を実装しています。</p>
@@ -28,7 +29,7 @@
     <!-- 会話画面 -->
     <section id="conversationScreen" class="screen" hidden>
       <div class="panel conversationPanel">
-        <div class="meta">
+        <div class="conversationHeader">
           <div id="characterName" class="characterName"></div>
         </div>
 
