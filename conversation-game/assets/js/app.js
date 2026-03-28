@@ -1,4 +1,4 @@
-const STORAGE_KEY = "conversation_game_state_v4";
+const STORAGE_KEY = "conversation_game_state_v5";
 
 const allData = {
   child: childData,
@@ -279,8 +279,8 @@ async function renderCharacterSelect() {
 
       try {
         optimizedSrc = await createOptimizedImageUrl(character.image, {
-          maxWidth: 360,
-          maxHeight: 640,
+          maxWidth: 420,
+          maxHeight: 720,
           type: "image/webp",
           quality: 0.90
         });
