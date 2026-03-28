@@ -781,3 +781,107 @@ img{
     font-size:13px;
   }
 }
+
+
+/* =========================
+   メニュー修正
+========================= */
+
+.menuSheet[hidden]{
+  display:none !important;
+}
+
+.menuBtn{
+  width:40px;
+  height:40px;
+  border:none;
+  border-radius:12px;
+  background:rgba(255,255,255,.85);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  gap:5px;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+}
+
+.menuBtn span{
+  width:18px;
+  height:2px;
+  background:#666;
+  border-radius:999px;
+}
+
+.menuBtn.is-open span:nth-child(1){
+  transform:translateY(6px) rotate(45deg);
+}
+.menuBtn.is-open span:nth-child(2){
+  opacity:0;
+}
+.menuBtn.is-open span:nth-child(3){
+  transform:translateY(-6px) rotate(-45deg);
+}
+
+.menuSheet{
+  position:fixed;
+  top:60px;
+  right:12px;
+  width:200px;
+  padding:10px;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  z-index:999;
+}
+
+/* =========================
+   1画面に収める
+========================= */
+
+.conversationPanel{
+  height:calc(100dvh - 60px);
+  display:flex;
+  flex-direction:column;
+}
+
+.messageArea{
+  flex:0 0 auto;
+  min-height:70px;
+  padding:10px;
+  font-size:14px;
+  line-height:1.8;
+}
+
+.questionArea{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:10px;
+}
+
+.questionBtn{
+  width:100%;
+  padding:10px;
+  font-size:14px;
+  border-radius:10px;
+  border:1px solid rgba(0,0,0,.1);
+  background:#fff;
+}
+
+/* 不要情報消す */
+.questionBtn .meta{
+  display:none;
+}
+
+/* 上の無駄削る */
+.siteTitle{
+  display:none;
+}
+
+.topbarButtons{
+  display:none;
+}
