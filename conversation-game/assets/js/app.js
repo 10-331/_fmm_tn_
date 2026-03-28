@@ -365,3 +365,70 @@ function trimCharacterImages() {
     }
   });
 }
+
+const imageCache = new Map();
+
+/**
+ * 画像を指定サイズに縮小して Blob URL を返す
+ * - 元画像は壊さない
+ * - 同じ画像・同じ条件ならキャッシュ再利用
+ */
+async function createOptimizedImageUrl(src, options = {}) {
+  const {
+    maxWidth = 800,
+    maxHeight = 1200,
+    type = "image/webp",
+    quality = 0.92
+  } = options;
+
+  const cacheKey = `${src}__${maxWidth}x${maxHeight}__${type}__${quality}`;
+  if (imageCache.has(cacheKey)) {
+    return imageCache.get(cacheKey);
+  }
+
+  const img = await loadImage(src);
+
+  const { width, height } = fitSize(img.naturalWidth, img.naturalHeight, maxWidth, maxHeight);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d", { alpha: true });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, 0, 0, width, height);
+
+  const blob = await canvasToBlob(canvas, type, quality);
+  const url = URL.createObjectURL(blob);
+
+  imageCache.set(cacheKey, url);
+  return url;
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+function fitSize(srcWidth, srcHeight, maxWidth, maxHeight) {
+  const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight, 1);
+  return {
+    width: Math.round(srcWidth * ratio),
+    height: Math.round(srcHeight * ratio)
+  };
+}
+
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("画像のBlob化に失敗しました"));
+    }, type, quality);
+  });
+}
