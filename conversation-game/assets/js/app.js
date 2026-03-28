@@ -456,3 +456,16 @@ if (menuBtn && menuSheet) {
     }
   });
 }
+
+
+backBtn.addEventListener("click", () => {
+  state.selectedCharacter = null;
+  saveState();
+  if (menuSheet) menuSheet.hidden = true;
+  render();
+});
+
+resetBtn.addEventListener("click", () => {
+  if (menuSheet) menuSheet.hidden = true;
+  resetState();
+});
