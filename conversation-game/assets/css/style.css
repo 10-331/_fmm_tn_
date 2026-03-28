@@ -325,6 +325,38 @@ img{
   border-radius:16px;
 }
 
+.visualArea{
+  position:relative;
+  flex:0 0 180px;
+  min-height:180px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,.72), transparent 36%),
+    linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0)),
+    rgba(255,255,255,.18);
+  border-bottom:1px solid rgba(120,130,160,.12);
+}
+
+.bgArea{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  opacity:.22;
+}
+
+.characterSprite{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:auto;
+  height:100%;
+  max-width:94%;
+  object-fit:contain;
+  object-position:center bottom;
+}
+
 .conversationHeader{
   padding:8px 10px 6px;
   border-bottom:1px solid rgba(120,130,160,.12);
@@ -490,6 +522,15 @@ img{
     border-radius:20px;
   }
 
+  .visualArea{
+    flex:0 0 220px;
+    min-height:220px;
+  }
+
+  .characterSprite{
+    max-width:92%;
+  }
+
   .conversationHeader{
     padding:10px 12px 8px;
   }
@@ -547,6 +588,11 @@ img{
 
   .characterStatus{
     font-size:8px;
+  }
+
+  .visualArea{
+    flex:0 0 160px;
+    min-height:160px;
   }
 
   .msg{
