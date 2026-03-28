@@ -629,3 +629,64 @@ img{
     font-size:13.5px;
   }
 }
+
+
+.conversationPanel{
+  display:flex;
+  flex-direction:column;
+  height:calc(100dvh - 128px);
+  min-height:auto;
+  overflow:hidden;
+  padding:0;
+  background:rgba(255,255,255,.72);
+}
+
+.visualArea{
+  position:relative;
+  flex:0 0 42%;
+  min-height:220px;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg, #f8f3f4 0%, #eef1f8 100%);
+}
+
+.bgArea{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  opacity:.9;
+}
+
+.characterSprite{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:auto;
+  height:100%;
+  max-width:92%;
+  object-fit:contain;
+  object-position:center bottom;
+}
+
+.conversationHeader{
+  padding:12px 14px 8px;
+  border-bottom:1px solid rgba(120,130,160,.12);
+  background:rgba(255,255,255,.20);
+}
+
+.messageArea{
+  flex:1;
+  overflow-y:auto;
+  padding:14px;
+  line-height:2;
+  font-size:14px;
+  background:rgba(255,255,255,.10);
+}
+
+.questionArea{
+  padding:10px 14px 14px;
+  background:rgba(248,246,250,.88);
+  border-top:1px solid rgba(120,130,160,.12);
+}
