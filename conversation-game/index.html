@@ -27,18 +27,22 @@
     </section>
 
     <!-- 会話画面 -->
-    <section id="conversationScreen" class="screen" hidden>
-      <div class="panel conversationPanel">
-        <div class="conversationHeader">
-          <div id="characterName" class="characterName"></div>
-        </div>
+<section id="conversationScreen" class="screen" hidden>
+  <div class="panel conversationPanel">
+    <div class="visualArea">
+      <div id="bgArea" class="bgArea"></div>
+      <img id="characterSprite" class="characterSprite" src="./assets/img/filler-face.png" alt="">
+    </div>
 
-        <div id="messageArea" class="messageArea"></div>
+    <div class="conversationHeader">
+      <div id="characterName" class="characterName"></div>
+    </div>
 
-        <div id="questionArea" class="questionArea"></div>
-      </div>
-    </section>
-  </main>
+    <div id="messageArea" class="messageArea"></div>
+
+    <div id="questionArea" class="questionArea"></div>
+  </div>
+</section>
 
   <script src="./assets/data/characters.js"></script>
   <script src="./assets/data/filler-data.js"></script>
