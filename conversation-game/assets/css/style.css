@@ -1,8 +1,10 @@
 :root{
   --bg1:#0f1116;
   --bg2:#171b24;
-  --panel:rgba(13,16,22,.84);
-  --line:rgba(255,255,255,.12);
+  --bg3:#23293a;
+  --panel:rgba(13,16,22,.72);
+  --panel-strong:rgba(10,12,18,.86);
+  --line:rgba(255,255,255,.10);
   --text:#f3f1ec;
   --muted:rgba(243,241,236,.62);
   --accent:#bcc8db;
@@ -21,11 +23,12 @@ html,body{
   margin:0;
   width:100%;
   min-height:100%;
-  background:
-    radial-gradient(circle at top, rgba(160,180,220,.10), transparent 28%),
-    linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 100%);
   color:var(--text);
   font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(169,187,224,.16), transparent 32%),
+    radial-gradient(circle at 85% 20%, rgba(255,255,255,.05), transparent 18%),
+    linear-gradient(180deg, var(--bg3) 0%, var(--bg2) 28%, var(--bg1) 100%);
 }
 
 body{
@@ -39,6 +42,7 @@ button{
 
 img{
   max-width:100%;
+  display:block;
 }
 
 .app{
@@ -64,7 +68,7 @@ img{
   font-size:18px;
   font-weight:500;
   letter-spacing:.08em;
-  color:var(--muted);
+  color:var(--text);
 }
 
 .topbarButtons{
@@ -93,12 +97,18 @@ img{
 }
 
 .panel{
-  border:1px solid var(--line);
+  border:1px solid rgba(255,255,255,.08);
   border-radius:24px;
   background:var(--panel);
-  backdrop-filter:blur(10px);
-  box-shadow:0 18px 40px rgba(0,0,0,.24);
+  backdrop-filter:blur(12px);
+  box-shadow:0 20px 44px rgba(0,0,0,.28);
   padding:22px;
+}
+
+.selectPanel{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01)),
+    var(--panel);
 }
 
 .lead{
@@ -121,16 +131,17 @@ img{
 .characterList{
   display:grid;
   grid-template-columns:repeat(6, 1fr);
-  gap:16px;
+  gap:18px;
   align-items:end;
 }
 
 .characterBtn{
   appearance:none;
   width:100%;
-  border:1px solid var(--line);
+  border:1px solid rgba(255,255,255,.08);
   border-radius:24px;
-  background:rgba(255,255,255,.05);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
   color:var(--text);
   cursor:pointer;
   padding:0;
@@ -138,23 +149,24 @@ img{
   text-align:left;
   transition:
     transform .18s ease,
-    background .18s ease,
     border-color .18s ease,
     box-shadow .18s ease,
+    background .18s ease,
     opacity .18s ease;
-  box-shadow:0 10px 24px rgba(0,0,0,.18);
+  box-shadow:0 14px 32px rgba(0,0,0,.22);
 }
 
 .characterBtn:hover{
   transform:translateY(-4px);
-  background:rgba(255,255,255,.08);
-  border-color:rgba(255,255,255,.22);
-  box-shadow:0 16px 30px rgba(0,0,0,.24);
+  border-color:rgba(255,255,255,.18);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  box-shadow:0 20px 36px rgba(0,0,0,.28);
 }
 
 .characterList .characterBtn:nth-child(1){
   grid-column:1 / 3;
-  transform:translateY(30px);
+  transform:translateY(26px);
 }
 
 .characterList .characterBtn:nth-child(2){
@@ -164,53 +176,86 @@ img{
 
 .characterList .characterBtn:nth-child(3){
   grid-column:5 / 7;
-  transform:translateY(30px);
+  transform:translateY(26px);
 }
 
 .characterList .characterBtn:nth-child(1):hover,
 .characterList .characterBtn:nth-child(3):hover{
-  transform:translateY(26px);
+  transform:translateY(22px);
 }
 
 .characterVisual{
   position:relative;
   width:100%;
-  height:320px;
+  height:430px;
   overflow:hidden;
-  background:#111;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(205,220,255,.16), transparent 28%),
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0) 42%),
+    linear-gradient(180deg, #1b2030 0%, #131720 58%, #0d1016 100%);
+  isolation:isolate;
 }
 
-.characterVisual img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center top;
-  display:block;
+/* 立ち絵の背後のぼんやり光 */
+.characterVisual::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:18px;
+  width:68%;
+  height:68%;
+  transform:translateX(-50%);
+  border-radius:999px 999px 28px 28px;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.12), rgba(171,191,236,.10) 34%, rgba(171,191,236,0) 72%);
+  filter:blur(10px);
+  z-index:0;
 }
 
+/* 足元側の暗めグラデ */
 .characterVisual::after{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(180deg, rgba(0,0,0,0) 34%, rgba(0,0,0,.48) 100%);
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0) 42%, rgba(0,0,0,.22) 72%, rgba(0,0,0,.44) 100%);
   pointer-events:none;
+  z-index:1;
 }
 
+.characterVisual img{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center bottom;
+  transform:translateX(-50%);
+  z-index:2;
+  padding:16px 8px 0;
+}
+
+/* 名前のせ */
 .characterOverlay{
   position:absolute;
   inset:auto 0 0 0;
-  z-index:1;
+  z-index:3;
   padding:14px 14px 16px;
+  background:linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.20));
 }
 
 .overlayName{
   display:inline-block;
   font-size:18px;
   letter-spacing:.08em;
+  text-shadow:0 2px 10px rgba(0,0,0,.5);
 }
 
 .characterInfo{
   padding:14px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0));
 }
 
 .characterBtn .name{
@@ -226,11 +271,11 @@ img{
 }
 
 .characterBtn.is-coming-soon{
-  opacity:.84;
+  opacity:.82;
 }
 
 .characterBtn.is-coming-soon .characterVisual img{
-  filter:grayscale(.16) brightness(.84);
+  filter:grayscale(.12) brightness(.88);
 }
 
 /* =========================
@@ -240,16 +285,20 @@ img{
 .conversationPanel{
   display:flex;
   flex-direction:column;
-  height:80dvh;
+  height:82dvh;
   min-height:560px;
-  justify-content:space-between;
-  gap:0;
   overflow:hidden;
+  padding:0;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.03), transparent 24%),
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)),
+    var(--panel-strong);
 }
 
 .conversationHeader{
-  padding:0 0 12px;
+  padding:18px 18px 12px;
   border-bottom:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.02);
 }
 
 .characterName{
@@ -262,20 +311,23 @@ img{
   flex:1;
   overflow-y:auto;
   border:none;
-  background:transparent;
-  padding:18px 4px 18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,0));
+  padding:20px 18px 18px;
   line-height:2.05;
   font-size:15px;
   white-space:pre-wrap;
   animation:fadeIn .24s ease;
+  scrollbar-width:thin;
 }
 
 .questionArea{
   position:sticky;
   bottom:0;
-  background:rgba(9,11,16,.78);
-  backdrop-filter:blur(8px);
-  padding:12px 0 0;
+  background:
+    linear-gradient(180deg, rgba(16,19,27,.72), rgba(10,12,18,.92));
+  backdrop-filter:blur(10px);
+  padding:12px 18px 16px;
   border-top:1px solid rgba(255,255,255,.08);
 }
 
@@ -284,9 +336,9 @@ img{
   width:100%;
   margin:0 0 8px;
   text-align:left;
-  border:1px solid var(--line);
+  border:1px solid rgba(255,255,255,.10);
   border-radius:14px;
-  background:rgba(255,255,255,.06);
+  background:rgba(255,255,255,.05);
   color:var(--text);
   padding:14px 16px;
   cursor:pointer;
@@ -294,9 +346,13 @@ img{
   transition:background .16s ease, border-color .16s ease, transform .12s ease;
 }
 
+.questionBtn:last-child{
+  margin-bottom:0;
+}
+
 .questionBtn:hover{
-  background:rgba(255,255,255,.09);
-  border-color:rgba(255,255,255,.22);
+  background:rgba(255,255,255,.08);
+  border-color:rgba(255,255,255,.18);
 }
 
 .questionBtn:active{
@@ -355,7 +411,7 @@ img{
   }
 
   .characterVisual{
-    height:280px;
+    height:360px;
   }
 }
 
@@ -416,11 +472,15 @@ img{
   }
 
   .characterBtn{
-    border-radius:16px;
+    border-radius:18px;
   }
 
   .characterVisual{
-    height:220px;
+    height:300px;
+  }
+
+  .characterVisual img{
+    padding:10px 10px 0;
   }
 
   .characterOverlay{
@@ -445,12 +505,13 @@ img{
   }
 
   .conversationPanel{
-    height:calc(100dvh - 130px);
+    height:calc(100dvh - 128px);
     min-height:auto;
+    border-radius:18px;
   }
 
   .conversationHeader{
-    padding-bottom:10px;
+    padding:14px 14px 10px;
   }
 
   .characterName{
@@ -458,13 +519,13 @@ img{
   }
 
   .messageArea{
-    padding:14px 2px 14px;
+    padding:16px 14px 14px;
     font-size:14px;
     line-height:2;
   }
 
   .questionArea{
-    padding-top:10px;
+    padding:10px 14px 14px;
   }
 
   .questionBtn{
@@ -493,7 +554,7 @@ img{
   }
 
   .characterVisual{
-    height:190px;
+    height:260px;
   }
 
   .messageArea{
