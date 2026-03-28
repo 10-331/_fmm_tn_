@@ -102,9 +102,12 @@ img{
 }
 
 .menuBtn::before,
-.menuBtn::after,
+.menuBtn::after{
+  display:none !important;
+  content:none !important;
+}
+
 .menuBtn span{
-  content:"";
   display:block !important;
   width:18px;
   height:2px;
