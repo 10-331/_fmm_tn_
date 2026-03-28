@@ -764,6 +764,7 @@ img{
   }
 
   .tapHintInline{
+      right:0;
     font-size:11px;
   }
 }
