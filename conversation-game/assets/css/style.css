@@ -380,27 +380,27 @@ img{
 }
 
 .msg{
-  max-width:86%;
-  padding:10px 12px;
-  border-radius:14px;
-  line-height:1.55;
-  font-size:13.5px;
+  width:100%;
+  text-align:left;
+  padding:0;
+  border-radius:0;
+  line-height:1.9;
+  font-size:15px;
+  background:none;
+  border:none;
   white-space:pre-wrap;
   word-break:break-word;
 }
 
 .msg.character{
-  align-self:flex-start;
-  background:rgba(255,255,255,.82);
-  border:1px solid rgba(120,130,160,.10);
+  align-self:stretch;
+  background:none;
+  border:none;
 }
 
 .msg.user{
-  align-self:flex-end;
-  background:rgba(220,230,255,.82);
-  border:1px solid rgba(120,130,160,.10);
+  display:none;
 }
-
 .questionArea{
   flex:0 0 auto;
   display:grid;
