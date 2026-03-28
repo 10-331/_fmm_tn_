@@ -290,6 +290,8 @@ function showTapPrompt() {
   hint.className = "tapHintInline";
   hint.textContent = "▼";
   msg.appendChild(hint);
+
+  questionAreaEl.innerHTML = "";
 }
 
 function startConversation() {
