@@ -270,7 +270,7 @@ img{
 .characterVisual{
   position:relative;
   width:100%;
-  height:125px;
+  height:132px;
   overflow:hidden;
   background:
     radial-gradient(circle at 50% 18%, rgba(255,255,255,.90), transparent 30%),
@@ -397,13 +397,13 @@ img{
   border-radius:12px;
   background:rgba(255,255,255,.78);
   color:var(--text);
-  padding:9px 10px;
+  padding:7px 10px;
   cursor:pointer;
   line-height:1.35;
   font-size:13px;
   box-shadow:none;
   margin:0;
-  min-height:42px;
+  min-height:36px;
 }
 
 .questionBtn:hover{
