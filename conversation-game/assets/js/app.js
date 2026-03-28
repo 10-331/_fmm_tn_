@@ -1,4 +1,4 @@
-const STORAGE_KEY = "conversation_game_state_v9";
+const STORAGE_KEY = "conversation_game_state_v10";
 
 const characterSelectScreen = document.getElementById("characterSelectScreen");
 const conversationScreen = document.getElementById("conversationScreen");
@@ -26,7 +26,10 @@ function loadState() {
         selectedCharacter: null,
         conversation: {
           currentSceneIndex: 0,
-          askedInScene: []
+          askedInScene: [],
+          phase: "idle", // idle | intro | choice | answer | outro | ended
+          pendingText: "",
+          pendingAction: null
         }
       };
     }
@@ -37,7 +40,10 @@ function loadState() {
       selectedCharacter: parsed.selectedCharacter ?? null,
       conversation: {
         currentSceneIndex: parsed.conversation?.currentSceneIndex ?? 0,
-        askedInScene: parsed.conversation?.askedInScene ?? []
+        askedInScene: parsed.conversation?.askedInScene ?? [],
+        phase: "idle",
+        pendingText: "",
+        pendingAction: null
       }
     };
   } catch {
@@ -45,14 +51,23 @@ function loadState() {
       selectedCharacter: null,
       conversation: {
         currentSceneIndex: 0,
-        askedInScene: []
+        askedInScene: [],
+        phase: "idle",
+        pendingText: "",
+        pendingAction: null
       }
     };
   }
 }
 
 function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    selectedCharacter: state.selectedCharacter,
+    conversation: {
+      currentSceneIndex: state.conversation.currentSceneIndex,
+      askedInScene: state.conversation.askedInScene
+    }
+  }));
 }
 
 function resetState() {
@@ -60,6 +75,9 @@ function resetState() {
   state.selectedCharacter = null;
   state.conversation.currentSceneIndex = 0;
   state.conversation.askedInScene = [];
+  state.conversation.phase = "idle";
+  state.conversation.pendingText = "";
+  state.conversation.pendingAction = null;
   render();
 }
 
@@ -247,9 +265,25 @@ function getCurrentScene() {
   return fillerData.scenes[state.conversation.currentSceneIndex];
 }
 
+function setPending(text, action) {
+  state.conversation.pendingText = text || "";
+  state.conversation.pendingAction = action || null;
+}
+
+function clearPending() {
+  state.conversation.pendingText = "";
+  state.conversation.pendingAction = null;
+}
+
+function showTapPrompt() {
+  questionAreaEl.innerHTML = `<div class="emptyState">タップして進む</div>`;
+}
+
 function startConversation() {
   state.conversation.currentSceneIndex = 0;
   state.conversation.askedInScene = [];
+  state.conversation.phase = "intro";
+  clearPending();
   saveState();
 
   showConversationScreen();
@@ -259,12 +293,18 @@ function startConversation() {
 
   const scene = getCurrentScene();
   if (!scene) {
+    state.conversation.phase = "ended";
     questionAreaEl.innerHTML = `<div class="emptyState">${fillerData.meta.endingMessage}</div>`;
     return;
   }
 
-  showMessage(scene.intro[0] || "");
-  renderTopics(scene);
+  const introText = scene.intro[0] || "";
+  showMessage(introText);
+  setPending("", () => {
+    state.conversation.phase = "choice";
+    renderTopics(scene);
+  });
+  showTapPrompt();
 }
 
 function renderConversation() {
@@ -274,11 +314,18 @@ function renderConversation() {
 
   const scene = getCurrentScene();
   if (!scene) {
+    state.conversation.phase = "ended";
     questionAreaEl.innerHTML = `<div class="emptyState">${fillerData.meta.endingMessage}</div>`;
     return;
   }
 
-  renderTopics(scene);
+  if (state.conversation.phase === "choice") {
+    renderTopics(scene);
+  } else if (state.conversation.phase === "ended") {
+    questionAreaEl.innerHTML = `<div class="emptyState">${fillerData.meta.endingMessage}</div>`;
+  } else {
+    showTapPrompt();
+  }
 }
 
 function renderTopics(scene) {
@@ -306,13 +353,19 @@ function renderTopics(scene) {
       saveState();
 
       const minTopicsAsked = scene.nextSceneCondition?.minTopicsAsked ?? 1;
-
       if (state.conversation.askedInScene.length >= minTopicsAsked) {
-        setTimeout(() => {
+        state.conversation.phase = "answer";
+        setPending("", () => {
           proceedScene();
-        }, 600);
+        });
+        showTapPrompt();
       } else {
-        renderTopics(scene);
+        state.conversation.phase = "answer";
+        setPending("", () => {
+          state.conversation.phase = "choice";
+          renderTopics(scene);
+        });
+        showTapPrompt();
       }
     });
 
@@ -326,23 +379,49 @@ function proceedScene() {
 
   if (scene?.outro) {
     showMessage(scene.outro);
+    state.conversation.phase = "outro";
+    setPending("", () => {
+      goNextScene();
+    });
+    showTapPrompt();
+  } else {
+    goNextScene();
   }
+}
 
+function goNextScene() {
   state.conversation.currentSceneIndex += 1;
   state.conversation.askedInScene = [];
   saveState();
 
-  setTimeout(() => {
-    const nextScene = getCurrentScene();
+  const nextScene = getCurrentScene();
 
-    if (!nextScene) {
-      questionAreaEl.innerHTML = `<div class="emptyState">${fillerData.meta.endingMessage}</div>`;
-      return;
-    }
+  if (!nextScene) {
+    state.conversation.phase = "ended";
+    showMessage(fillerData.meta.endingMessage);
+    questionAreaEl.innerHTML = "";
+    return;
+  }
 
-    showMessage(nextScene.intro[0] || "");
+  const introText = nextScene.intro[0] || "";
+  showMessage(introText);
+  state.conversation.phase = "intro";
+  setPending("", () => {
+    state.conversation.phase = "choice";
     renderTopics(nextScene);
-  }, 700);
+  });
+  showTapPrompt();
+}
+
+function handleAdvance() {
+  if (!state.selectedCharacter) return;
+  if (state.selectedCharacter !== "filler") return;
+  if (!conversationScreen || conversationScreen.hidden) return;
+  if (!state.conversation.pendingAction) return;
+
+  const action = state.conversation.pendingAction;
+  clearPending();
+  action();
 }
 
 /* =========================
@@ -366,11 +445,14 @@ function selectCharacter(characterId) {
   characterNameEl.textContent = selected?.label ?? "";
 
   showMessage("……この会話はまだ準備中。");
+  state.conversation.phase = "ended";
   questionAreaEl.innerHTML = `<div class="emptyState">現在はフィラーのみ会話できます。</div>`;
 }
 
 backBtn.addEventListener("click", () => {
   state.selectedCharacter = null;
+  state.conversation.phase = "idle";
+  clearPending();
   saveState();
   render();
 });
@@ -384,6 +466,14 @@ menuSheet.addEventListener("click", (event) => event.stopPropagation());
 document.addEventListener("click", () => closeMenu());
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") closeMenu();
+});
+
+messageAreaEl.addEventListener("click", handleAdvance);
+questionAreaEl.addEventListener("click", (event) => {
+  // 選択肢ボタンじゃない場所を押した時だけ進行
+  if (!event.target.closest(".questionBtn")) {
+    handleAdvance();
+  }
 });
 
 /* =========================
