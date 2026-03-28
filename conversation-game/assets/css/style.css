@@ -810,3 +810,10 @@ img{
     animation:tapFloatSoftMobile 1.6s ease-in-out infinite !important;
   }
 }
+
+
+.msg.character{
+  width:auto !important;
+  max-width:72% !important;
+  align-self:flex-start !important;
+}
