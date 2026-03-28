@@ -1,4 +1,4 @@
-const STORAGE_KEY = "conversation_game_state_v8";
+const STORAGE_KEY = "conversation_game_state_v9";
 
 const characterSelectScreen = document.getElementById("characterSelectScreen");
 const conversationScreen = document.getElementById("conversationScreen");
@@ -234,12 +234,8 @@ async function renderCharacterSelect() {
    会話描画
 ========================= */
 
-function appendMessage(text, type = "character") {
-  const div = document.createElement("div");
-  div.className = `msg ${type}`;
-  div.textContent = text;
-  messageAreaEl.appendChild(div);
-  messageAreaEl.scrollTop = messageAreaEl.scrollHeight;
+function showMessage(text) {
+  messageAreaEl.innerHTML = `<div class="msg character">${text}</div>`;
 }
 
 function clearConversationArea() {
@@ -267,7 +263,7 @@ function startConversation() {
     return;
   }
 
-  scene.intro.forEach(line => appendMessage(line, "character"));
+  showMessage(scene.intro[0] || "");
   renderTopics(scene);
 }
 
@@ -277,7 +273,6 @@ function renderConversation() {
   characterNameEl.textContent = fillerData.meta.displayName;
 
   const scene = getCurrentScene();
-
   if (!scene) {
     questionAreaEl.innerHTML = `<div class="emptyState">${fillerData.meta.endingMessage}</div>`;
     return;
@@ -305,16 +300,17 @@ function renderTopics(scene) {
 
     btn.addEventListener("click", () => {
       const answer = topic.answers[Math.floor(Math.random() * topic.answers.length)];
-      appendMessage(answer, "character");
+      showMessage(answer);
 
       state.conversation.askedInScene.push(topic.id);
       saveState();
 
       const minTopicsAsked = scene.nextSceneCondition?.minTopicsAsked ?? 1;
+
       if (state.conversation.askedInScene.length >= minTopicsAsked) {
         setTimeout(() => {
           proceedScene();
-        }, 250);
+        }, 600);
       } else {
         renderTopics(scene);
       }
@@ -329,7 +325,7 @@ function proceedScene() {
   questionAreaEl.innerHTML = "";
 
   if (scene?.outro) {
-    appendMessage(scene.outro, "character");
+    showMessage(scene.outro);
   }
 
   state.conversation.currentSceneIndex += 1;
@@ -344,9 +340,9 @@ function proceedScene() {
       return;
     }
 
-    nextScene.intro.forEach(line => appendMessage(line, "character"));
+    showMessage(nextScene.intro[0] || "");
     renderTopics(nextScene);
-  }, 350);
+  }, 700);
 }
 
 /* =========================
@@ -369,7 +365,7 @@ function selectCharacter(characterId) {
   const selected = characters.find(c => c.id === characterId);
   characterNameEl.textContent = selected?.label ?? "";
 
-  appendMessage("……この会話はまだ準備中。", "character");
+  showMessage("……この会話はまだ準備中。");
   questionAreaEl.innerHTML = `<div class="emptyState">現在はフィラーのみ会話できます。</div>`;
 }
 
