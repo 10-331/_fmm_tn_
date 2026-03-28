@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ある日のフィラー</title>
+  <link rel="stylesheet" href="./assets/css/style.css" />
+</head>
+<body>
+  <main class="game" id="game">
+    <div class="bg" id="bg"></div>
+    <div class="bgOverlay"></div>
+
+    <header class="topbar">
+      <div class="title">ある日のフィラー</div>
+      <div class="topButtons">
+        <button id="resetBtn" class="miniBtn" type="button">最初から</button>
+      </div>
+    </header>
+
+    <div class="notice" id="notice" aria-live="polite"></div>
+
+    <section class="textbox">
+      <div class="metaRow">
+        <div class="name" id="name"></div>
+        <div class="sceneId" id="sceneId"></div>
+      </div>
+
+      <div class="text" id="text"></div>
+
+      <div class="choices" id="choices"></div>
+
+      <div class="controls">
+        <button id="nextBtn" class="nextBtn" type="button">次へ</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="./assets/data/scenario.js"></script>
+  <script src="./assets/js/game.js"></script>
+</body>
+</html>

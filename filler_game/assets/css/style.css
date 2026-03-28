@@ -1,0 +1,236 @@
+:root{
+  --bg:#0f1115;
+  --panel:rgba(12,14,18,.78);
+  --panel-soft:rgba(18,21,28,.62);
+  --line:rgba(255,255,255,.12);
+  --text:#f4f2ed;
+  --muted:rgba(244,242,237,.62);
+  --accent:#b8c4d9;
+  --notice:rgba(20,26,38,.92);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+}
+
+body{
+  min-height:100vh;
+}
+
+button{
+  font:inherit;
+}
+
+.game{
+  position:relative;
+  width:100%;
+  min-height:100vh;
+  overflow:hidden;
+  background:#111;
+}
+
+.bg{
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,.08), transparent 28%),
+    linear-gradient(180deg, #20242d 0%, #15181f 50%, #0e1015 100%);
+  background-size:cover;
+  background-position:center;
+  transform:scale(1.02);
+  transition:background-image .5s ease, filter .5s ease;
+}
+
+.bgOverlay{
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg, rgba(5,6,9,.18) 0%, rgba(5,6,9,.34) 45%, rgba(5,6,9,.68) 100%);
+  pointer-events:none;
+}
+
+.topbar{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:16px 18px;
+}
+
+.title{
+  letter-spacing:.08em;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.topButtons{
+  display:flex;
+  gap:8px;
+}
+
+.miniBtn{
+  appearance:none;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  padding:8px 12px;
+  border-radius:999px;
+  cursor:pointer;
+}
+
+.notice{
+  position:relative;
+  z-index:2;
+  margin:0 18px;
+  margin-left:auto;
+  width:min(340px, calc(100vw - 36px));
+  min-height:54px;
+  padding:12px 14px;
+  border:1px solid rgba(184,196,217,.22);
+  border-radius:14px;
+  background:var(--notice);
+  box-shadow:0 10px 24px rgba(0,0,0,.22);
+  color:#e7edf8;
+  font-size:13px;
+  line-height:1.7;
+  opacity:0;
+  transform:translateY(-10px);
+  pointer-events:none;
+  transition:opacity .28s ease, transform .28s ease;
+}
+
+.notice.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.textbox{
+  position:relative;
+  z-index:2;
+  width:min(980px, calc(100vw - 24px));
+  margin:clamp(180px, 35vh, 360px) auto 18px;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:22px;
+  background:var(--panel);
+  backdrop-filter:blur(10px);
+  box-shadow:0 14px 40px rgba(0,0,0,.26);
+}
+
+.metaRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.name{
+  color:var(--accent);
+  font-size:14px;
+  letter-spacing:.06em;
+  min-height:1.4em;
+}
+
+.sceneId{
+  color:var(--muted);
+  font-size:12px;
+  letter-spacing:.08em;
+}
+
+.text{
+  min-height:10em;
+  font-size:15px;
+  line-height:2.1;
+  white-space:pre-wrap;
+}
+
+.choices{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:18px;
+}
+
+.choiceBtn{
+  appearance:none;
+  width:100%;
+  text-align:left;
+  padding:14px 16px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:var(--panel-soft);
+  color:var(--text);
+  cursor:pointer;
+  transition:transform .16s ease, background .16s ease, border-color .16s ease;
+}
+
+.choiceBtn:hover{
+  transform:translateY(-1px);
+  background:rgba(255,255,255,.09);
+  border-color:rgba(255,255,255,.22);
+}
+
+.controls{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:16px;
+}
+
+.nextBtn{
+  appearance:none;
+  min-width:120px;
+  padding:12px 18px;
+  border:none;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  color:var(--text);
+  cursor:pointer;
+}
+
+.nextBtn[hidden]{
+  display:none;
+}
+
+@media (max-width: 768px){
+  .topbar{
+    padding:14px;
+  }
+
+  .notice{
+    margin:0 14px;
+    width:auto;
+  }
+
+  .textbox{
+    width:calc(100vw - 16px);
+    margin:clamp(150px, 34vh, 300px) auto 10px;
+    padding:16px 14px;
+    border-radius:18px;
+  }
+
+  .text{
+    min-height:11.5em;
+    font-size:14px;
+    line-height:2;
+  }
+
+  .choiceBtn{
+    padding:13px 14px;
+  }
+
+  .nextBtn{
+    width:100%;
+  }
+}
