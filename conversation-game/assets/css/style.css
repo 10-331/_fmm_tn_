@@ -295,6 +295,7 @@ img{
   padding:18px 18px 12px;
   border-bottom:1px solid rgba(120,130,160,.12);
   background:rgba(255,255,255,.18);
+  flex:0 0 auto;
 }
 
 .characterName{
@@ -304,7 +305,8 @@ img{
 }
 
 .messageArea{
-  flex:1;
+  flex:1 1 auto;
+  min-height:140px;
   overflow-y:auto;
   border:none;
   background:
@@ -312,19 +314,22 @@ img{
   padding:20px 18px 18px;
   line-height:2.05;
   font-size:15px;
+  color:var(--text);
   white-space:pre-wrap;
+  word-break:break-word;
   animation:fadeIn .24s ease;
   scrollbar-width:thin;
 }
 
 .questionArea{
-  position:sticky;
-  bottom:0;
+  flex:0 0 auto;
+  position:relative;
+  bottom:auto;
   background:
     linear-gradient(180deg, rgba(248,246,250,.76), rgba(242,239,247,.94));
-  backdrop-filter:blur(10px);
   padding:12px 18px 16px;
   border-top:1px solid rgba(120,130,160,.12);
+  z-index:2;
 }
 
 .questionBtn{
@@ -374,14 +379,49 @@ img{
   padding:8px 2px 0;
 }
 
-@keyframes fadeIn{
-  from{
-    opacity:0;
-    transform:translateY(6px);
+@media (max-width: 768px){
+  .conversationPanel{
+    height:calc(100dvh - 128px);
+    min-height:auto;
+    border-radius:18px;
   }
-  to{
-    opacity:1;
-    transform:translateY(0);
+
+  .conversationHeader{
+    padding:14px 14px 10px;
+  }
+
+  .characterName{
+    font-size:14px;
+  }
+
+  .messageArea{
+    min-height:110px;
+    padding:16px 14px 14px;
+    font-size:14px;
+    line-height:2;
+  }
+
+  .questionArea{
+    padding:10px 14px 14px;
+  }
+
+  .questionBtn{
+    min-height:52px;
+    padding:12px 13px;
+    font-size:14px;
+    line-height:1.75;
+    border-radius:12px;
+  }
+
+  .questionBtn .meta{
+    font-size:11px;
+    margin-top:3px;
+  }
+
+  .emptyState{
+    font-size:13px;
+    line-height:1.8;
+    padding-top:4px;
   }
 }
 
