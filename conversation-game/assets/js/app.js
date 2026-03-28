@@ -1,4 +1,4 @@
-const STORAGE_KEY = "conversation_game_state_v6";
+const STORAGE_KEY = "conversation_game_state_v7";
 
 const characterSelectScreen = document.getElementById("characterSelectScreen");
 const conversationScreen = document.getElementById("conversationScreen");
@@ -6,6 +6,8 @@ const characterListEl = document.getElementById("characterList");
 const characterNameEl = document.getElementById("characterName");
 const messageAreaEl = document.getElementById("messageArea");
 const questionAreaEl = document.getElementById("questionArea");
+const characterSpriteEl = document.getElementById("characterSprite");
+const bgAreaEl = document.getElementById("bgArea");
 
 const menuBtn = document.getElementById("menuBtn");
 const menuSheet = document.getElementById("menuSheet");
@@ -170,8 +172,27 @@ function showConversationScreen() {
 }
 
 /* =========================
-   キャラ選択描画
+   キャラ表示
 ========================= */
+
+function setConversationVisual(characterId) {
+  const spriteMap = {
+    filler: "./assets/img/filler-face.png",
+    child: "./assets/img/child-face.png",
+    aya: "./assets/img/aya-face.png"
+  };
+
+  const src = spriteMap[characterId] || "";
+
+  if (characterSpriteEl) {
+    characterSpriteEl.src = src;
+    characterSpriteEl.alt = characterId || "";
+  }
+
+  if (bgAreaEl) {
+    bgAreaEl.style.backgroundImage = "";
+  }
+}
 
 async function renderCharacterSelect() {
   characterListEl.innerHTML = "";
@@ -239,6 +260,7 @@ function startConversation() {
 
 function renderConversation() {
   showConversationScreen();
+  setConversationVisual("filler");
   characterNameEl.textContent = fillerData.meta.displayName;
   clearConversationArea();
 
@@ -329,6 +351,7 @@ function selectCharacter(characterId) {
   }
 
   showConversationScreen();
+  setConversationVisual(characterId);
   clearConversationArea();
 
   const selected = characters.find(c => c.id === characterId);
@@ -371,6 +394,7 @@ async function render() {
     renderConversation();
   } else {
     showConversationScreen();
+    setConversationVisual(state.selectedCharacter);
   }
 }
 
