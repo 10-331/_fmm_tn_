@@ -1,0 +1,35 @@
+function renderCharacterSelect() {
+  characterListEl.innerHTML = "";
+
+  characters.forEach(character => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "characterBtn";
+    if (character.status !== "playable") {
+      button.classList.add("is-coming-soon");
+    }
+
+    button.addEventListener("click", () => {
+      selectCharacter(character.id);
+    });
+
+    const imageHtml = character.image
+      ? `<img src="${character.image}" alt="${character.label}">`
+      : "";
+
+    button.innerHTML = `
+      <div class="characterVisual">
+        ${imageHtml}
+        <div class="characterOverlay">
+          <span class="overlayName">${character.label}</span>
+        </div>
+      </div>
+      <div class="characterInfo">
+        <span class="name">${character.label}</span>
+        <span class="status">${character.statusLabel}</span>
+      </div>
+    `;
+
+    characterListEl.appendChild(button);
+  });
+}

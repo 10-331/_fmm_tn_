@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conversation Game</title>
+  <link rel="stylesheet" href="./assets/css/style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <h1 class="siteTitle">Conversation</h1>
+      <div class="topbarButtons">
+        <button id="backBtn" class="subBtn" type="button" hidden>キャラクター選択へ戻る</button>
+        <button id="resetBtn" class="subBtn danger" type="button">最初から</button>
+      </div>
+    </header>
+
+    <!-- キャラクター選択画面 -->
+    <section id="characterSelectScreen" class="screen">
+      <div class="panel">
+        <p class="lead">誰と話しますか？</p>
+        <div id="characterList" class="characterList"></div>
+        <p class="note">※ 現在はフィラーのみ会話を実装しています。</p>
+      </div>
+    </section>
+
+    <!-- 会話画面 -->
+    <section id="conversationScreen" class="screen" hidden>
+      <div class="panel conversationPanel">
+        <div class="meta">
+          <div id="characterName" class="characterName"></div>
+        </div>
+
+        <div id="messageArea" class="messageArea"></div>
+
+        <div id="questionArea" class="questionArea"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./assets/data/characters.js"></script>
+  <script src="./assets/data/filler-data.js"></script>
+  <script src="./assets/data/child-data.js"></script>
+  <script src="./assets/data/aya-data.js"></script>
+  <script src="./assets/js/app.js"></script>
+</body>
+</html>
