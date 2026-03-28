@@ -768,3 +768,45 @@ img{
     font-size:11px;
   }
 }
+
+
+/* ▼の見た目を強制上書き */
+.msg .tapHintInline{
+  position:absolute !important;
+  right:0 !important;
+  bottom:0 !important;
+  display:inline-block !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  color:rgba(120,130,160,.72) !important;
+  opacity:.45 !important;
+  user-select:none !important;
+  pointer-events:none !important;
+  will-change:transform, opacity;
+  animation:tapFloatSoftMobile 1.8s ease-in-out infinite !important;
+}
+
+@keyframes tapFloatSoftMobile{
+  0%{
+    opacity:.35;
+    transform:translateY(0);
+  }
+  50%{
+    opacity:.9;
+    transform:translateY(3px);
+  }
+  100%{
+    opacity:.35;
+    transform:translateY(0);
+  }
+}
+
+/* モバイルでは少しだけ見やすく */
+@media (max-width: 768px){
+  .msg .tapHintInline{
+    font-size:13px !important;
+    right:0 !important;
+    bottom:0 !important;
+    animation:tapFloatSoftMobile 1.6s ease-in-out infinite !important;
+  }
+}
