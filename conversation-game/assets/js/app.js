@@ -253,7 +253,11 @@ async function renderCharacterSelect() {
 ========================= */
 
 function showMessage(text) {
-  messageAreaEl.innerHTML = `<div class="msg character">${text}</div>`;
+  messageAreaEl.innerHTML = `
+    <div class="msg character">
+      <span class="msgText">${text}</span>
+    </div>
+  `;
 }
 
 function clearConversationArea() {
@@ -276,7 +280,16 @@ function clearPending() {
 }
 
 function showTapPrompt() {
-  questionAreaEl.innerHTML = `<div class="tapHint">▼</div>`;
+  const msg = messageAreaEl.querySelector(".msg.character");
+  if (!msg) return;
+
+  const oldHint = msg.querySelector(".tapHintInline");
+  if (oldHint) oldHint.remove();
+
+  const hint = document.createElement("span");
+  hint.className = "tapHintInline";
+  hint.textContent = "▼";
+  msg.appendChild(hint);
 }
 
 function startConversation() {
