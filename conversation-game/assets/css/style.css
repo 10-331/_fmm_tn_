@@ -580,3 +580,23 @@ img{
     font-size:12.5px;
   }
 }
+
+
+.msg{
+  margin-bottom:10px;
+  padding:10px 14px;
+  border-radius:14px;
+  max-width:85%;
+  line-height:1.5;
+  font-size:14px;
+}
+
+.msg.character{
+  background:#f1f1f6;
+  align-self:flex-start;
+}
+
+.msg.user{
+  background:#dbe6ff;
+  align-self:flex-end;
+}
