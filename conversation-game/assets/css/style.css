@@ -649,3 +649,121 @@ img{
     font-size:12.5px;
   }
 }
+
+/* =========================
+   会話表示の調整
+========================= */
+
+/* 綾の話している幅を少し狭める */
+.msg{
+  width:auto;
+  max-width:72%;
+  text-align:left;
+  padding:0;
+  border-radius:0;
+  line-height:1.9;
+  font-size:15px;
+  background:none;
+  border:none;
+  white-space:pre-wrap;
+  word-break:break-word;
+  position:relative;
+}
+
+.msg.character{
+  align-self:flex-start;
+  background:none;
+  border:none;
+}
+
+.msgText{
+  display:block;
+  padding-right:20px; /* ▼ぶんの余白 */
+}
+
+/* ▼を右下に */
+.tapHintInline{
+  position:absolute;
+  right:0;
+  bottom:0;
+  font-size:12px;
+  color:rgba(120,130,160,.58);
+  user-select:none;
+  animation:tapFloatSoft 2.2s ease-in-out infinite;
+}
+
+/* 目にやさしい、ゆっくりした点滅 + ふわふわ */
+@keyframes tapFloatSoft{
+  0%, 100%{
+    opacity:.35;
+    transform:translateY(0);
+  }
+  50%{
+    opacity:.78;
+    transform:translateY(2px);
+  }
+}
+
+/* =========================
+   選択肢エリアの高さを固定気味にする
+   4つ入る時の開始位置を基準にする
+========================= */
+
+.questionArea{
+  flex:0 0 auto;
+  display:grid;
+  gap:8px;
+  padding:8px 10px 10px;
+  background:
+    linear-gradient(180deg, rgba(248,246,250,.76), rgba(242,239,247,.94));
+  border-top:1px solid rgba(120,130,160,.12);
+  align-content:start;
+  min-height:216px; /* 4択ぶんを確保 */
+}
+
+/* ボタンの高さを安定させる */
+.questionBtn{
+  appearance:none;
+  width:100%;
+  text-align:left;
+  border:1px solid rgba(120,130,160,.14);
+  border-radius:12px;
+  background:rgba(255,255,255,.78);
+  color:var(--text);
+  padding:9px 10px;
+  cursor:pointer;
+  line-height:1.35;
+  font-size:13px;
+  box-shadow:none;
+  margin:0;
+  min-height:42px;
+}
+
+/* PC側も少し整える */
+@media (min-width: 769px){
+  .msg{
+    max-width:64%;
+    font-size:14px;
+    line-height:1.85;
+  }
+
+  .questionArea{
+    min-height:228px;
+  }
+}
+
+/* 小さいスマホでは少しだけ圧縮 */
+@media (max-width: 420px){
+  .msg{
+    max-width:78%;
+    font-size:13px;
+  }
+
+  .questionArea{
+    min-height:204px;
+  }
+
+  .tapHintInline{
+    font-size:11px;
+  }
+}
