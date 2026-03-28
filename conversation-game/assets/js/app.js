@@ -437,3 +437,22 @@ resetBtn.addEventListener("click", () => {
 });
 
 render();
+
+
+const menuBtn = document.getElementById("menuBtn");
+const menuSheet = document.getElementById("menuSheet");
+
+if (menuBtn && menuSheet) {
+  menuBtn.addEventListener("click", () => {
+    menuSheet.hidden = !menuSheet.hidden;
+  });
+
+  document.addEventListener("click", (event) => {
+    const clickedInsideMenu = menuSheet.contains(event.target);
+    const clickedMenuBtn = menuBtn.contains(event.target);
+
+    if (!clickedInsideMenu && !clickedMenuBtn) {
+      menuSheet.hidden = true;
+    }
+  });
+}
