@@ -185,9 +185,9 @@ function getProgress(characterId) {
 
 function setupMenuIcon() {
   if (!menuBtn) return;
-  if (menuBtn.querySelector("span")) return;
 
-  menuBtn.textContent = "";
+  menuBtn.innerHTML = "";
+
   for (let i = 0; i < 3; i++) {
     const line = document.createElement("span");
     menuBtn.appendChild(line);
