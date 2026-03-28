@@ -87,43 +87,36 @@ img{
   border:none;
   border-radius:12px;
   background:rgba(255,255,255,.92);
-  color:transparent;
   box-shadow:0 4px 14px rgba(0,0,0,.08);
+
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
-  gap:4px;
+  gap:5px;
+
   cursor:pointer;
   padding:0;
+
+  /* これ重要 */
   position:relative;
   overflow:hidden;
-  font-size:0;
-  line-height:1;
 }
 
-.menuBtn::before,
-.menuBtn::after,
+/* 線 */
 .menuBtn span{
-  content:"";
-  display:block !important;
-  width:18px;
+  display:block;
+  width:20px;
   height:2px;
-  border-radius:999px;
   background:#5f6880;
-  transition:transform .2s ease, opacity .2s ease;
+  border-radius:999px;
 }
 
-.menuBtn.is-open::before{
-  transform:translateY(6px) rotate(45deg);
-}
-
-.menuBtn.is-open span{
-  opacity:0;
-}
-
-.menuBtn.is-open::after{
-  transform:translateY(-6px) rotate(-45deg);
+/* 疑似要素は使わない（混乱の元だから殺す） */
+.menuBtn::before,
+.menuBtn::after{
+  display:none !important;
+  content:none !important;
 }
 
 .menuSheet{
