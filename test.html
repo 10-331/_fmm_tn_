@@ -3,173 +3,135 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Character // AYA</title>
+<title>SYS_RECOVERY // AYA</title>
 <style>
   :root {
-    --glass-bg: rgba(255, 255, 255, 0.75);
-    --accent: #e74c74;
-    --text: #333;
+    --bg: #0d0d0d;
+    --accent: #a8c1d9;
+    --text: #fff;
   }
 
   html, body {
     margin: 0; padding: 0;
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-    background: #f8e9e9;
+    font-family: monospace; /* エンジニアらしい無機質なフォント */
+    background: var(--bg);
     color: var(--text);
-    /* スクロールの跳ね返りで下地が見えないように */
-    overscroll-behavior-y: none;
+    height: 100%; overflow: hidden;
+    user-select: none; -webkit-touch-callout: none;
   }
 
-  /* --- 1. 背景固定：彼女を常に「そこ」に置く --- */
-  .fixed-visual {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100dvh; /* 動的ビューポート */
+  /* --- 背景：ノイズ混じりの彼女 --- */
+  .visual-layer {
+    position: fixed; inset: 0;
+    display: flex; justify-content: center; align-items: center;
     z-index: 1;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* 上寄せ */
-    background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 100%);
+    transition: filter 0.5s ease, transform 0.5s ease;
+    /* 初期状態：激しいノイズとボケ */
+    filter: blur(20px) brightness(0.3) grayscale(1);
+    transform: scale(1.1);
   }
 
   .char-img {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-    /* スマホで顔が一番いい位置に来るように調整 */
-    object-position: center 15%; 
-    filter: drop-shadow(0 10px 40px rgba(0,0,0,0.08));
-    transition: filter 0.8s ease;
+    height: 90%; width: auto; object-fit: contain;
+    object-position: center 20%;
   }
 
-  /* --- 2. スクロール層：文字だけが動く --- */
-  .scroll-layer {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    /* 最初の表示で顔が見えるよう、大きな余白を空ける */
-    padding-top: 65dvh; 
+  /* --- 修復中のUI層 --- */
+  .ui-layer {
+    position: relative; z-index: 10;
+    height: 100%; display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 20px; text-align: center;
+    pointer-events: none; /* 下の長押しを邪魔しない */
   }
 
-  .content-sheet {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 30px 30px 0 0; /* 上だけ丸めて「引き出し」感を出す */
-    padding: 40px 25px 100px;
-    box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
-    min-height: 100vh;
+  .status-msg {
+    font-size: 0.7rem; letter-spacing: 0.3em;
+    color: var(--accent); margin-bottom: 10px;
+    opacity: 0.8;
   }
 
-  .name-area {
-    margin-bottom: 30px;
-    text-align: center;
-  }
-  .name-area h1 {
-    font-size: 1.4rem; font-weight: normal; margin: 0;
-    letter-spacing: 0.3em;
-  }
-  .name-area span {
-    font-size: 0.7rem; color: #999; letter-spacing: 0.2em;
+  .hold-instruction {
+    font-size: 0.9rem; border: 1px solid var(--accent);
+    padding: 15px 30px; border-radius: 2px;
+    animation: pulse 2s infinite;
   }
 
-  .status-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 40px;
-    justify-content: center;
-  }
-  .status-tag {
-    background: rgba(255,255,255,0.5);
-    border: 1px solid rgba(0,0,0,0.05);
-    padding: 6px 15px;
-    border-radius: 99px;
-    font-size: 0.8rem;
-  }
-  .status-tag b { font-weight: normal; color: #888; margin-right: 8px; font-size: 0.6rem; }
-
-  .bio-text {
-    font-size: 0.9rem;
-    line-height: 2.2;
-    color: #444;
-    text-align: justify;
-    max-width: 500px;
-    margin: 0 auto;
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; } 50% { opacity: 1; }
   }
 
-  .secret-link {
-    display: block;
-    margin: 30px auto 0;
-    text-align: center;
-    color: var(--accent);
-    text-decoration: none;
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    border: 1px solid var(--accent);
-    width: fit-content;
-    padding: 8px 25px;
-    border-radius: 2px;
+  /* --- プロフィール：修復完了時に浮かび上がる --- */
+  .profile-overlay {
+    position: absolute; bottom: 15%; left: 0; width: 100%;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.6s ease;
   }
 
-  /* メニュー：透過して邪魔しない */
-  .menu-dot {
-    position: fixed; top: 25px; right: 25px;
-    z-index: 100;
-    width: 35px; height: 35px;
-    background: rgba(255,255,255,0.5);
-    backdrop-filter: blur(5px);
-    border-radius: 50%;
-    display: grid; place-items: center;
+  .profile-data {
+    display: inline-block; text-align: left;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    padding: 20px; border-left: 2px solid var(--accent);
+    font-family: "Hiragino Mincho ProN", serif;
   }
 
+  /* --- アクティブ状態（長押し中）の演出 --- */
+  body.is-repairing .visual-layer {
+    filter: blur(0) brightness(1) grayscale(0);
+    transform: scale(1);
+  }
+  body.is-repairing .profile-overlay {
+    opacity: 1; transform: translateY(0);
+  }
+  body.is-repairing .hold-instruction {
+    display: none;
+  }
 </style>
 </head>
 <body>
 
-<div class="menu-dot" id="menuBtn">
-  <div style="width:18px; height:1px; background:#333; box-shadow: 0 5px 0 #333, 0 -5px 0 #333;"></div>
+<div class="visual-layer" id="visual">
+  <img src="assets/profile/aya2.PNG" alt="Aya" class="char-img">
 </div>
 
-<div class="fixed-visual" id="visualRoot">
-  <img src="assets/profile/aya2.PNG" alt="Aya" class="char-img" id="ayaImg">
+<div class="ui-layer">
+  <div class="status-msg">MEMORY_ID: 2054_AYA_S</div>
+  <div class="hold-instruction">長押しして修復</div>
+
+  <div class="profile-overlay">
+    <div class="profile-data">
+      <div style="font-size: 1.2rem; margin-bottom: 10px;">笹井 綾 / AYA SASAI</div>
+      <div style="font-size: 0.8rem; line-height: 1.8; opacity: 0.9;">
+        AGE: 22<br>
+        JOB: ENGINEER<br>
+        MEMO: 極度の方向音痴。AIに詳しいが冷淡。<br>
+        一部の記憶にノイズ。
+      </div>
+    </div>
+  </div>
 </div>
-
-<main class="scroll-layer">
-  <article class="content-sheet">
-    <div class="name-area">
-      <span>CHARACTER_01</span>
-      <h1>笹井 綾</h1>
-      <span>AYA SASAI</span>
-    </div>
-
-    <div class="status-list">
-      <div class="status-tag"><b>AGE</b>22</div>
-      <div class="status-tag"><b>HEIGHT</b>145cm</div>
-      <div class="status-tag"><b>JOB</b>Engineer</div>
-      <div class="status-tag"><b>PARTNER</b>So Murakumo</div>
-    </div>
-
-    <div class="bio-text">
-      転職に伴い、2054年の冬が終わる頃にHAMAにやってきた女性。メタバース企業に勤めているが、本人は技術には詳しく、方向音痴で、どこか浮世離れしている。<br><br>
-      箱入り娘ゆえの世間知らずさと、AIに対する妙に冷めた視線。そのギャップの理由は、彼女自身も気づいていない「曖昧な記憶」にあるのかもしれない。
-      
-      <a href="Secret.html" class="secret-link">一部の記憶が曖昧</a>
-    </div>
-  </article>
-</main>
 
 <script>
-  // スクロール量に応じて、背後の彼女の「ピント」や「明暗」を操作する
-  // 文字を読んでいる時は彼女が少し遠のき、上に戻るとはっきり見える演出
-  window.addEventListener('scroll', () => {
-    const scroll = window.scrollY;
-    const img = document.getElementById('ayaImg');
-    const opacity = 1 - Math.min(scroll / 500, 0.4); // 読み進めると少し薄くなる
-    const blur = Math.min(scroll / 100, 4); // 読み進めると少しボケる
-    
-    img.style.filter = `blur(${blur}px) opacity(${opacity})`;
-  });
+  const body = document.body;
+
+  // スマホの長押し体験をJSで制御
+  const startRepair = (e) => {
+    e.preventDefault();
+    body.classList.add('is-repairing');
+  };
+
+  const stopRepair = () => {
+    body.classList.remove('is-repairing');
+  };
+
+  // タッチイベント（スマホ用）
+  window.addEventListener('touchstart', startRepair);
+  window.addEventListener('touchend', stopRepair);
+
+  // マウスイベント（PC確認用）
+  window.addEventListener('mousedown', startRepair);
+  window.addEventListener('mouseup', stopRepair);
 </script>
 
 </body>
