@@ -3,135 +3,159 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>SYS_RECOVERY // AYA</title>
+<title>LOST_POSITION // AYA</title>
 <style>
   :root {
-    --bg: #0d0d0d;
-    --accent: #a8c1d9;
-    --text: #fff;
+    --accent: #e74c74;
+    --grid-color: rgba(120, 110, 150, 0.1);
   }
 
   html, body {
     margin: 0; padding: 0;
-    font-family: monospace; /* エンジニアらしい無機質なフォント */
-    background: var(--bg);
-    color: var(--text);
-    height: 100%; overflow: hidden;
-    user-select: none; -webkit-touch-callout: none;
-  }
-
-  /* --- 背景：ノイズ混じりの彼女 --- */
-  .visual-layer {
-    position: fixed; inset: 0;
-    display: flex; justify-content: center; align-items: center;
-    z-index: 1;
-    transition: filter 0.5s ease, transform 0.5s ease;
-    /* 初期状態：激しいノイズとボケ */
-    filter: blur(20px) brightness(0.3) grayscale(1);
-    transform: scale(1.1);
-  }
-
-  .char-img {
-    height: 90%; width: auto; object-fit: contain;
-    object-position: center 20%;
-  }
-
-  /* --- 修復中のUI層 --- */
-  .ui-layer {
-    position: relative; z-index: 10;
-    height: 100%; display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    padding: 20px; text-align: center;
-    pointer-events: none; /* 下の長押しを邪魔しない */
-  }
-
-  .status-msg {
-    font-size: 0.7rem; letter-spacing: 0.3em;
-    color: var(--accent); margin-bottom: 10px;
-    opacity: 0.8;
-  }
-
-  .hold-instruction {
-    font-size: 0.9rem; border: 1px solid var(--accent);
-    padding: 15px 30px; border-radius: 2px;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 0.3; } 50% { opacity: 1; }
-  }
-
-  /* --- プロフィール：修復完了時に浮かび上がる --- */
-  .profile-overlay {
-    position: absolute; bottom: 15%; left: 0; width: 100%;
-    opacity: 0; transform: translateY(20px);
-    transition: all 0.6s ease;
-  }
-
-  .profile-data {
-    display: inline-block; text-align: left;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    padding: 20px; border-left: 2px solid var(--accent);
+    width: 100%; height: 100%;
+    overflow: hidden; /* 通常のスクロールを殺す */
+    background: #fdfdfd;
     font-family: "Hiragino Mincho ProN", serif;
   }
 
-  /* --- アクティブ状態（長押し中）の演出 --- */
-  body.is-repairing .visual-layer {
-    filter: blur(0) brightness(1) grayscale(0);
-    transform: scale(1);
+  /* 巨大なキャンバス（スマホの3〜4画面分くらいの広さ） */
+  #viewport {
+    position: absolute;
+    width: 300vw;
+    height: 300vh;
+    /* 初期位置を中央に（迷子の始まり） */
+    top: -100vh;
+    left: -100vw;
+    background: 
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 50px 50px; /* 方眼紙のようなグリッド */
+    cursor: grab;
+    will-change: transform;
   }
-  body.is-repairing .profile-overlay {
-    opacity: 1; transform: translateY(0);
+
+  /* 空間に散らばった断片たち */
+  .fragment {
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
   }
-  body.is-repairing .hold-instruction {
-    display: none;
+
+  /* 彼女：どこかに立っている */
+  .char-img {
+    top: 130vh; left: 140vw;
+    height: 60vh; width: auto;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.05));
   }
+
+  /* 断片テキスト：あちこちに浮いている */
+  .text-box {
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(5px);
+    padding: 15px;
+    border: 1px solid #eee;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    letter-spacing: 0.1em;
+    width: 200px;
+  }
+
+  .pos-1 { top: 110vh; left: 90vw; }
+  .pos-2 { top: 160vh; left: 170vw; }
+  .pos-3 { top: 145vh; left: 110vw; }
+
+  /* UI：固定の案内 */
+  .guide-ui {
+    position: fixed; bottom: 30px; left: 0; width: 100%;
+    text-align: center; z-index: 100;
+    pointer-events: none;
+    opacity: 0.5; font-size: 0.7rem; letter-spacing: 0.2em;
+  }
+
+  /* 現在地を示すレーダーのようなもの */
+  .radar {
+    position: fixed; top: 25px; left: 25px;
+    width: 40px; height: 40px;
+    border: 1px solid #ccc; border-radius: 50%;
+    z-index: 100;
+  }
+  .dot {
+    position: absolute; width: 4px; height: 4px;
+    background: var(--accent); border-radius: 50%;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+  }
+
 </style>
 </head>
 <body>
 
-<div class="visual-layer" id="visual">
-  <img src="assets/profile/aya2.PNG" alt="Aya" class="char-img">
-</div>
+<div class="guide-ui">スワイプして、彼女を見つける</div>
+<div class="radar"><div class="dot" id="radarDot"></div></div>
 
-<div class="ui-layer">
-  <div class="status-msg">MEMORY_ID: 2054_AYA_S</div>
-  <div class="hold-instruction">長押しして修復</div>
+<div id="viewport">
+  <img src="assets/profile/aya2.PNG" alt="Aya" class="fragment char-img">
 
-  <div class="profile-overlay">
-    <div class="profile-data">
-      <div style="font-size: 1.2rem; margin-bottom: 10px;">笹井 綾 / AYA SASAI</div>
-      <div style="font-size: 0.8rem; line-height: 1.8; opacity: 0.9;">
-        AGE: 22<br>
-        JOB: ENGINEER<br>
-        MEMO: 極度の方向音痴。AIに詳しいが冷淡。<br>
-        一部の記憶にノイズ。
-      </div>
-    </div>
+  <div class="fragment text-box pos-1">
+    <b>NAME: 笹井 綾</b><br>
+    エンジニア。22歳。<br>
+    最近HAMAに来た。
+  </div>
+
+  <div class="fragment text-box pos-2">
+    <b>MEMO:</b><br>
+    AIには詳しいが、<br>
+    ペットロボには冷たい。
+  </div>
+
+  <div class="fragment text-box pos-3">
+    <b>WARNING:</b><br>
+    極度の方向音痴。<br>
+    現在地を見失いやすい。
   </div>
 </div>
 
 <script>
-  const body = document.body;
+  const viewport = document.getElementById('viewport');
+  const dot = document.getElementById('radarDot');
+  let isDragging = false;
+  let startX, startY;
+  let scrollLeft, scrollTop;
 
-  // スマホの長押し体験をJSで制御
-  const startRepair = (e) => {
-    e.preventDefault();
-    body.classList.add('is-repairing');
+  // タッチ操作（スワイプ）の実装
+  const onStart = (e) => {
+    isDragging = true;
+    const touch = e.touches ? e.touches[0] : e;
+    startX = touch.pageX - viewport.offsetLeft;
+    startY = touch.pageY - viewport.offsetTop;
   };
 
-  const stopRepair = () => {
-    body.classList.remove('is-repairing');
+  const onMove = (e) => {
+    if (!isDragging) return;
+    const touch = e.touches ? e.touches[0] : e;
+    const x = touch.pageX - startX;
+    const y = touch.pageY - startY;
+    
+    // 境界制限（これがないと無限に飛んでいく）
+    const limitX = Math.max(Math.min(x, 0), -window.innerWidth * 2);
+    const limitY = Math.max(Math.min(y, 0), -window.innerHeight * 2);
+
+    viewport.style.left = limitX + 'px';
+    viewport.style.top = limitY + 'px';
+
+    // レーダーのドットを逆に動かす
+    dot.style.transform = `translate(${-limitX/20 - 50}%, ${-limitY/20 - 50}%)`;
   };
 
-  // タッチイベント（スマホ用）
-  window.addEventListener('touchstart', startRepair);
-  window.addEventListener('touchend', stopRepair);
+  const onEnd = () => { isDragging = false; };
 
-  // マウスイベント（PC確認用）
-  window.addEventListener('mousedown', startRepair);
-  window.addEventListener('mouseup', stopRepair);
+  window.addEventListener('touchstart', onStart);
+  window.addEventListener('touchmove', onMove);
+  window.addEventListener('touchend', onEnd);
+  
+  // PCマウス用
+  window.addEventListener('mousedown', onStart);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onEnd);
 </script>
 
 </body>
