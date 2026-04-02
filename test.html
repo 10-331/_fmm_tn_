@@ -3,143 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>PRIVATE_LINK // AYA</title>
 <style>
-  :root { --bg: #0a0c10; --pulse: rgba(255, 62, 108, 0.4); --text: #eee; }
+  :root { --bg: #000205; --line: rgba(142, 184, 255, 0.05); }
   body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font-family: "Hiragino Mincho ProN", serif;
+    margin: 0; background: var(--bg); color: #7889a0;
+    font-family: "Courier New", "Yu Gothic", sans-serif;
     height: 100dvh; overflow: hidden; touch-action: none;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
 
-  /* 鼓動する背景 */
-  #heartbeat {
-    position: fixed; inset: 0;
-    background: radial-gradient(circle, var(--pulse) 0%, transparent 70%);
-    opacity: 0; z-index: 1;
+  /* 1. 物理的な「走査線」と「モアレ」のシミュレーション */
+  #overlay {
+    position: fixed; inset: 0; z-index: 100; pointer-events: none;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 2px, 3px 100%;
   }
 
-  /* 秘密のデータ表示（触れている間だけ見える） */
-  #secret-content {
-    z-index: 10; width: 85%; opacity: 0; filter: blur(20px);
-    transition: opacity 0.3s, filter 0.5s;
-    text-align: center;
+  /* 2. 深度のある背景：流体ノイズ */
+  #canvas-container {
+    position: fixed; inset: 0; filter: contrast(1.2) brightness(0.8);
+    transition: filter 3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .id-card {
-    border: 1px solid rgba(255,255,255,0.2);
-    padding: 30px; background: rgba(255,255,255,0.02);
-    backdrop-filter: blur(10px);
+  /* 3. 無機質なシステムログ */
+  #kernel-log {
+    position: fixed; bottom: 20px; left: 20px;
+    font-size: 10px; line-height: 1.4; opacity: 0.4;
+    letter-spacing: 0.05em; z-index: 10;
   }
 
-  .char-img {
-    width: 100%; max-width: 200px; margin-bottom: 20px;
-    filter: drop-shadow(0 0 15px var(--pulse));
-  }
-
-  /* 警告文（スクショ対策） */
-  #warning {
-    position: fixed; inset: 0; background: #fff; color: #000;
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100; visibility: hidden; font-weight: bold;
-    letter-spacing: 0.5em; text-align: center;
-  }
-
-  .guide {
-    position: fixed; bottom: 50px; font-size: 0.7rem;
-    color: var(--pulse); letter-spacing: 0.2em; z-index: 20;
-    animation: blink 2s infinite;
-  }
-  @keyframes blink { 50% { opacity: 0.3; } }
-
-  /* 波紋エフェクト */
-  .ripple {
-    position: fixed; border: 2px solid var(--pulse);
-    border-radius: 50%; pointer-events: none;
-    animation: ripple-out 1.5s ease-out forwards;
-    z-index: 5;
-  }
-  @keyframes ripple-out {
-    0% { transform: scale(0); opacity: 1; }
-    100% { transform: scale(4); opacity: 0; }
+  /* 被写体：光の粒子として存在 */
+  #subject {
+    position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
+    width: 90%; max-width: 300px; opacity: 0;
+    filter: blur(40px) brightness(1.5);
+    transition: opacity 5s, filter 5s;
+    mix-blend-mode: screen;
   }
 </style>
 </head>
 <body>
 
-<div id="heartbeat"></div>
-<div id="warning">RECORDING_PROHIBITED<br><br>「……記録、しないで。私だけを見て。」</div>
+<div id="overlay"></div>
+<div id="kernel-log"></div>
 
-<div id="secret-content">
-  <div class="id-card">
-    <img src="assets/profile/aya2.PNG" class="char-img">
-    <div style="font-size: 1.2rem; letter-spacing: 0.3em;">笹井 綾</div>
-    <div style="font-size: 0.6rem; opacity: 0.6; margin-top: 10px;">
-      SYNC_STATUS: STABLE (65bpm)<br>
-      SESSION: PRIVATE_ONLY
-    </div>
-  </div>
+<div id="canvas-container">
+  <img src="assets/profile/aya2.PNG" id="subject">
 </div>
 
-<div class="guide" id="guide-text">── 画面を長押しして、鼓動を同期せよ</div>
-
 <script>
-  const content = document.getElementById('secret-content');
-  const heartbeat = document.getElementById('heartbeat');
-  const warning = document.getElementById('warning');
-  const guide = document.getElementById('guide-text');
+  const log = document.getElementById('kernel-log');
+  const subject = document.getElementById('subject');
+  const container = document.getElementById('canvas-container');
+  
+  let accessTimer;
+  let isAccessing = false;
 
-  let pulseInterval;
+  // システムログの自動生成
+  function addLog(msg) {
+    const line = document.createElement('div');
+    line.textContent = `[${new Date().toISOString().split('T')[1].slice(0,-1)}] ${msg}`;
+    log.appendChild(line);
+    if (log.childNodes.length > 8) log.removeChild(log.firstChild);
+  }
 
-  function startSync(e) {
-    // 指を置いた瞬間の演出
-    createRipple(e.touches[0].clientX, e.touches[0].clientY);
+  // ログインプロトコル（長押し）
+  window.addEventListener('touchstart', (e) => {
+    isAccessing = true;
+    addLog("INTERRUPT_SIGNAL_RECEIVED...");
+    addLog("SYNCHRONIZING_PHASE...");
     
-    // コンテンツ表示（スクショを撮る隙を与えない速さで）
-    content.style.opacity = "1";
-    content.style.filter = "blur(0px)";
-    guide.style.opacity = "0";
+    accessTimer = setTimeout(() => {
+      if(isAccessing) {
+        addLog("BOUNDARY_COLLAPSE_SUCCESS");
+        subject.style.opacity = "0.7";
+        subject.style.filter = "blur(2px) brightness(1.1)";
+        container.style.filter = "contrast(1.0) brightness(1.0)";
+        // 微細な振動
+        shakeEffect();
+      }
+    }, 3000); // 3秒間の沈黙
+  });
 
-    // 鼓動開始
-    pulseInterval = setInterval(() => {
-      heartbeat.style.opacity = "1";
-      setTimeout(() => heartbeat.style.opacity = "0", 400);
-      // 軽く画面を揺らす（視覚的バイブレーション）
-      document.body.style.transform = `translate(${Math.random()*2}px, ${Math.random()*2}px)`;
-    }, 900); // 1分間に約66拍のリズム
+  window.addEventListener('touchend', () => {
+    isAccessing = false;
+    clearTimeout(accessTimer);
+    addLog("CONNECTION_LOST_IMMEDIATELY");
+    subject.style.opacity = "0";
+    subject.style.filter = "blur(40px) brightness(1.5)";
+    container.style.filter = "contrast(1.2) brightness(0.8)";
+  });
+
+  function shakeEffect() {
+    if(!isAccessing) return;
+    document.body.style.transform = `translate(${Math.random()*0.5}px, ${Math.random()*0.5}px)`;
+    setTimeout(shakeEffect, 50);
   }
 
-  function stopSync() {
-    // 指を離した瞬間に「隠蔽」
-    content.style.opacity = "0";
-    content.style.filter = "blur(20px)";
-    guide.style.opacity = "1";
-    
-    clearInterval(pulseInterval);
-    heartbeat.style.opacity = "0";
-    document.body.style.transform = "none";
-
-    // スクショ対策用の警告を一瞬出す（iPhoneのスクショはボタンを離した時に判定されることが多いため）
-    warning.style.visibility = "visible";
-    setTimeout(() => warning.style.visibility = "hidden", 1000);
-  }
-
-  function createRipple(x, y) {
-    const r = document.createElement('div');
-    r.className = 'ripple';
-    r.style.left = x + 'px';
-    r.style.top = y + 'px';
-    document.body.appendChild(r);
-    setTimeout(() => r.remove(), 1500);
-  }
-
-  // イベント登録
-  document.body.addEventListener('touchstart', startSync);
-  document.body.addEventListener('touchend', stopSync);
-
-  // おまけ：PCでの右クリック禁止（エンジニアのガード）
-  document.addEventListener('contextmenu', e => e.preventDefault());
+  // 初期ログ
+  setInterval(() => {
+    if(!isAccessing) addLog("STATUS: SEARCHING_FRAGMENTS...");
+  }, 4000);
 </script>
 </body>
 </html>
