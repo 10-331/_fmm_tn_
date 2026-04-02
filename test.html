@@ -3,148 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DEVICE_SYNC // AYA</title>
+<title>BATTERY_CONNECT</title>
 <style>
-  :root { --bg: #f4f7f9; --accent: #8eb8ff; --text: #4a5568; }
-  body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font-family: "Hiragino Mincho ProN", serif;
-    height: 100dvh; overflow: hidden; touch-action: none;
+  :root { --bg: #f8faff; --accent: #8eb8ff; }
+  body { margin: 0; background: var(--bg); font-family: "Hiragino Mincho ProN", serif; height: 100dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+  
+  #monitor {
+    width: 250px; height: 120px; border: 1px solid #ddd;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    background: #fff; position: relative;
   }
-
-  /* 重力で動くデータの破片 */
-  .particle {
-    position: absolute; width: 40px; height: 40px;
-    background: rgba(142, 184, 255, 0.1);
-    border: 1px solid var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.5rem; pointer-events: none;
-  }
-
-  /* キャラクターメッセージ */
-  #msg-box {
-    position: fixed; bottom: 100px; width: 80%; left: 10%;
-    background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
-    padding: 20px; border-radius: 15px; border: 1px solid var(--accent);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    z-index: 100; opacity: 0; transform: translateY(20px);
-    transition: 0.5s;
-  }
-
-  /* 画面全体のノイズ（シェイクで消える） */
-  #noise-layer {
-    position: fixed; inset: 0; z-index: 50;
-    background: url('https://www.transparenttextures.com/patterns/p6.png');
-    opacity: 0.3; pointer-events: none;
-  }
-
-  .status-bar {
-    position: fixed; top: 20px; right: 20px; font-family: monospace; font-size: 0.7rem;
+  .loading-bar { width: 0%; height: 2px; background: var(--accent); position: absolute; bottom: 0; left: 0; transition: 1s; }
+  #status-text { font-size: 0.7rem; color: #999; margin-top: 10px; }
+  #battery-val { font-size: 2rem; color: var(--accent); font-weight: bold; }
+  
+  .scan-btn {
+    margin-top: 30px; padding: 10px 20px; border: 1px solid var(--accent);
+    background: none; color: var(--accent); cursor: pointer; font-size: 0.8rem;
   }
 </style>
 </head>
 <body>
 
-<div id="noise-layer"></div>
-<div class="status-bar" id="battery-ui">BATTERY: --%</div>
-
-<div id="msg-box">
-  <div id="char-name" style="font-size: 0.7rem; color: var(--accent); margin-bottom: 5px;">AYA_SASAI</div>
-  <div id="text">......接続を確認。</div>
+<div id="monitor">
+  <div id="battery-val">--%</div>
+  <div id="status-text">DEVICE_NOT_LINKED</div>
+  <div class="loading-bar" id="bar"></div>
 </div>
 
+<button class="scan-btn" onclick="syncBattery()">[ 端末のバイオメトリクスを同期 ]</button>
+
 <script>
-  const msgBox = document.getElementById('msg-box');
-  const textEl = document.getElementById('text');
-  const noise = document.getElementById('noise-layer');
-  const batteryUi = document.getElementById('battery-ui');
+async function syncBattery() {
+  const valEl = document.getElementById('battery-val');
+  const textEl = document.getElementById('status-text');
+  const bar = document.getElementById('bar');
 
-  // 1. バッテリー読み取り & セリフ
-  async function checkBattery() {
-    if (!navigator.getBattery) return;
-    const battery = await navigator.getBattery();
-    const level = Math.floor(battery.level * 100);
-    batteryUi.textContent = `BATTERY: ${level}%`;
+  textEl.textContent = "SYNCING...";
+  bar.style.width = "100%";
 
-    let quote = "";
-    if (level > 80) quote = `${level}%......。元気な端末。これなら長時間の解析も耐えられそう。`;
-    else if (level > 40) quote = `${level}%？ 中途半端......。今のうちに、充電するか悩むね。`;
-    else quote = `残り${level}%......。消えちゃう前に、私を見つけて。`;
-    
-    showMsg(quote);
-  }
-
-  function showMsg(txt) {
-    textEl.textContent = txt;
-    msgBox.style.opacity = "1";
-    msgBox.style.transform = "translateY(0)";
-  }
-
-  // 2. 重力シミュレーション（簡易版）
-  const particles = [];
-  function createParticles() {
-    for(let i=0; i<5; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.textContent = "DATA";
-      document.body.appendChild(p);
-      particles.push({ el: p, x: Math.random()*300, y: Math.random()*500, vx: 0, vy: 0 });
+  try {
+    // getBatteryがサポートされているか確認
+    if (navigator.getBattery) {
+      const battery = await navigator.getBattery();
+      updateUI(battery);
+      
+      // リアルタイム監視（充電器に刺した時など）
+      battery.addEventListener('levelchange', () => updateUI(battery));
+    } else {
+      // iOSなどの非対応ブラウザへのフォールバック
+      throw new Error("API_NOT_SUPPORTED");
     }
+  } catch (e) {
+    valEl.textContent = "ERR";
+    valEl.style.color = "#ff8e8e";
+    textEl.textContent = "アクセス拒否。ブラウザの制限を確認してください。";
   }
+}
 
-  // 3. ジャイロ・加速度センサー（シェイク & 傾き）
-  let lastX, lastY, lastZ;
-  let moveCount = 0;
-
-  window.addEventListener('devicemotion', (e) => {
-    const acc = e.accelerationIncludingGravity;
-    if (!acc) return;
-
-    // 重力で粒子を動かす
-    particles.forEach(p => {
-      p.vx += acc.x * 0.1;
-      p.vy -= acc.y * 0.1;
-      p.x += p.vx; p.y += p.vy;
-      // 壁バウンド
-      if(p.x < 0 || p.x > window.innerWidth - 40) p.vx *= -0.5;
-      if(p.y < 0 || p.y > window.innerHeight - 40) p.vy *= -0.5;
-      p.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
-    });
-
-    // シェイク検知（ノイズを飛ばす）
-    let delta = Math.abs(acc.x - lastX) + Math.abs(acc.y - lastY);
-    if (delta > 20) {
-      moveCount++;
-      if (moveCount > 5) {
-        noise.style.opacity = "0"; // 振るとノイズが晴れる
-        showMsg("......ん、端末を振った？ ノイズが、少し消えたみたい。");
-        vibrate(50);
-      }
-    }
-    lastX = acc.x; lastY = acc.y; lastZ = acc.z;
-  });
-
-  // バイブレーション（Android & 一部ブラウザ。iOSは現在制限が厳しい）
-  function vibrate(ms) {
-    if (navigator.vibrate) navigator.vibrate(ms);
-  }
-
-  // 4. フリップ（画面を伏せるとリセット/隠す）
-  window.addEventListener('deviceorientation', (e) => {
-    if (Math.abs(e.beta) < 20 && Math.abs(e.gamma) < 20) {
-        // 画面が水平（伏せられた/置かれた）
-        msgBox.style.opacity = "0";
-    }
-  });
-
-  // iOSのための権限リクエストボタン
-  document.body.onclick = () => {
-    if (typeof DeviceMotionEvent.requestPermission === 'function') {
-      DeviceMotionEvent.requestPermission();
-    }
-    checkBattery();
-    createParticles();
-  };
+function updateUI(battery) {
+  const level = Math.floor(battery.level * 100);
+  document.getElementById('battery-val').textContent = level + "%";
+  
+  let comment = "";
+  if (level > 80) comment = "「……十分だね。解析、続けよう」";
+  else if (level > 20) comment = "「" + level + "%……。充電器、探したほうがいいかも」";
+  else comment = "「消えちゃう……。急いで、記録を保存して」";
+  
+  document.getElementById('status-text').textContent = comment;
+}
 </script>
 </body>
 </html>
