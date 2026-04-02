@@ -3,129 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SYNC_PROTOCOL_405</title>
+<title>PRIVATE_LINK // AYA</title>
 <style>
-  :root { --bg: #05070a; --accent: #ff3e6c; --ok: #00f2ff; }
+  :root { --bg: #0a0c10; --pulse: rgba(255, 62, 108, 0.4); --text: #eee; }
   body {
-    margin: 0; background: var(--bg); color: #fff;
+    margin: 0; background: var(--bg); color: var(--text);
     font-family: "Hiragino Mincho ProN", serif;
     height: 100dvh; overflow: hidden; touch-action: none;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
 
-  /* 時間表示（メタ演出） */
-  #clock { font-family: monospace; font-size: 3rem; opacity: 0.2; position: fixed; top: 40px; }
-
-  /* メッセージ */
-  #msg { width: 80%; text-align: center; font-size: 0.9rem; line-height: 2; margin-bottom: 40px; letter-spacing: 0.1em; }
-
-  /* 認証キャンバス（一筆書き） */
-  #auth-canvas {
-    border: 1px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.02);
-    box-shadow: 0 0 20px rgba(255, 62, 108, 0.1);
+  /* 鼓動する背景 */
+  #heartbeat {
+    position: fixed; inset: 0;
+    background: radial-gradient(circle, var(--pulse) 0%, transparent 70%);
+    opacity: 0; z-index: 1;
   }
 
-  .status-label { font-size: 0.6rem; color: var(--accent); letter-spacing: 0.3em; margin-top: 10px; }
+  /* 秘密のデータ表示（触れている間だけ見える） */
+  #secret-content {
+    z-index: 10; width: 85%; opacity: 0; filter: blur(20px);
+    transition: opacity 0.3s, filter 0.5s;
+    text-align: center;
+  }
+
+  .id-card {
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 30px; background: rgba(255,255,255,0.02);
+    backdrop-filter: blur(10px);
+  }
+
+  .char-img {
+    width: 100%; max-width: 200px; margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px var(--pulse));
+  }
+
+  /* 警告文（スクショ対策） */
+  #warning {
+    position: fixed; inset: 0; background: #fff; color: #000;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; visibility: hidden; font-weight: bold;
+    letter-spacing: 0.5em; text-align: center;
+  }
+
+  .guide {
+    position: fixed; bottom: 50px; font-size: 0.7rem;
+    color: var(--pulse); letter-spacing: 0.2em; z-index: 20;
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  /* 波紋エフェクト */
+  .ripple {
+    position: fixed; border: 2px solid var(--pulse);
+    border-radius: 50%; pointer-events: none;
+    animation: ripple-out 1.5s ease-out forwards;
+    z-index: 5;
+  }
+  @keyframes ripple-out {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(4); opacity: 0; }
+  }
 </style>
 </head>
 <body>
 
-<div id="clock">00:00</div>
+<div id="heartbeat"></div>
+<div id="warning">RECORDING_PROHIBITED<br><br>「……記録、しないで。私だけを見て。」</div>
 
-<div id="msg">
-  「……今、境界のノイズが一番薄い。」<br>
-  「この回路を、君の指で繋いで。……外さないでね」
+<div id="secret-content">
+  <div class="id-card">
+    <img src="assets/profile/aya2.PNG" class="char-img">
+    <div style="font-size: 1.2rem; letter-spacing: 0.3em;">笹井 綾</div>
+    <div style="font-size: 0.6rem; opacity: 0.6; margin-top: 10px;">
+      SYNC_STATUS: STABLE (65bpm)<br>
+      SESSION: PRIVATE_ONLY
+    </div>
+  </div>
 </div>
 
-<canvas id="auth-canvas"></canvas>
-<div class="status-label" id="status">PATTERN_TRACE_REQUIRED</div>
+<div class="guide" id="guide-text">── 画面を長押しして、鼓動を同期せよ</div>
 
 <script>
-  const canvas = document.getElementById('auth-canvas');
-  const ctx = canvas.getContext('2d');
-  const clockEl = document.getElementById('clock');
-  const statusEl = document.getElementById('status');
-  
-  let isDrawing = false;
-  let points = []; // ユーザーが通った軌跡
-  const targetPattern = []; // 本来なぞるべき正解（今回は簡易的に「V字」）
+  const content = document.getElementById('secret-content');
+  const heartbeat = document.getElementById('heartbeat');
+  const warning = document.getElementById('warning');
+  const guide = document.getElementById('guide-text');
 
-  function init() {
-    canvas.width = 280;
-    canvas.height = 280;
-    updateClock();
-    setInterval(updateClock, 1000);
-    drawGuide();
-  }
+  let pulseInterval;
 
-  function updateClock() {
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    clockEl.textContent = `${h}:${m}`;
+  function startSync(e) {
+    // 指を置いた瞬間の演出
+    createRipple(e.touches[0].clientX, e.touches[0].clientY);
     
-    // ゾロ目チェック（例：22:22など）
-    if (h[0] === h[1] && m[0] === m[1]) {
-      clockEl.style.opacity = "0.8";
-      clockEl.style.color = "var(--accent)";
-    }
+    // コンテンツ表示（スクショを撮る隙を与えない速さで）
+    content.style.opacity = "1";
+    content.style.filter = "blur(0px)";
+    guide.style.opacity = "0";
+
+    // 鼓動開始
+    pulseInterval = setInterval(() => {
+      heartbeat.style.opacity = "1";
+      setTimeout(() => heartbeat.style.opacity = "0", 400);
+      // 軽く画面を揺らす（視覚的バイブレーション）
+      document.body.style.transform = `translate(${Math.random()*2}px, ${Math.random()*2}px)`;
+    }, 900); // 1分間に約66拍のリズム
   }
 
-  function drawGuide() {
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    ctx.moveTo(40, 40); ctx.lineTo(140, 240); ctx.lineTo(240, 40); // V字のガイド
-    ctx.stroke();
-  }
-
-  function startTrace(e) {
-    isDrawing = true;
-    points = [];
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawGuide();
-    ctx.setLineDash([]);
-  }
-
-  function doTrace(e) {
-    if (!isDrawing) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+  function stopSync() {
+    // 指を離した瞬間に「隠蔽」
+    content.style.opacity = "0";
+    content.style.filter = "blur(20px)";
+    guide.style.opacity = "1";
     
-    points.push({x, y});
-    
-    ctx.strokeStyle = "var(--accent)";
-    ctx.lineWidth = 3;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = "var(--accent)";
-    
-    if (points.length > 1) {
-      ctx.beginPath();
-      ctx.moveTo(points[points.length-2].x, points[points.length-2].y);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-    }
+    clearInterval(pulseInterval);
+    heartbeat.style.opacity = "0";
+    document.body.style.transform = "none";
+
+    // スクショ対策用の警告を一瞬出す（iPhoneのスクショはボタンを離した時に判定されることが多いため）
+    warning.style.visibility = "visible";
+    setTimeout(() => warning.style.visibility = "hidden", 1000);
   }
 
-  function endTrace() {
-    isDrawing = false;
-    // 本来はここで「targetPattern」との一致率を計算
-    if (points.length > 20) {
-      statusEl.textContent = "SUCCESS: 記憶セクター解禁";
-      statusEl.style.color = "var(--ok)";
-      document.getElementById('msg').textContent = "「……お疲れ様。よくできました。……中、見てみる？」";
-    } else {
-      statusEl.textContent = "ERROR: 接続不完全";
-    }
+  function createRipple(x, y) {
+    const r = document.createElement('div');
+    r.className = 'ripple';
+    r.style.left = x + 'px';
+    r.style.top = y + 'px';
+    document.body.appendChild(r);
+    setTimeout(() => r.remove(), 1500);
   }
 
-  canvas.addEventListener('touchstart', startTrace);
-  canvas.addEventListener('touchmove', doTrace);
-  canvas.addEventListener('touchend', endTrace);
+  // イベント登録
+  document.body.addEventListener('touchstart', startSync);
+  document.body.addEventListener('touchend', stopSync);
 
-  window.onload = init;
+  // おまけ：PCでの右クリック禁止（エンジニアのガード）
+  document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 </body>
 </html>
