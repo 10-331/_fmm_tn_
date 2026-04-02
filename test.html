@@ -3,159 +3,144 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Fragment // Layer_White</title>
+<title>FRAGMENT_SCAN // AYA</title>
 <style>
   :root {
-    --bg: #f8faff;
-    --accent: #8eb8ff;
-    --text: #2d3436;
-    --sub: #a0aec0;
+    --bg: #fdfeff;
+    --accent: #7abfff;
+    --text: #4a5568;
   }
 
   html, body {
     margin: 0; padding: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: "Times New Roman", "YuMincho", "Hiragino Mincho ProN", serif;
-    height: 100dvh; width: 100%;
-    overflow: hidden;
+    font-family: "Hiragino Mincho ProN", serif;
+    height: 100%; width: 100%;
+    overflow: hidden; touch-action: none; /* スクロールを禁止して干渉に集中 */
   }
 
-  /* --- 1. 空間の深み（ダサさを消す背景） --- */
-  .space {
-    position: fixed; inset: 0; z-index: -1;
-    background: radial-gradient(circle at 20% 30%, #ffffff 0%, #ecefef 100%);
-  }
-  /* 浮遊する「記憶の層」を表現するぼかし */
-  .layer {
-    position: absolute; width: 200vw; height: 200vh;
-    background: radial-gradient(circle, rgba(142, 184, 255, 0.08) 0%, transparent 60%);
-    top: -50vh; left: -50vw;
-    animation: sway 25s infinite alternate ease-in-out;
-  }
-  @keyframes sway {
-    from { transform: translate(0, 0) rotate(0deg); }
-    to { transform: translate(10vw, 5vh) rotate(5deg); }
+  /* --- 背面：解析された「真実」のレイヤー --- */
+  #underlay {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 40px;
+    z-index: 1;
   }
 
-  /* --- 2. 解析画面：浮遊するインターフェース --- */
-  #terminal {
-    height: 100dvh;
-    padding: 80px 30px 150px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    display: flex; flex-direction: column; gap: 40px;
-    mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+  .char-img {
+    max-width: 80%; height: auto;
+    filter: brightness(1.1) saturate(0.8);
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
   }
 
-  .log-line {
-    position: relative;
-    font-size: 1rem;
-    line-height: 2.2;
+  .secret-log {
+    margin-top: 20px;
+    font-size: 0.85rem;
     letter-spacing: 0.2em;
-    opacity: 0;
-    filter: blur(15px);
-    transform: scale(0.98);
-    animation: etherReveal 2s forwards cubic-bezier(0.1, 0.9, 0.2, 1);
+    line-height: 2;
+    text-align: center;
+    color: var(--accent);
   }
 
-  @keyframes etherReveal {
-    to { opacity: 1; filter: blur(0); transform: scale(1); }
+  /* --- 前面：白い霧（キャンバス） --- */
+  #fogCanvas {
+    position: fixed; inset: 0;
+    z-index: 10;
+    cursor: crosshair;
   }
 
-  /* 画面端に流れる「エンジニア的」な微細テキスト */
-  .side-info {
+  /* UI演出 */
+  .guide {
+    position: fixed; bottom: 40px; width: 100%;
+    text-align: center; z-index: 20;
+    font-size: 0.7rem; color: #aaa;
+    letter-spacing: 0.3em;
+    pointer-events: none;
+    animation: blink 2s infinite;
+  }
+
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  .side-code {
     position: fixed; top: 20px; left: 20px;
     font-family: monospace; font-size: 0.6rem;
-    color: var(--sub); letter-spacing: 0.1em;
-    writing-mode: vertical-rl;
-    opacity: 0.4;
+    opacity: 0.2; z-index: 5;
   }
-
-  /* 画像：白の中に沈むように */
-  .char-img {
-    display: block;
-    max-width: 90%;
-    margin: 40px auto;
-    opacity: 0;
-    filter: brightness(1.1) grayscale(0.2) blur(10px);
-    animation: apparition 4s 1s forwards ease-in-out;
-  }
-  @keyframes apparition {
-    to { opacity: 1; filter: brightness(1) grayscale(0) blur(0); }
-  }
-
-  /* 起動ボタン：デザインの「芯」を作る */
-  #entry {
-    position: fixed; inset: 0;
-    background: #fff;
-    display: flex; justify-content: center; align-items: center;
-    z-index: 1000;
-    transition: opacity 2.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .entry-circle {
-    width: 60px; height: 60px;
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
-    transition: 0.5s; cursor: pointer;
-  }
-  .entry-circle:active {
-    transform: scale(0.9);
-    border-color: var(--accent);
-  }
-
 </style>
 </head>
 <body>
 
-<div class="space"><div class="layer"></div></div>
-<div class="side-info">SYSTEM_VERSION_2054.09.20 // STATUS: SEARCHING_FRAGMENTS...</div>
+<div class="side-code">ERR_DATA_CORRUPTION // RECOVERING_VIA_TOUCH...</div>
+<div class="guide">指先で、霧を拭ってください</div>
 
-<div id="entry" onclick="begin()">
-  <div class="entry-circle"><span style="font-size: 0.7rem; color: #999; letter-spacing: 0;">START</span></div>
+<div id="underlay">
+  <img src="assets/profile/aya2.PNG" alt="Aya" class="char-img">
+  <div class="secret-log">
+    【 笹井 綾 / AYA_SASAI 】<br>
+    エンジニア。22歳。<br>
+    ── 霧が晴れても、彼女はそこにいない。
+  </div>
 </div>
 
-<div id="terminal"></div>
+<canvas id="fogCanvas"></canvas>
 
 <script>
-  const terminal = document.getElementById('terminal');
-  const entry = document.getElementById('entry');
+  const canvas = document.getElementById('fogCanvas');
+  const ctx = canvas.getContext('2d');
+  let isDrawing = false;
 
-  const scenario = [
-    { text: "……声がする。" },
-    { text: "白く塗りつぶされた、意識の境界線で。" },
-    { text: "対象特定：笹井 綾（AYA_SASAI）", accent: true },
-    { text: "エンジニア。22歳。145cm。", sub: true },
-    { text: "彼女の指先は、常に実体のない回路をなぞっている。" },
-    { text: "「神隠し」── システム上のエラー、あるいは必然。" },
-    { type: "img", src: "assets/profile/aya2.PNG" },
-    { text: "溶けて、そのまま雲隠れ。", accent: true }
-  ];
+  // キャンバスサイズを画面に合わせる
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    fillFog();
+  }
 
-  async function begin() {
-    entry.style.opacity = '0';
-    setTimeout(() => entry.style.display = 'none', 2500);
-
-    for (const line of scenario) {
-      const el = document.createElement('div');
-      if (line.type === 'img') {
-        const img = document.createElement('img');
-        img.src = line.src;
-        img.className = 'char-img';
-        el.appendChild(img);
-      } else {
-        el.className = 'log-line';
-        if (line.accent) el.style.color = '#54a0ff';
-        if (line.sub) el.style.fontSize = '0.75rem', el.style.opacity = '0.6';
-        el.textContent = line.text;
-      }
-      
-      terminal.appendChild(el);
-      terminal.scrollTo({ top: terminal.scrollHeight, behavior: 'smooth' });
-      await new Promise(r => setTimeout(r, 2200));
+  // 霧（白いレイヤー）で塗りつぶす
+  function fillFog() {
+    ctx.fillStyle = '#fff'; // 完全に真っ白な霧
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // わずかに質感を出すためのノイズ（ダサさを消す隠し味）
+    for (let i = 0; i < 500; i++) {
+      ctx.fillStyle = `rgba(200, 220, 255, ${Math.random() * 0.05})`;
+      ctx.beginPath();
+      ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2, 0, Math.PI * 2);
+      ctx.fill();
     }
   }
+
+  // 「拭う」処理：透明な円を描く（destination-out）
+  function scratch(x, y) {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    // ぼかしを効かせて「柔らかく」拭う
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 40);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    ctx.fillStyle = gradient;
+    ctx.arc(x, y, 40, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // イベントリスナー（スマホ・PC両対応）
+  function getPos(e) {
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX, y: t.clientY };
+  }
+
+  canvas.addEventListener('touchstart', (e) => { isDrawing = true; const p = getPos(e); scratch(p.x, p.y); });
+  canvas.addEventListener('touchmove', (e) => { if (isDrawing) { const p = getPos(e); scratch(p.x, p.y); } });
+  canvas.addEventListener('touchend', () => isDrawing = false);
+
+  canvas.addEventListener('mousedown', (e) => { isDrawing = true; const p = getPos(e); scratch(p.x, p.y); });
+  canvas.addEventListener('mousemove', (e) => { if (isDrawing) { const p = getPos(e); scratch(p.x, p.y); } });
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+
+  window.addEventListener('resize', resize);
+  resize();
 </script>
 
 </body>
