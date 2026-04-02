@@ -3,159 +3,183 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>LOST_POSITION // AYA</title>
+<title>SYS_LOG // SCRAPING // AYA_S</title>
 <style>
   :root {
-    --accent: #e74c74;
-    --grid-color: rgba(120, 110, 150, 0.1);
+    --bg: #000;
+    --accent-g: #00ff41; /* マトリックス的な緑 */
+    --accent-r: #ff0055; /* 不穏な赤 */
+    --text: #ddd;
   }
 
   html, body {
     margin: 0; padding: 0;
-    width: 100%; height: 100%;
-    overflow: hidden; /* 通常のスクロールを殺す */
-    background: #fdfdfd;
-    font-family: "Hiragino Mincho ProN", serif;
+    font-family: monospace; /* 無機質なフォント */
+    background: var(--bg);
+    color: var(--text);
+    height: 100%; overflow: hidden;
+    user-select: none; -webkit-touch-callout: none;
+    line-height: 1.5; font-size: 0.85rem;
   }
 
-  /* 巨大なキャンバス（スマホの3〜4画面分くらいの広さ） */
-  #viewport {
-    position: absolute;
-    width: 300vw;
-    height: 300vh;
-    /* 初期位置を中央に（迷子の始まり） */
-    top: -100vh;
-    left: -100vw;
-    background: 
-      linear-gradient(var(--grid-color) 1px, transparent 1px),
-      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-    background-size: 50px 50px; /* 方眼紙のようなグリッド */
-    cursor: grab;
-    will-change: transform;
+  /* --- ハッキング画面（コンソール） --- */
+  .terminal {
+    position: absolute; inset: 0;
+    padding: 30px 20px 80px;
+    display: flex; flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    overflow-y: scroll; /* ログがたまるとスクロール */
+    scroll-behavior: smooth;
+    opacity: 0.9;
+    /* 古いモニターのような走査線効果 */
+    background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
   }
 
-  /* 空間に散らばった断片たち */
-  .fragment {
-    position: absolute;
-    user-select: none;
-    pointer-events: none;
+  .terminal::before {
+    content: "";
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
+    pointer-events: none; z-index: 100;
   }
 
-  /* 彼女：どこかに立っている */
+  /* 1行ずつのログ */
+  .log-line {
+    opacity: 0; transform: translateY(5px);
+    animation: revealLog 0.2s ease forwards;
+    width: 100%; text-align: left;
+    white-space: pre-wrap; word-break: break-all;
+    margin: 2px 0;
+  }
+
+  /* JSで表示秒数を変える */
+  @keyframes revealLog {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 彼女：データの最後に表示される、不安定な画像 */
   .char-img {
-    top: 130vh; left: 140vw;
-    height: 60vh; width: auto;
-    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.05));
+    height: 20vh; width: auto; object-fit: contain;
+    filter: brightness(0.6) contrast(1.5) grayscale(0.5);
+    transition: filter 0.2s ease, transform 0.2s ease;
+    margin: 20px auto 0;
+    display: block; opacity: 0;
   }
 
-  /* 断片テキスト：あちこちに浮いている */
-  .text-box {
-    background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(5px);
-    padding: 15px;
-    border: 1px solid #eee;
-    font-size: 0.8rem;
-    line-height: 1.6;
-    letter-spacing: 0.1em;
-    width: 200px;
+  /* --- アクティブ状態（抽出完了時）の演出 --- */
+  body.is-glitched .terminal {
+    animation: screenShake 0.15s infinite;
+    mix-blend-mode: exclusion; /* 画面の色を反転 */
   }
 
-  .pos-1 { top: 110vh; left: 90vw; }
-  .pos-2 { top: 160vh; left: 170vw; }
-  .pos-3 { top: 145vh; left: 110vw; }
+  body.is-glitched .char-img {
+    opacity: 1;
+    filter: brightness(1) contrast(2) saturate(2);
+    transform: scale(1.1) skew(1deg);
+  }
+
+  @keyframes screenShake {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-1px, 1px); }
+    50% { transform: translate(1px, -1px); }
+    75% { transform: translate(-1px, -1px); }
+  }
 
   /* UI：固定の案内 */
   .guide-ui {
     position: fixed; bottom: 30px; left: 0; width: 100%;
-    text-align: center; z-index: 100;
-    pointer-events: none;
-    opacity: 0.5; font-size: 0.7rem; letter-spacing: 0.2em;
-  }
-
-  /* 現在地を示すレーダーのようなもの */
-  .radar {
-    position: fixed; top: 25px; left: 25px;
-    width: 40px; height: 40px;
-    border: 1px solid #ccc; border-radius: 50%;
-    z-index: 100;
-  }
-  .dot {
-    position: absolute; width: 4px; height: 4px;
-    background: var(--accent); border-radius: 50%;
-    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center; z-index: 1000;
+    font-size: 0.7rem; color: #fff;
+    opacity: 0.6; pointer-events: none;
   }
 
 </style>
 </head>
 <body>
 
-<div class="guide-ui">スワイプして、彼女を見つける</div>
-<div class="radar"><div class="dot" id="radarDot"></div></div>
-
-<div id="viewport">
-  <img src="assets/profile/aya2.PNG" alt="Aya" class="fragment char-img">
-
-  <div class="fragment text-box pos-1">
-    <b>NAME: 笹井 綾</b><br>
-    エンジニア。22歳。<br>
-    最近HAMAに来た。
+<div class="terminal" id="terminal">
   </div>
 
-  <div class="fragment text-box pos-2">
-    <b>MEMO:</b><br>
-    AIには詳しいが、<br>
-    ペットロボには冷たい。
-  </div>
-
-  <div class="fragment text-box pos-3">
-    <b>WARNING:</b><br>
-    極度の方向音痴。<br>
-    現在地を見失いやすい。
-  </div>
-</div>
+<div class="guide-ui">画面をタップして、データを抽出</div>
 
 <script>
-  const viewport = document.getElementById('viewport');
-  const dot = document.getElementById('radarDot');
-  let isDragging = false;
-  let startX, startY;
-  let scrollLeft, scrollTop;
+  const terminal = document.getElementById('terminal');
+  const body = document.body;
 
-  // タッチ操作（スワイプ）の実装
-  const onStart = (e) => {
-    isDragging = true;
-    const touch = e.touches ? e.touches[0] : e;
-    startX = touch.pageX - viewport.offsetLeft;
-    startY = touch.pageY - viewport.offsetTop;
-  };
+  // 抽出されるデータ（断片）
+  const data = [
+    "SYS_LOG :: Starting scraping process...",
+    "TARGET_ID :: AYA_SASAI_ID:20540132",
+    "DECRYPTING_DATA... [33%]",
+    "DECRYPTING_DATA... [68%]",
+    "DECRYPTING_DATA... [100%]",
+    "> BASIC_STATUS :: Height: 145cm",
+    "> BASIC_STATUS :: Age: 22",
+    "> BASIC_STATUS :: Job: Engineer_Mv",
+    "> BASIC_STATUS :: Date_of_Birth: Sep_20",
+    "FETCHING_MEMO...",
+    "> BIO :: 転職に伴いHAMAへ流入。",
+    "> BIO :: AIについては博識だが、ペットロボには冷淡。",
+    "> BIO :: 極度の方向音痴。現在地を見失いやすい。",
+    "WARNING :: Memory corrupted in part_C. 記憶に曖昧な箇所あり。",
+    "SCANNING_IMAGE... [100%]",
+    "DISPLAY_IMAGE :: ", // ここに画像を挿入
+    "END_OF_LOG :: Hacking complete."
+  ];
 
-  const onMove = (e) => {
-    if (!isDragging) return;
-    const touch = e.touches ? e.touches[0] : e;
-    const x = touch.pageX - startX;
-    const y = touch.pageY - startY;
+  let lineIndex = 0;
+
+  // タップ体験をJSで制御
+  const showNextLine = (e) => {
+    e.preventDefault();
+    if (lineIndex >= data.length) {
+      // 全データ抽出完了後の演出（グリッチ）
+      glitchScreen();
+      return;
+    }
+
+    const lineData = data[lineIndex];
+    const logLine = document.createElement('div');
+    logLine.className = 'log-line';
+
+    // 色の調整
+    if (lineData.startsWith("WARNING") || lineData.startsWith("> BIO")) {
+      logLine.style.color = 'var(--accent-r)'; // 不穏な赤
+    } else if (lineData.startsWith("> BASIC")) {
+      logLine.style.color = 'var(--accent-g)'; // 抽出成功の緑
+    } else {
+      logLine.style.color = '#fff';
+    }
+
+    // 画像の処理
+    if (lineData === "DISPLAY_IMAGE :: ") {
+      logLine.textContent = lineData;
+      const img = document.createElement('img');
+      img.src = "assets/profile/aya2.PNG";
+      img.alt = "Scraped Aya";
+      img.className = 'char-img';
+      img.id = 'charImg';
+      logLine.appendChild(img);
+    } else {
+      logLine.textContent = lineData;
+    }
+
+    terminal.appendChild(logLine);
     
-    // 境界制限（これがないと無限に飛んでいく）
-    const limitX = Math.max(Math.min(x, 0), -window.innerWidth * 2);
-    const limitY = Math.max(Math.min(y, 0), -window.innerHeight * 2);
-
-    viewport.style.left = limitX + 'px';
-    viewport.style.top = limitY + 'px';
-
-    // レーダーのドットを逆に動かす
-    dot.style.transform = `translate(${-limitX/20 - 50}%, ${-limitY/20 - 50}%)`;
+    // ログがたまると自動スクロール
+    terminal.scrollTop = terminal.scrollHeight;
+    
+    lineIndex++;
   };
 
-  const onEnd = () => { isDragging = false; };
+  // 全抽出後の演出
+  const glitchScreen = () => {
+    body.classList.add('is-glitched');
+    setTimeout(() => body.classList.remove('is-glitched'), 500); // 0.5秒で戻る
+  };
 
-  window.addEventListener('touchstart', onStart);
-  window.addEventListener('touchmove', onMove);
-  window.addEventListener('touchend', onEnd);
-  
-  // PCマウス用
-  window.addEventListener('mousedown', onStart);
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('mouseup', onEnd);
+  // タッチイベント（スマホ・PC共通）
+  window.addEventListener('click', showNextLine);
 </script>
 
 </body>
