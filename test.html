@@ -3,165 +3,147 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>SCRAPING_LOG // AYA_S</title>
+<title>個体識別ログ // 笹井 綾</title>
 <style>
   :root {
-    --bg: #050505;
-    --accent-g: #00ff41;
-    --accent-r: #ff2d55;
-    --text: #c0c0c0;
+    --bg: #0a0c10;
+    --accent: #50b7f5; /* 落ち着いた解析ブルー */
+    --warning: #f5a623;
+    --text: #e0e0e0;
   }
 
   html, body {
     margin: 0; padding: 0;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: "Hiragino Sans", "Meiryo", sans-serif;
     background: var(--bg);
     color: var(--text);
-    height: 100%; width: 100%;
+    height: 100dvh; width: 100%;
     overflow: hidden;
     user-select: none; -webkit-touch-callout: none;
   }
 
-  /* 走査線エフェクト（常に表示） */
-  body::after {
-    content: " ";
+  /* グリッド背景 */
+  body::before {
+    content: "";
     position: fixed; inset: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    background-size: 100% 2px, 3px 100%;
-    pointer-events: none; z-index: 1000;
+    background-image: 
+      linear-gradient(rgba(80, 183, 245, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(80, 183, 245, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+    z-index: -1;
   }
 
-  /* ログ表示エリア */
   #terminal {
     height: 100dvh;
-    padding: 25px 20px 100px;
+    padding: 30px 20px 120px;
     box-sizing: border-box;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
   }
 
   .log-line {
-    font-size: 0.8rem;
-    word-break: break-all;
-    line-height: 1.4;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    letter-spacing: 0.05em;
     opacity: 0;
-    transform: translateX(-5px);
-    animation: slideIn 0.1s forwards;
+    transform: translateY(10px);
+    animation: reveal 0.3s ease forwards;
+    border-left: 2px solid transparent;
+    padding-left: 10px;
   }
 
-  @keyframes slideIn {
-    to { opacity: 1; transform: translateX(0); }
+  @keyframes reveal {
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  /* 強調カラー */
-  .green { color: var(--accent-g); text-shadow: 0 0 5px var(--accent-g); }
-  .red { color: var(--accent-r); text-shadow: 0 0 5px var(--accent-r); }
+  /* 解析状態に応じた色分け */
+  .info { border-left-color: var(--accent); color: var(--accent); }
+  .warn { border-left-color: var(--warning); color: var(--warning); font-weight: bold; }
+  .data { border-left-color: #fff; background: rgba(255,255,255,0.05); padding: 10px; }
 
-  /* 彼女の画像：ノイズを乗せる */
   .char-img {
     display: block;
-    max-width: 80%;
-    height: auto;
-    margin: 20px auto;
-    filter: grayscale(1) contrast(1.2) brightness(0.8);
-    opacity: 0.7;
-    border: 1px solid var(--accent-g);
+    max-width: 90%;
+    margin: 15px auto;
+    filter: drop-shadow(0 0 10px var(--accent));
+    opacity: 0.9;
+    border: 1px solid rgba(80, 183, 245, 0.3);
   }
 
-  /* 操作ガイド */
   .guide {
     position: fixed;
-    bottom: 0; left: 0; width: 100%;
-    background: rgba(0,0,0,0.8);
-    padding: 15px;
-    text-align: center;
-    font-size: 0.7rem;
-    color: var(--accent-g);
-    z-index: 500;
-    border-top: 1px solid var(--accent-g);
+    bottom: 25px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #000;
+    padding: 10px 30px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    border-radius: 2px;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(80, 183, 245, 0.5);
   }
-
 </style>
 </head>
-<body id="body">
+<body>
 
 <div id="terminal">
-  <div class="log-line green">ACCESS_GRANTED: USER_UNIDENTIFIED</div>
-  <div class="log-line">SYSTEM_INITIALIZED... READY_TO_EXTRACT</div>
+  <div class="log-line info">システム起動... 接続完了。</div>
+  <div class="log-line info">対象個体の外部データをスキャン中。</div>
 </div>
 
-<div class="guide" id="guide">TAP_SCREEN_TO_FETCH_DATA</div>
+<div class="guide" id="guide">画面をタップして解析</div>
 
 <script>
   const terminal = document.getElementById('terminal');
   const guide = document.getElementById('guide');
   
-  // 抽出するデータ配列
   const logData = [
-    { text: ">>> CONNECTING_TO_REMOTE_SERVER...", color: "white" },
-    { text: ">>> SEARCHING_FOR: AYA_SASAI", color: "white" },
-    { text: "SUCCESS: TARGET_FOUND [ID:2054_0920]", color: "green" },
-    { text: "---", color: "white" },
-    { text: "NAME: 笹井 綾 (AYA SASAI)", color: "white" },
-    { text: "AGE: 22 / HEIGHT: 145cm", color: "white" },
-    { text: "OCCUPATION: Engineer (HAMA_Metax)", color: "white" },
-    { text: "---", color: "white" },
-    { text: "NOTICE: Directional sensory impairment detected.", color: "red" },
-    { text: "NOTICE: High proficiency in AI systems.", color: "green" },
-    { text: "WARNING: PARTIAL_MEMORY_LOSS [Sector_C]", color: "red" },
-    { text: ">>> EXTRACTING_VISUAL_DATA...", color: "white" },
-    { type: "image", src: "assets/profile/aya2.PNG" },
-    { text: ">>> SCRAPING_COMPLETE. CONNECTION_CLOSED.", color: "green" }
+    { text: ">>> データベース照合中...", type: "info" },
+    { text: "対象を特定：笹井 綾（AYA SASAI）", type: "data" },
+    { text: "年齢：22歳 / 身長：145cm", type: "data" },
+    { text: "職業：エンジニア（HAMAメタバース関連企業）", type: "data" },
+    { text: ">>> 傾向分析を開始...", type: "info" },
+    { text: "特記事項：極度の方向音痴。ナビゲーション能力に欠陥あり。", type: "warn" },
+    { text: "特記事項：AI技術への深い造詣を確認。ただし、対ペットロボットへの反応は「冷淡」と記録あり。", type: "warn" },
+    { text: "注意：セクターCにおける記憶データに著しい欠落（ノイズ）を検出。", type: "warn" },
+    { text: ">>> 視覚情報を復元します...", type: "info" },
+    { isImage: true, src: "assets/profile/aya2.PNG" },
+    { text: "全ての情報の抽出が完了しました。接続を維持します。", type: "info" }
   ];
 
-  let currentLine = 0;
+  let current = 0;
 
-  function addLogLine() {
-    if (currentLine >= logData.length) {
-      guide.textContent = "SYSTEM_HALTED: NO_MORE_DATA";
+  function next() {
+    if (current >= logData.length) {
+      guide.textContent = "解析完了";
+      guide.style.background = "#555";
       return;
     }
 
-    const data = logData[currentLine];
+    const item = logData[current];
     const div = document.createElement('div');
-    div.className = 'log-line';
+    div.className = 'log-line ' + (item.type || '');
 
-    if (data.type === "image") {
+    if (item.isImage) {
       const img = document.createElement('img');
-      img.src = data.src;
+      img.src = item.src;
       img.className = 'char-img';
       div.appendChild(img);
     } else {
-      div.textContent = data.text;
-      if (data.color === "green") div.classList.add('green');
-      if (data.color === "red") div.classList.add('red');
+      div.textContent = item.text;
     }
 
     terminal.appendChild(div);
-    
-    // 常に最新のログ（下端）へスクロール
-    terminal.scrollTo({
-      top: terminal.scrollHeight,
-      behavior: 'smooth'
-    });
-
-    currentLine++;
+    terminal.scrollTo({ top: terminal.scrollHeight, behavior: 'smooth' });
+    current++;
   }
 
-  // 画面全体、どこを触っても反応するように
-  // touchstart（スマホ）とmousedown（PC）両方をカバー
-  const handleInput = (e) => {
-    e.preventDefault();
-    addLogLine();
-  };
-
-  document.body.addEventListener('touchstart', handleInput, { passive: false });
-  document.body.addEventListener('mousedown', handleInput);
-
+  document.body.addEventListener('touchstart', (e) => { e.preventDefault(); next(); }, { passive: false });
+  document.body.addEventListener('mousedown', next);
 </script>
 </body>
 </html>
