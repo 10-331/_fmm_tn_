@@ -3,122 +3,116 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Fragment // AYA</title>
+<title>Aya // Whiteout</title>
 <style>
   :root {
-    --fog: rgba(210, 230, 255, 0.1);
-    --accent: #b8dfff;
-    --warn: #ffb8d1;
-    --bg: #050810;
+    --bg: #fdfeff;
+    --accent: #a5d8ff;
+    --text: #4a5568;
+    --glass: rgba(255, 255, 255, 0.6);
   }
 
   html, body {
     margin: 0; padding: 0;
     background: var(--bg);
-    color: #eef;
+    color: var(--text);
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
     height: 100dvh; width: 100%;
     overflow: hidden;
   }
 
-  /* --- 1. 幻想的な背景：揺らぐ霧 --- */
-  .fog-wrapper {
+  /* --- 幻想的な背景：白昼夢のような光 --- */
+  .white-fog {
     position: fixed; inset: 0; z-index: -1;
-    background: radial-gradient(circle at 50% 50%, #101a30 0%, #050810 100%);
+    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
   }
 
-  .fog-aura {
-    position: absolute;
-    width: 150%; height: 150%;
-    top: -25%; left: -25%;
-    background: url('https://www.transparenttextures.com/patterns/p6.png'), 
-                radial-gradient(circle at 30% 40%, rgba(100, 150, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 70% 60%, rgba(200, 100, 255, 0.05) 0%, transparent 50%);
-    filter: blur(40px);
-    animation: drift 20s infinite alternate ease-in-out;
+  /* 画面を漂う白い粒子（雪や塵、あるいはデータの欠片） */
+  .particles {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(165, 216, 255, 0.05) 0%, transparent 70%);
+    animation: pulse 8s infinite alternate ease-in-out;
   }
 
-  @keyframes drift {
-    from { transform: rotate(0deg) scale(1); }
-    to { transform: rotate(5deg) scale(1.1); }
+  @keyframes pulse {
+    from { opacity: 0.3; transform: scale(1); }
+    to { opacity: 0.8; transform: scale(1.2); }
   }
 
-  /* --- 2. 解析ログ：水面に広がるような波紋演出 --- */
   #terminal {
     height: 100dvh;
-    padding: 50px 30px;
+    padding: 60px 25px;
     box-sizing: border-box;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 25px;
   }
 
   .log-line {
-    font-size: 0.9rem;
-    line-height: 1.8;
+    font-size: 0.95rem;
+    line-height: 2;
     letter-spacing: 0.15em;
     opacity: 0;
-    filter: blur(10px);
-    transform: translateY(10px);
-    animation: rippleReveal 1.2s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+    filter: blur(8px);
+    animation: whiteReveal 1.5s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  @keyframes rippleReveal {
-    to { opacity: 1; filter: blur(0); transform: translateY(0); }
+  @keyframes whiteReveal {
+    to { opacity: 1; filter: blur(0); }
   }
 
-  .loader-text {
-    font-size: 0.7rem;
+  .loader-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
     color: var(--accent);
-    opacity: 0.6;
-    margin-bottom: -10px;
+    margin-bottom: -15px;
+    font-weight: bold;
   }
 
-  .accent { color: var(--accent); text-shadow: 0 0 15px rgba(184, 223, 255, 0.5); }
-  .warn { color: var(--warn); text-shadow: 0 0 15px rgba(255, 184, 209, 0.4); }
-
-  /* 彼女の画像：霧の中から現れる */
+  /* 画像：光の中に溶け込ませる */
   .char-img {
     display: block;
-    max-width: 80%;
-    margin: 30px auto;
-    filter: drop-shadow(0 0 30px rgba(255,255,255,0.1)) brightness(0.9);
+    max-width: 85%;
+    margin: 20px auto;
     opacity: 0;
-    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-    animation: apparition 3s 1s forwards ease-in-out;
+    /* 下の方から光に溶けるように */
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    filter: brightness(1.05) saturate(0.9);
+    animation: fadeInImg 3s 1s forwards ease-in-out;
   }
 
-  @keyframes apparition {
-    to { opacity: 1; filter: brightness(1.1) drop-shadow(0 0 40px rgba(255,255,255,0.15)); }
+  @keyframes fadeInImg {
+    to { opacity: 1; }
   }
 
-  /* 最初の入り口 */
+  /* 最初のボタン：極限までシンプルに */
   #entry {
     position: fixed; inset: 0;
-    background: var(--bg);
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
+    background: #fff;
+    display: flex; justify-content: center; align-items: center;
     z-index: 1000;
     transition: opacity 2s ease;
   }
 
-  .entry-msg {
-    font-size: 0.9rem;
-    letter-spacing: 0.4em;
-    color: var(--accent);
+  .entry-btn {
+    font-size: 0.85rem;
+    letter-spacing: 0.5em;
+    color: #999;
     cursor: pointer;
-    padding: 20px;
+    border: none; background: none;
+    padding: 30px;
   }
 
 </style>
 </head>
 <body>
 
-<div class="fog-wrapper"><div class="fog-aura"></div></div>
+<div class="white-fog"><div class="particles"></div></div>
 
 <div id="entry" onclick="begin()">
-  <div class="entry-msg">── 彼女の記憶に触れる</div>
+  <button class="entry-btn">── 記憶の深層へ ──</button>
 </div>
 
 <div id="terminal"></div>
@@ -128,14 +122,14 @@
   const entry = document.getElementById('entry');
 
   const scenario = [
-    { type: "dim", text: "接続... 意識の深層セクターへ。" },
-    { type: "accent", text: "対象特定：笹井 綾" },
-    { type: "load", text: "Scanning Physical Data..." },
-    { type: "normal", text: "22歳。145cm。柔らかな輪郭の奥に、冷徹な回路。" },
-    { type: "load", text: "Analyzing Memories..." },
-    { type: "warn", text: "注意：極度の方向把握困難。彼女は常に「迷子」の中にいる。" },
-    { type: "warn", text: "警告：神隠しに似たデータの欠落を確認。境界が溶けている。" },
-    { type: "load", text: "Restoring Visual Fragment..." },
+    { type: "dim", text: "System_Link established... 深い霧の向こうへ。" },
+    { type: "accent", text: "対象特定：笹井 綾（AYA_SASAI）" },
+    { type: "load", text: "CONNECTING..." },
+    { type: "normal", text: "22歳。145cm。HAMAの空気に、彼女はまだ馴染めない。" },
+    { type: "load", text: "ACCESSING_MEMORIES..." },
+    { type: "normal", text: "地図を持たない。道を見失うのが、彼女の『日常』。" },
+    { type: "normal", text: "「ここがどこか、もうわからなくていい」" },
+    { type: "load", text: "RESTORE_VISUAL..." },
     { type: "img", src: "assets/profile/aya2.PNG" },
     { type: "accent", text: "── 溶けて、そのまま雲隠れ。" }
   ];
@@ -147,7 +141,7 @@
     for (const line of scenario) {
       const el = document.createElement('div');
       if (line.type === 'load') {
-        el.className = 'loader-text';
+        el.className = 'loader-tag';
         el.textContent = line.text;
       } else if (line.type === 'img') {
         const img = document.createElement('img');
@@ -155,15 +149,14 @@
         img.className = 'char-img';
         el.appendChild(img);
       } else {
-        el.className = 'log-line ' + line.type;
+        el.className = 'log-line';
+        if (line.type === 'accent') el.style.color = '#7abfff';
         el.textContent = line.text;
       }
       
       terminal.appendChild(el);
       terminal.scrollTo({ top: terminal.scrollHeight, behavior: 'smooth' });
-      
-      // 次の行へのウェイト（少しゆっくり、余韻を持たせて）
-      await new Promise(r => setTimeout(r, line.type === 'load' ? 1200 : 2000));
+      await new Promise(r => setTimeout(r, 1800));
     }
   }
 </script>
