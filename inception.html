@@ -6,12 +6,12 @@
     <title>__fmm_tn_ // inception</title>
     <style>
         :root {
-            --bg-white: #fcfcfc;
-            /* 桜の色：少し湿度と重みのある濃い桃色 */
-            --sakura-deep: rgba(231, 76, 116, 0.6);
-            --trunk-shadow: rgba(40, 30, 30, 0.08);
-            --deep-orange: #d35400;
-            --text-main: rgba(80, 70, 70, 0.7);
+            --bg-white: #f7f7f7;
+            /* 桜の色：透き通るようでいて、どこか吸い込まれる濃い桃色 */
+            --sakura-base: rgba(255, 182, 193, 0.6);
+            --sakura-deep: rgba(231, 76, 116, 0.5);
+            --shadow-sepia: rgba(60, 50, 50, 0.07);
+            --text-color: rgba(90, 80, 80, 0.6);
         }
 
         * {
@@ -29,69 +29,69 @@
             font-family: "serif", "YuMincho", "Hiragino Mincho ProN", serif;
         }
 
-        /* 視界の「歪み」と「ノイズ」：夢の不確実さ */
+        /* 1. 記憶のノイズ：古い夢のような質感 */
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.04;
             z-index: 10;
             pointer-events: none;
+            animation: grain 0.5s steps(1) infinite;
         }
 
-        /* 見上げる視点のビネット：周辺を白く飛ばして中央の「圧」を強調 */
-        .vignette {
+        @keyframes grain {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-1%, -1%); }
+            30% { transform: translate(1%, 1%); }
+            60% { transform: translate(-1%, 1%); }
+            90% { transform: translate(1%, -1%); }
+        }
+
+        /* 2. 「見上げる」視界：巨大な幹の影 */
+        .trunk-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 70%, transparent 20%, rgba(255, 255, 255, 0.9) 100%);
-            z-index: 5;
+            bottom: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 140vw;
+            height: 120vh;
+            background: radial-gradient(circle at 50% 100%, var(--shadow-sepia) 0%, transparent 70%);
+            filter: blur(60px);
+            z-index: 1;
             pointer-events: none;
         }
 
-        /* 巨大な「幹」：画面下部からせり出す重厚な影 */
-        .giant-trunk {
-            position: absolute;
-            bottom: -10vh;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40vw;
-            height: 110vh;
-            background: linear-gradient(to top, var(--trunk-shadow) 0%, transparent 80%);
-            border-radius: 50% 50% 0 0;
-            filter: blur(40px);
-            z-index: 1;
-        }
-
-        /* 花びら：色が濃くなり、舞い方に「重力」を持たせる */
+        /* 3. 風に舞う花びら：奥から手前へ押し寄せる */
         .petal {
             position: absolute;
-            background-color: var(--sakura-deep);
+            background: var(--sakura-base);
             border-radius: 150% 0 150% 0;
             pointer-events: none;
             z-index: 4;
-            filter: blur(0.3px);
-            box-shadow: 0 0 5px rgba(231, 76, 116, 0.2);
-            animation: fall-down linear infinite;
+            filter: blur(1px);
+            box-shadow: 0 0 10px rgba(255, 192, 203, 0.3);
+            animation: wind-flow linear infinite;
         }
 
-        @keyframes fall-down {
+        @keyframes wind-flow {
             0% {
-                transform: translate(0, -10vh) rotate(0deg) scale(0.8);
+                transform: translate(0, -10vh) rotate(0deg) scale(0.5);
                 opacity: 0;
             }
-            15% { opacity: 1; }
-            85% { opacity: 1; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
             100% {
-                /* 見上げる視線なので、手前（下）に来るほど大きく、少しボケる */
-                transform: translate(15vw, 110vh) rotate(540deg) scale(1.5);
+                /* 風で横に流されながら、手前に迫ってくる */
+                transform: translate(40vw, 110vh) rotate(720deg) scale(2);
                 opacity: 0;
-                filter: blur(2px);
+                filter: blur(4px);
             }
         }
 
-        /* ナビゲーション：あえて「幹」の影が薄くなる中段に配置 */
-        .nav-container {
+        /* 4. メインコンテンツ：迷い込んだ後に浮かび上がる */
+        .content {
             position: relative;
             z-index: 20;
             height: 100%;
@@ -99,107 +99,109 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding-top: 10vh;
+            opacity: 0;
+            animation: wake-up 4s ease-in forwards;
+            animation-delay: 1.5s;
         }
 
-        .site-title {
-            font-size: 1.1rem;
+        @keyframes wake-up {
+            from { opacity: 0; filter: blur(10px); }
+            to { opacity: 1; filter: blur(0px); }
+        }
+
+        .title {
+            font-size: 1rem;
             letter-spacing: 0.8em;
-            color: var(--text-main);
-            margin-bottom: 5vh;
+            color: var(--text-color);
+            margin-bottom: 60px;
             font-weight: 200;
-            text-shadow: 0 0 15px rgba(255,255,255,0.8);
         }
 
-        .menu-list {
-            list-style: none;
-            text-align: center;
-        }
-
-        .menu-item {
+        .nav-link {
             display: block;
-            font-size: 0.85rem;
-            color: var(--text-main);
+            font-size: 0.8rem;
+            color: var(--text-color);
             text-decoration: none;
-            margin: 25px 0;
+            margin: 20px 0;
             letter-spacing: 0.4em;
-            transition: 0.8s cubic-bezier(0.2, 0, 0.2, 1);
-            opacity: 0.6;
+            transition: 1s;
         }
 
-        /* タップ時の違和感（圧） */
-        .menu-item:active {
-            color: var(--deep-orange);
-            transform: scale(0.95);
-            filter: blur(2px);
-            opacity: 1;
+        .nav-link:active {
+            color: #d35400;
+            letter-spacing: 0.6em;
         }
 
-        /* 隠された「本名」の残滓：背景に溶け込ませる */
-        .latent-word {
+        /* 5. 画面の明滅：呼吸のようなゆらぎ */
+        .breathing-overlay {
             position: fixed;
-            bottom: 5vh;
-            right: 5vw;
-            font-size: 0.7rem;
-            color: rgba(0, 0, 0, 0.03);
-            letter-spacing: 0.5em;
-            z-index: 2;
-            writing-mode: vertical-rl;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            z-index: 100;
+            pointer-events: none;
+            animation: breath 8s ease-in-out infinite;
+        }
+
+        @keyframes breath {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.05; }
         }
     </style>
 </head>
 <body>
 
-    <div class="vignette"></div>
-    <div class="giant-trunk"></div>
-    <div class="latent-word">誰モ知ラナイ夢</div>
+    <div class="breathing-overlay"></div>
+    <div class="trunk-overlay"></div>
     
-    <div class="nav-container">
-        <h1 class="site-title">__fmm_tn_</h1>
-        <ul class="menu-list">
-            <li><a href="#" class="menu-item">STORY</a></li>
-            <li><a href="#" class="menu-item">WHERE</a></li>
-            <li><a href="#" class="menu-item">WORKS</a></li>
-            <li><a href="#" class="menu-item">LOG</a></li>
-        </ul>
+    <div class="content">
+        <h1 class="title">__fmm_tn_</h1>
+        <nav>
+            <a href="#" class="nav-link">STORY</a>
+            <a href="#" class="nav-link">WHERE</a>
+            <a href="#" class="nav-link">WORKS</a>
+            <a href="#" class="nav-link">LOG</a>
+        </nav>
     </div>
 
     <script>
-        // 花びらの生成：見上げる視点を意識したランダム性
-        function createPetal() {
+        // 花びらを生成する関数
+        function spawnPetal() {
             const petal = document.createElement('div');
             petal.className = 'petal';
             
-            const size = Math.random() * 8 + 6 + 'px';
+            // サイズのばらつき
+            const size = Math.random() * 7 + 5 + 'px';
             petal.style.width = size;
             petal.style.height = size;
             
-            // 幹の周辺（中央寄り）から多く降るように調整
-            const startX = (Math.random() * 120) - 10; 
-            petal.style.left = startX + 'vw';
+            // 開始位置（横方向のランダム）
+            petal.style.left = Math.random() * 120 - 20 + 'vw';
             
-            // 落下速度に「個体差（重み）」を出す
-            const duration = Math.random() * 4 + 6 + 's';
+            // 風の強さ（アニメーション秒数）のばらつき
+            const duration = Math.random() * 5 + 4 + 's';
             petal.style.animationDuration = duration;
             
-            // 花びらごとに微妙に色を変えて「湿度」を出す
-            const opacity = Math.random() * 0.5 + 0.3;
-            petal.style.opacity = opacity;
+            // 色のわずかな変化
+            if(Math.random() > 0.7) petal.style.background = 'var(--sakura-deep)';
             
             document.body.appendChild(petal);
             
+            // アニメーション終了後に削除
             setTimeout(() => {
                 petal.remove();
-            }, 10000);
+            }, duration * 1000);
         }
 
-        // 密度の調整：180msごとに生成
-        setInterval(createPetal, 180);
+        // 一定間隔で花びらを降らせる
+        setInterval(spawnPetal, 150);
 
-        // スクロールによる微細な「視差」：スマホを動かしている感覚
-        document.addEventListener('scroll', () => {
-            const scrolled = window.scrollY;
-            document.querySelector('.giant-trunk').style.transform = `translateX(-50%) translateY(${scrolled * 0.1}px)`;
+        // 懐かしい「揺らぎ」：スマホの傾きに合わせて幹が微動する（簡易版）
+        window.addEventListener('deviceorientation', (event) => {
+            const x = event.beta;  // 傾き
+            const trunk = document.querySelector('.trunk-overlay');
+            if(trunk) {
+                trunk.style.transform = `translateX(calc(-50% + ${x * 0.2}px))`;
+            }
         });
     </script>
 </body>
