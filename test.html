@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Character // AYA</title>
+
+<style>
+  :root{
+    --bg-gradient: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+    --card-glass: rgba(255, 255, 255, 0.4);
+    --line-soft: rgba(120, 110, 150, 0.15);
+    --text-main: #333;
+    --accent-blue: #a8c1d9; /* わずかなメカニカル感 */
+  }
+
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    color: var(--text-main);
+    background: var(--bg-gradient) fixed;
+    line-height: 1.6;
+  }
+
+  .page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 20px;
+  }
+
+  .wrap {
+    width: min(1000px, 100%);
+    display: grid;
+    grid-template-columns: 440px 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* --- 左：ビジュアル（視界の再現） --- */
+  .visual-section {
+    position: sticky;
+    top: 60px;
+  }
+
+  .visual-card {
+    position: relative;
+    border-radius: 2px; /* 敢えて角を落としすぎず、写真のように */
+    background: #fff;
+    padding: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+    border: 1px solid var(--line-soft);
+    cursor: zoom-in;
+    transition: 0.5s cubic-bezier(0.2, 0, 0.2, 1);
+  }
+
+  .visual-card::after {
+    content: "FOCUS_LEVEL: 04";
+    position: absolute;
+    top: 20px; left: 25px;
+    font-size: 0.6rem; font-family: monospace;
+    opacity: 0.3; letter-spacing: 0.2em;
+  }
+
+  .img-viewport {
+    width: 100%;
+    height: 640px;
+    overflow: hidden;
+    position: relative;
+    background: #fdfdfd;
+  }
+
+  .char-img {
+    width: 110%;
+    position: absolute;
+    left: 50%; top: 0;
+    /* 初期：顔へのフォーカス */
+    transform: translateX(-50%) translateY(40px) scale(2.8);
+    transform-origin: center top;
+    filter: saturate(0.9) contrast(1.05);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+  }
+
+  /* 全身モードへの切り替え */
+  .visual-card.is-full { cursor: zoom-out; }
+  .visual-card.is-full .char-img {
+    transform: translateX(-50%) translateY(20px) scale(1);
+    filter: saturate(1) contrast(1);
+  }
+
+  /* --- 右：プロフィール（ログ形式） --- */
+  .info-card {
+    padding-top: 10px;
+  }
+
+  .name-block {
+    margin-bottom: 40px;
+    border-left: 1px solid #333;
+    padding-left: 20px;
+  }
+
+  .name-en { font-size: 0.7rem; letter-spacing: 0.4em; opacity: 0.5; margin-bottom: 5px; }
+  .name-jp { font-size: 1.4rem; letter-spacing: 0.2em; font-weight: normal; margin: 0; }
+  .tagline { font-size: 0.85rem; color: #777; margin-top: 10px; letter-spacing: 0.05em; }
+
+  .profile-sheet {
+    background: var(--card-glass);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--line-soft);
+    border-radius: 4px;
+    padding: 30px;
+  }
+
+  .data-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 15px 30px;
+    margin-bottom: 30px;
+  }
+
+  .data-list dt {
+    font-size: 0.65rem;
+    font-family: monospace;
+    color: #999;
+    letter-spacing: 0.1em;
+    padding-top: 4px;
+  }
+
+  .data-list dd {
+    margin: 0;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 5px;
+  }
+
+  .bio-text {
+    font-size: 0.88rem;
+    line-height: 2.2;
+    color: #444;
+    text-align: justify;
+  }
+
+  /* 曖昧な記憶：ノイズが走るリンク */
+  .memory-link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dashed var(--accent-blue);
+    cursor: help;
+    transition: 0.3s;
+    position: relative;
+  }
+  .memory-link:hover {
+    color: var(--accent-blue);
+    background: rgba(168, 193, 217, 0.1);
+  }
+
+  /* --- メニュー・その他 --- */
+  .menu-trigger {
+    position: fixed; top: 30px; right: 30px;
+    width: 25px; height: 10px;
+    cursor: pointer; z-index: 100;
+  }
+  .menu-trigger span {
+    display: block; width: 100%; height: 1px;
+    background: #333; transition: 0.3s;
+  }
+  .menu-trigger span:last-child { margin-top: 8px; width: 60%; margin-left: auto; }
+
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: 1fr; }
+    .visual-section { position: relative; top: 0; }
+    .img-viewport { height: 500px; }
+    .char-img { transform: translateX(-50%) translateY(30px) scale(2.5); }
+    .visual-card.is-full .char-img { transform: translateX(-50%) translateY(20px) scale(1.1); }
+    .profile-sheet { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="menu-trigger" id="menuBtn">
+  <span></span><span></span>
+</div>
+
+<div class="page">
+  <div class="wrap">
+    
+    <div class="visual-section">
+      <section class="visual-card" id="visualCard">
+        <div class="img-viewport">
+          <img src="assets/profile/aya2.PNG" alt="Aya Sasai" class="char-img" id="charImg">
+        </div>
+      </section>
+    </div>
+
+    <section class="info-card">
+      <div class="name-block">
+        <div class="name-en">DEVELOPER_ID: AYA_S</div>
+        <h1 class="name-jp">笹井 綾</h1>
+        <p class="tagline">今がすべての方向音痴なムードメーカー</p>
+      </div>
+
+      <div class="profile-sheet">
+        <dl class="data-list">
+          <dt>BIRTH</dt><dd>September, 20</dd>
+          <dt>AGE</dt><dd>22</dd>
+          <dt>HEIGHT</dt><dd>145cm</dd>
+          <dt>JOB</dt><dd>エンジニア（メタバース関連企業）</dd>
+          <dt>RELATION</dt><dd>叢雲 添</dd>
+        </dl>
+
+        <div class="bio-text">
+          <p>転職に伴い、2054年の冬が終わる頃にHAMAにやってきた女性。
+メタバースサービスが有名な企業に勤めているが、自部署は業務内容が異なるため、メタバース関連の業務知識はない。<br><br>
+交友関係が広く休日は大抵外出しているものの、極度の方向音痴のため、よく街中で眉をハの字にしている。箱入り娘で一般常識も怪しいが、なぜかAIについては博識で、ペットロボに対しても少し冷たい様子。
+<a href="Secret.html" class="memory-link">一部の記憶が曖昧</a>だが、本人は気にしていないらしい。</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  const card = document.getElementById('visualCard');
+  card.onclick = () => card.classList.toggle('is-full');
+
+  // おまけ：記憶のリンクに触れた時の小さな遊び
+  const link = document.querySelector('.memory-link');
+  link.onmouseover = () => {
+    card.style.filter = 'contrast(1.2) brightness(1.1) grayscale(0.2)';
+    setTimeout(() => card.style.filter = '', 150);
+  };
+</script>
+
+</body>
+</html>
