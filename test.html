@@ -3,165 +3,169 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>CONNECTION_ESTABLISHED</title>
+<title>Fragment // AYA</title>
 <style>
   :root {
-    --accent: #00f2ff;
-    --sub-accent: #7000ff;
-    --bg: #030509;
-    --glass: rgba(255, 255, 255, 0.03);
+    --fog: rgba(210, 230, 255, 0.1);
+    --accent: #b8dfff;
+    --warn: #ffb8d1;
+    --bg: #050810;
   }
 
   html, body {
     margin: 0; padding: 0;
     background: var(--bg);
-    color: #fff;
-    font-family: "Hiragino Sans", "Meiryo", sans-serif;
-    height: 100%; overflow: hidden;
-  }
-
-  /* --- 近未来演出：背景レイヤー --- */
-  .bg-effects {
-    position: fixed; inset: 0; z-index: -1;
-  }
-  /* 微細なグリッド */
-  .grid {
-    position: absolute; inset: 0;
-    background-image: 
-      linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
-    mask-image: radial-gradient(circle, black 30%, transparent 80%);
-  }
-  /* 浮遊する光の粒子 */
-  .orb {
-    position: absolute; width: 300px; height: 300px;
-    background: var(--sub-accent);
-    filter: blur(100px); opacity: 0.2;
-    animation: floating 15s infinite alternate;
-  }
-
-  @keyframes floating {
-    0% { transform: translate(-10%, -10%); }
-    100% { transform: translate(20%, 20%); }
-  }
-
-  /* --- テキストエリア（一人称視点） --- */
-  #scene {
-    height: 100dvh;
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    padding: 0 40px;
-    transition: all 1s ease;
-  }
-
-  .narration {
-    font-size: 0.95rem;
-    line-height: 2.2;
-    letter-spacing: 0.15em;
-    margin-bottom: 50px;
-    text-shadow: 0 0 10px rgba(255,255,255,0.3);
-    text-align: center;
-  }
-
-  /* --- 近未来的なボタン（Glass UI） --- */
-  .choice-box {
-    display: flex; flex-direction: column;
-    gap: 20px; width: 100%; max-width: 280px;
-    opacity: 0; transform: translateY(20px);
-    transition: all 0.8s 0.5s ease forwards;
-  }
-
-  .cyber-btn {
-    position: relative;
-    padding: 18px;
-    background: var(--glass);
-    border: 1px solid rgba(0, 242, 255, 0.3);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: var(--accent);
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
-    text-align: center;
-    cursor: pointer;
+    color: #eef;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    height: 100dvh; width: 100%;
     overflow: hidden;
   }
 
-  .cyber-btn::before {
-    content: "";
-    position: absolute; top: 0; left: -100%;
-    width: 50%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.2), transparent);
-    transition: 0.5s;
+  /* --- 1. 幻想的な背景：揺らぐ霧 --- */
+  .fog-wrapper {
+    position: fixed; inset: 0; z-index: -1;
+    background: radial-gradient(circle at 50% 50%, #101a30 0%, #050810 100%);
   }
 
-  .cyber-btn:active::before {
-    left: 100%;
-    transition: 0.3s;
+  .fog-aura {
+    position: absolute;
+    width: 150%; height: 150%;
+    top: -25%; left: -25%;
+    background: url('https://www.transparenttextures.com/patterns/p6.png'), 
+                radial-gradient(circle at 30% 40%, rgba(100, 150, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(200, 100, 255, 0.05) 0%, transparent 50%);
+    filter: blur(40px);
+    animation: drift 20s infinite alternate ease-in-out;
   }
 
-  /* 角の装飾 */
-  .corner {
-    position: absolute; width: 6px; height: 6px;
-    border: 1px solid var(--accent);
+  @keyframes drift {
+    from { transform: rotate(0deg) scale(1); }
+    to { transform: rotate(5deg) scale(1.1); }
   }
-  .tl { top: 0; left: 0; border-right: none; border-bottom: none; }
-  .br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+  /* --- 2. 解析ログ：水面に広がるような波紋演出 --- */
+  #terminal {
+    height: 100dvh;
+    padding: 50px 30px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .log-line {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    letter-spacing: 0.15em;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(10px);
+    animation: rippleReveal 1.2s forwards cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes rippleReveal {
+    to { opacity: 1; filter: blur(0); transform: translateY(0); }
+  }
+
+  .loader-text {
+    font-size: 0.7rem;
+    color: var(--accent);
+    opacity: 0.6;
+    margin-bottom: -10px;
+  }
+
+  .accent { color: var(--accent); text-shadow: 0 0 15px rgba(184, 223, 255, 0.5); }
+  .warn { color: var(--warn); text-shadow: 0 0 15px rgba(255, 184, 209, 0.4); }
+
+  /* 彼女の画像：霧の中から現れる */
+  .char-img {
+    display: block;
+    max-width: 80%;
+    margin: 30px auto;
+    filter: drop-shadow(0 0 30px rgba(255,255,255,0.1)) brightness(0.9);
+    opacity: 0;
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    animation: apparition 3s 1s forwards ease-in-out;
+  }
+
+  @keyframes apparition {
+    to { opacity: 1; filter: brightness(1.1) drop-shadow(0 0 40px rgba(255,255,255,0.15)); }
+  }
+
+  /* 最初の入り口 */
+  #entry {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 1000;
+    transition: opacity 2s ease;
+  }
+
+  .entry-msg {
+    font-size: 0.9rem;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    cursor: pointer;
+    padding: 20px;
+  }
 
 </style>
 </head>
 <body>
 
-<div class="bg-effects">
-  <div class="grid"></div>
-  <div class="orb"></div>
+<div class="fog-wrapper"><div class="fog-aura"></div></div>
+
+<div id="entry" onclick="begin()">
+  <div class="entry-msg">── 彼女の記憶に触れる</div>
 </div>
 
-<main id="scene">
-  <div class="narration" id="textTarget"></div>
-  
-  <div class="choice-box" id="choices">
-    <div class="cyber-btn" onclick="connect('DIRECT')">
-      <div class="corner tl"></div><div class="corner br"></div>
-      [ 落ちている端末に触れる ]
-    </div>
-    <div class="cyber-btn" onclick="connect('SCAN')">
-      <div class="corner tl"></div><div class="corner br"></div>
-      [ 周囲の残留思念をスキャン ]
-    </div>
-  </div>
-</main>
+<div id="terminal"></div>
 
 <script>
-  const narrationText = "視界が、青白いノイズに染まる。\n\n冷たい空気が、肌を刺した。\n目の前には、誰の物ともしれない『記憶の器』が横たわっている。";
-  let charIndex = 0;
+  const terminal = document.getElementById('terminal');
+  const entry = document.getElementById('entry');
 
-  function type() {
-    const target = document.getElementById('textTarget');
-    if (charIndex < narrationText.length) {
-      const char = narrationText.charAt(charIndex);
-      target.innerHTML += (char === "\n") ? "<br>" : char;
-      charIndex++;
-      setTimeout(type, 80);
-    } else {
-      document.getElementById('choices').style.opacity = "1";
-      document.getElementById('choices').style.transform = "translateY(0)";
+  const scenario = [
+    { type: "dim", text: "接続... 意識の深層セクターへ。" },
+    { type: "accent", text: "対象特定：笹井 綾" },
+    { type: "load", text: "Scanning Physical Data..." },
+    { type: "normal", text: "22歳。145cm。柔らかな輪郭の奥に、冷徹な回路。" },
+    { type: "load", text: "Analyzing Memories..." },
+    { type: "warn", text: "注意：極度の方向把握困難。彼女は常に「迷子」の中にいる。" },
+    { type: "warn", text: "警告：神隠しに似たデータの欠落を確認。境界が溶けている。" },
+    { type: "load", text: "Restoring Visual Fragment..." },
+    { type: "img", src: "assets/profile/aya2.PNG" },
+    { type: "accent", text: "── 溶けて、そのまま雲隠れ。" }
+  ];
+
+  async function begin() {
+    entry.style.opacity = '0';
+    setTimeout(() => entry.style.display = 'none', 2000);
+
+    for (const line of scenario) {
+      const el = document.createElement('div');
+      if (line.type === 'load') {
+        el.className = 'loader-text';
+        el.textContent = line.text;
+      } else if (line.type === 'img') {
+        const img = document.createElement('img');
+        img.src = line.src;
+        img.className = 'char-img';
+        el.appendChild(img);
+      } else {
+        el.className = 'log-line ' + line.type;
+        el.textContent = line.text;
+      }
+      
+      terminal.appendChild(el);
+      terminal.scrollTo({ top: terminal.scrollHeight, behavior: 'smooth' });
+      
+      // 次の行へのウェイト（少しゆっくり、余韻を持たせて）
+      await new Promise(r => setTimeout(r, line.type === 'load' ? 1200 : 2000));
     }
   }
-
-  function connect(mode) {
-    const scene = document.getElementById('scene');
-    scene.style.filter = "blur(20px) brightness(2)";
-    scene.style.opacity = "0";
-    
-    setTimeout(() => {
-      // 次の「解析ページ」へ
-      alert(mode === 'DIRECT' ? "Direct Link Established." : "Peripheral Data Scanning...");
-      // window.location.href = "test_hack_loading.html";
-    }, 1000);
-  }
-
-  window.onload = type;
 </script>
 
 </body>
