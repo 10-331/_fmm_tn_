@@ -3,75 +3,129 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>BATTERY_CONNECT</title>
+<title>SYNC_PROTOCOL_405</title>
 <style>
-  :root { --bg: #f8faff; --accent: #8eb8ff; }
-  body { margin: 0; background: var(--bg); font-family: "Hiragino Mincho ProN", serif; height: 100dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-  
-  #monitor {
-    width: 250px; height: 120px; border: 1px solid #ddd;
-    display: flex; flex-direction: column; justify-content: center; align-items: center;
-    background: #fff; position: relative;
+  :root { --bg: #05070a; --accent: #ff3e6c; --ok: #00f2ff; }
+  body {
+    margin: 0; background: var(--bg); color: #fff;
+    font-family: "Hiragino Mincho ProN", serif;
+    height: 100dvh; overflow: hidden; touch-action: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
   }
-  .loading-bar { width: 0%; height: 2px; background: var(--accent); position: absolute; bottom: 0; left: 0; transition: 1s; }
-  #status-text { font-size: 0.7rem; color: #999; margin-top: 10px; }
-  #battery-val { font-size: 2rem; color: var(--accent); font-weight: bold; }
-  
-  .scan-btn {
-    margin-top: 30px; padding: 10px 20px; border: 1px solid var(--accent);
-    background: none; color: var(--accent); cursor: pointer; font-size: 0.8rem;
+
+  /* 時間表示（メタ演出） */
+  #clock { font-family: monospace; font-size: 3rem; opacity: 0.2; position: fixed; top: 40px; }
+
+  /* メッセージ */
+  #msg { width: 80%; text-align: center; font-size: 0.9rem; line-height: 2; margin-bottom: 40px; letter-spacing: 0.1em; }
+
+  /* 認証キャンバス（一筆書き） */
+  #auth-canvas {
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.02);
+    box-shadow: 0 0 20px rgba(255, 62, 108, 0.1);
   }
+
+  .status-label { font-size: 0.6rem; color: var(--accent); letter-spacing: 0.3em; margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<div id="monitor">
-  <div id="battery-val">--%</div>
-  <div id="status-text">DEVICE_NOT_LINKED</div>
-  <div class="loading-bar" id="bar"></div>
+<div id="clock">00:00</div>
+
+<div id="msg">
+  「……今、境界のノイズが一番薄い。」<br>
+  「この回路を、君の指で繋いで。……外さないでね」
 </div>
 
-<button class="scan-btn" onclick="syncBattery()">[ 端末のバイオメトリクスを同期 ]</button>
+<canvas id="auth-canvas"></canvas>
+<div class="status-label" id="status">PATTERN_TRACE_REQUIRED</div>
 
 <script>
-async function syncBattery() {
-  const valEl = document.getElementById('battery-val');
-  const textEl = document.getElementById('status-text');
-  const bar = document.getElementById('bar');
+  const canvas = document.getElementById('auth-canvas');
+  const ctx = canvas.getContext('2d');
+  const clockEl = document.getElementById('clock');
+  const statusEl = document.getElementById('status');
+  
+  let isDrawing = false;
+  let points = []; // ユーザーが通った軌跡
+  const targetPattern = []; // 本来なぞるべき正解（今回は簡易的に「V字」）
 
-  textEl.textContent = "SYNCING...";
-  bar.style.width = "100%";
-
-  try {
-    // getBatteryがサポートされているか確認
-    if (navigator.getBattery) {
-      const battery = await navigator.getBattery();
-      updateUI(battery);
-      
-      // リアルタイム監視（充電器に刺した時など）
-      battery.addEventListener('levelchange', () => updateUI(battery));
-    } else {
-      // iOSなどの非対応ブラウザへのフォールバック
-      throw new Error("API_NOT_SUPPORTED");
-    }
-  } catch (e) {
-    valEl.textContent = "ERR";
-    valEl.style.color = "#ff8e8e";
-    textEl.textContent = "アクセス拒否。ブラウザの制限を確認してください。";
+  function init() {
+    canvas.width = 280;
+    canvas.height = 280;
+    updateClock();
+    setInterval(updateClock, 1000);
+    drawGuide();
   }
-}
 
-function updateUI(battery) {
-  const level = Math.floor(battery.level * 100);
-  document.getElementById('battery-val').textContent = level + "%";
-  
-  let comment = "";
-  if (level > 80) comment = "「……十分だね。解析、続けよう」";
-  else if (level > 20) comment = "「" + level + "%……。充電器、探したほうがいいかも」";
-  else comment = "「消えちゃう……。急いで、記録を保存して」";
-  
-  document.getElementById('status-text').textContent = comment;
-}
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    clockEl.textContent = `${h}:${m}`;
+    
+    // ゾロ目チェック（例：22:22など）
+    if (h[0] === h[1] && m[0] === m[1]) {
+      clockEl.style.opacity = "0.8";
+      clockEl.style.color = "var(--accent)";
+    }
+  }
+
+  function drawGuide() {
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(40, 40); ctx.lineTo(140, 240); ctx.lineTo(240, 40); // V字のガイド
+    ctx.stroke();
+  }
+
+  function startTrace(e) {
+    isDrawing = true;
+    points = [];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGuide();
+    ctx.setLineDash([]);
+  }
+
+  function doTrace(e) {
+    if (!isDrawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    
+    points.push({x, y});
+    
+    ctx.strokeStyle = "var(--accent)";
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "var(--accent)";
+    
+    if (points.length > 1) {
+      ctx.beginPath();
+      ctx.moveTo(points[points.length-2].x, points[points.length-2].y);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+  }
+
+  function endTrace() {
+    isDrawing = false;
+    // 本来はここで「targetPattern」との一致率を計算
+    if (points.length > 20) {
+      statusEl.textContent = "SUCCESS: 記憶セクター解禁";
+      statusEl.style.color = "var(--ok)";
+      document.getElementById('msg').textContent = "「……お疲れ様。よくできました。……中、見てみる？」";
+    } else {
+      statusEl.textContent = "ERROR: 接続不完全";
+    }
+  }
+
+  canvas.addEventListener('touchstart', startTrace);
+  canvas.addEventListener('touchmove', doTrace);
+  canvas.addEventListener('touchend', endTrace);
+
+  window.onload = init;
 </script>
 </body>
 </html>
