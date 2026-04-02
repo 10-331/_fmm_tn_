@@ -3,184 +3,165 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>SYS_LOG // SCRAPING // AYA_S</title>
+<title>SCRAPING_LOG // AYA_S</title>
 <style>
   :root {
-    --bg: #000;
-    --accent-g: #00ff41; /* マトリックス的な緑 */
-    --accent-r: #ff0055; /* 不穏な赤 */
-    --text: #ddd;
+    --bg: #050505;
+    --accent-g: #00ff41;
+    --accent-r: #ff2d55;
+    --text: #c0c0c0;
   }
 
   html, body {
     margin: 0; padding: 0;
-    font-family: monospace; /* 無機質なフォント */
+    font-family: 'Courier New', Courier, monospace;
     background: var(--bg);
     color: var(--text);
-    height: 100%; overflow: hidden;
+    height: 100%; width: 100%;
+    overflow: hidden;
     user-select: none; -webkit-touch-callout: none;
-    line-height: 1.5; font-size: 0.85rem;
   }
 
-  /* --- ハッキング画面（コンソール） --- */
-  .terminal {
-    position: absolute; inset: 0;
-    padding: 30px 20px 80px;
-    display: flex; flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    overflow-y: scroll; /* ログがたまるとスクロール */
-    scroll-behavior: smooth;
-    opacity: 0.9;
-    /* 古いモニターのような走査線効果 */
-    background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
-  }
-
-  .terminal::before {
-    content: "";
+  /* 走査線エフェクト（常に表示） */
+  body::after {
+    content: " ";
     position: fixed; inset: 0;
-    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
-    pointer-events: none; z-index: 100;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none; z-index: 1000;
   }
 
-  /* 1行ずつのログ */
+  /* ログ表示エリア */
+  #terminal {
+    height: 100dvh;
+    padding: 25px 20px 100px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
   .log-line {
-    opacity: 0; transform: translateY(5px);
-    animation: revealLog 0.2s ease forwards;
-    width: 100%; text-align: left;
-    white-space: pre-wrap; word-break: break-all;
-    margin: 2px 0;
+    font-size: 0.8rem;
+    word-break: break-all;
+    line-height: 1.4;
+    opacity: 0;
+    transform: translateX(-5px);
+    animation: slideIn 0.1s forwards;
   }
 
-  /* JSで表示秒数を変える */
-  @keyframes revealLog {
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes slideIn {
+    to { opacity: 1; transform: translateX(0); }
   }
 
-  /* 彼女：データの最後に表示される、不安定な画像 */
+  /* 強調カラー */
+  .green { color: var(--accent-g); text-shadow: 0 0 5px var(--accent-g); }
+  .red { color: var(--accent-r); text-shadow: 0 0 5px var(--accent-r); }
+
+  /* 彼女の画像：ノイズを乗せる */
   .char-img {
-    height: 20vh; width: auto; object-fit: contain;
-    filter: brightness(0.6) contrast(1.5) grayscale(0.5);
-    transition: filter 0.2s ease, transform 0.2s ease;
-    margin: 20px auto 0;
-    display: block; opacity: 0;
+    display: block;
+    max-width: 80%;
+    height: auto;
+    margin: 20px auto;
+    filter: grayscale(1) contrast(1.2) brightness(0.8);
+    opacity: 0.7;
+    border: 1px solid var(--accent-g);
   }
 
-  /* --- アクティブ状態（抽出完了時）の演出 --- */
-  body.is-glitched .terminal {
-    animation: screenShake 0.15s infinite;
-    mix-blend-mode: exclusion; /* 画面の色を反転 */
-  }
-
-  body.is-glitched .char-img {
-    opacity: 1;
-    filter: brightness(1) contrast(2) saturate(2);
-    transform: scale(1.1) skew(1deg);
-  }
-
-  @keyframes screenShake {
-    0%, 100% { transform: translate(0, 0); }
-    25% { transform: translate(-1px, 1px); }
-    50% { transform: translate(1px, -1px); }
-    75% { transform: translate(-1px, -1px); }
-  }
-
-  /* UI：固定の案内 */
-  .guide-ui {
-    position: fixed; bottom: 30px; left: 0; width: 100%;
-    text-align: center; z-index: 1000;
-    font-size: 0.7rem; color: #fff;
-    opacity: 0.6; pointer-events: none;
+  /* 操作ガイド */
+  .guide {
+    position: fixed;
+    bottom: 0; left: 0; width: 100%;
+    background: rgba(0,0,0,0.8);
+    padding: 15px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--accent-g);
+    z-index: 500;
+    border-top: 1px solid var(--accent-g);
   }
 
 </style>
 </head>
-<body>
+<body id="body">
 
-<div class="terminal" id="terminal">
-  </div>
+<div id="terminal">
+  <div class="log-line green">ACCESS_GRANTED: USER_UNIDENTIFIED</div>
+  <div class="log-line">SYSTEM_INITIALIZED... READY_TO_EXTRACT</div>
+</div>
 
-<div class="guide-ui">画面をタップして、データを抽出</div>
+<div class="guide" id="guide">TAP_SCREEN_TO_FETCH_DATA</div>
 
 <script>
   const terminal = document.getElementById('terminal');
-  const body = document.body;
-
-  // 抽出されるデータ（断片）
-  const data = [
-    "SYS_LOG :: Starting scraping process...",
-    "TARGET_ID :: AYA_SASAI_ID:20540132",
-    "DECRYPTING_DATA... [33%]",
-    "DECRYPTING_DATA... [68%]",
-    "DECRYPTING_DATA... [100%]",
-    "> BASIC_STATUS :: Height: 145cm",
-    "> BASIC_STATUS :: Age: 22",
-    "> BASIC_STATUS :: Job: Engineer_Mv",
-    "> BASIC_STATUS :: Date_of_Birth: Sep_20",
-    "FETCHING_MEMO...",
-    "> BIO :: 転職に伴いHAMAへ流入。",
-    "> BIO :: AIについては博識だが、ペットロボには冷淡。",
-    "> BIO :: 極度の方向音痴。現在地を見失いやすい。",
-    "WARNING :: Memory corrupted in part_C. 記憶に曖昧な箇所あり。",
-    "SCANNING_IMAGE... [100%]",
-    "DISPLAY_IMAGE :: ", // ここに画像を挿入
-    "END_OF_LOG :: Hacking complete."
+  const guide = document.getElementById('guide');
+  
+  // 抽出するデータ配列
+  const logData = [
+    { text: ">>> CONNECTING_TO_REMOTE_SERVER...", color: "white" },
+    { text: ">>> SEARCHING_FOR: AYA_SASAI", color: "white" },
+    { text: "SUCCESS: TARGET_FOUND [ID:2054_0920]", color: "green" },
+    { text: "---", color: "white" },
+    { text: "NAME: 笹井 綾 (AYA SASAI)", color: "white" },
+    { text: "AGE: 22 / HEIGHT: 145cm", color: "white" },
+    { text: "OCCUPATION: Engineer (HAMA_Metax)", color: "white" },
+    { text: "---", color: "white" },
+    { text: "NOTICE: Directional sensory impairment detected.", color: "red" },
+    { text: "NOTICE: High proficiency in AI systems.", color: "green" },
+    { text: "WARNING: PARTIAL_MEMORY_LOSS [Sector_C]", color: "red" },
+    { text: ">>> EXTRACTING_VISUAL_DATA...", color: "white" },
+    { type: "image", src: "assets/profile/aya2.PNG" },
+    { text: ">>> SCRAPING_COMPLETE. CONNECTION_CLOSED.", color: "green" }
   ];
 
-  let lineIndex = 0;
+  let currentLine = 0;
 
-  // タップ体験をJSで制御
-  const showNextLine = (e) => {
-    e.preventDefault();
-    if (lineIndex >= data.length) {
-      // 全データ抽出完了後の演出（グリッチ）
-      glitchScreen();
+  function addLogLine() {
+    if (currentLine >= logData.length) {
+      guide.textContent = "SYSTEM_HALTED: NO_MORE_DATA";
       return;
     }
 
-    const lineData = data[lineIndex];
-    const logLine = document.createElement('div');
-    logLine.className = 'log-line';
+    const data = logData[currentLine];
+    const div = document.createElement('div');
+    div.className = 'log-line';
 
-    // 色の調整
-    if (lineData.startsWith("WARNING") || lineData.startsWith("> BIO")) {
-      logLine.style.color = 'var(--accent-r)'; // 不穏な赤
-    } else if (lineData.startsWith("> BASIC")) {
-      logLine.style.color = 'var(--accent-g)'; // 抽出成功の緑
-    } else {
-      logLine.style.color = '#fff';
-    }
-
-    // 画像の処理
-    if (lineData === "DISPLAY_IMAGE :: ") {
-      logLine.textContent = lineData;
+    if (data.type === "image") {
       const img = document.createElement('img');
-      img.src = "assets/profile/aya2.PNG";
-      img.alt = "Scraped Aya";
+      img.src = data.src;
       img.className = 'char-img';
-      img.id = 'charImg';
-      logLine.appendChild(img);
+      div.appendChild(img);
     } else {
-      logLine.textContent = lineData;
+      div.textContent = data.text;
+      if (data.color === "green") div.classList.add('green');
+      if (data.color === "red") div.classList.add('red');
     }
 
-    terminal.appendChild(logLine);
+    terminal.appendChild(div);
     
-    // ログがたまると自動スクロール
-    terminal.scrollTop = terminal.scrollHeight;
-    
-    lineIndex++;
+    // 常に最新のログ（下端）へスクロール
+    terminal.scrollTo({
+      top: terminal.scrollHeight,
+      behavior: 'smooth'
+    });
+
+    currentLine++;
+  }
+
+  // 画面全体、どこを触っても反応するように
+  // touchstart（スマホ）とmousedown（PC）両方をカバー
+  const handleInput = (e) => {
+    e.preventDefault();
+    addLogLine();
   };
 
-  // 全抽出後の演出
-  const glitchScreen = () => {
-    body.classList.add('is-glitched');
-    setTimeout(() => body.classList.remove('is-glitched'), 500); // 0.5秒で戻る
-  };
+  document.body.addEventListener('touchstart', handleInput, { passive: false });
+  document.body.addEventListener('mousedown', handleInput);
 
-  // タッチイベント（スマホ・PC共通）
-  window.addEventListener('click', showNextLine);
 </script>
-
 </body>
 </html>
