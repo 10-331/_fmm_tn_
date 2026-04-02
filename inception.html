@@ -2,166 +2,262 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>__fmm_tn_ // inception</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>home</title>
 <style>
-  :root {
-    --bg-gradient: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
-    --text-solid: #222; /* 以前より濃く、はっきりと */
-    --accent-shadow: rgba(0, 0, 0, 0.08);
-  }
-
+  /* ===== 1. ベース：元の繊細な質感と色を完全継承 ===== */
   html, body {
     margin: 0;
     padding: 0;
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-    background: var(--bg-gradient);
-    color: var(--text-solid);
+    color: #333;
     overflow-x: hidden;
+    /* 色が途切れないよう、グラデーションを画面全体に固定 */
+    background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%) fixed;
+    height: 100%;
+  }
+  
+  /* スマホでのスクロール時のバウンドで白地が見えないように */
+  body {
+    overscroll-behavior-y: none;
   }
 
-  /* セクション1：導入（ここを「重く」する） */
+  /* セクション1：導入（元の高さを維持） */
   section.intro {
-    height: 100vh;
+    height: 120vh;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    overflow: hidden;
-    background: rgba(255, 255, 255, 0.2); /* わずかな膜を張る */
+    overflow: hidden; 
   }
 
-  /* 波紋：もっと「重い」質感へ */
+  /* ===== 2. 波紋：自然界のリズム（不規則性）へ ===== */
   .ripple-container {
     position: absolute;
-    top: 0; right: 0; width: 100%; height: 100%;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
     z-index: 1;
   }
+
   .ripple-layer {
     position: absolute;
-    top: 0; right: 0;
-    width: 160vmax; height: 160vmax;
+    top: 0;
+    right: 0;
+    width: 160vmax; 
+    height: 160vmax;
     border-radius: 50%;
     transform: translate(50%, -50%) scale(0);
-    /* 線の太さと影を強くして、存在感を出す */
-    border: 3px solid rgba(0, 0, 0, 0.05); 
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.02);
+    /* 線の太さは元の繊細さを維持 */
+    border: 1.5px solid rgba(255, 255, 255, 0.35); 
+    box-shadow: 
+      -2px 2px 10px rgba(0, 0, 0, 0.03),
+      inset -1px 1px 5px rgba(255, 255, 255, 0.6);
     opacity: 0;
-    animation: rippleSpread 10s cubic-bezier(0.15, 0, 0.2, 1) infinite;
+    /* cubic-bezierを調整し、広がり方に粘り気を持たせる */
+    animation: rippleSpread cubic-bezier(0.2, 0, 0.2, 1) infinite;
   }
-  .layer1 { animation-delay: 0s; }
-  .layer2 { animation-delay: 3s; }
+
+  /* 3本の波紋のリズムを変える（不規則な重なり） */
+  .layer1 { animation-duration: 9s;  animation-delay: 0.2s; }
+  .layer2 { animation-duration: 11s; animation-delay: 2.5s; } /* 遅い */
+  .layer3 { animation-duration: 8s;  animation-delay: 4.8s; } /* 速い */
 
   @keyframes rippleSpread {
     0% { transform: translate(50%, -50%) scale(0); opacity: 0; }
     5% { opacity: 1; }
-    100% { transform: translate(50%, -50%) scale(1.2); opacity: 0; }
+    90% { opacity: 0.8; }
+    100% { transform: translate(50%, -50%) scale(1.3); opacity: 0; }
   }
 
-  /* 文章の塊：3行で1つとして魅せる */
-  .novel-block {
+  /* ===== 3. 文章：元のサイズ、位置、柔らかい現れ方を復元 ===== */
+  .novel {
     display: flex;
     flex-direction: row-reverse;
     justify-content: center;
-    align-items: center;
-    gap: 4em;
+    align-items: flex-start;
+    gap: 3.5em; /* 元の3emよりわずかに広げ、圧を逃がす */
     position: relative;
     z-index: 2;
-    padding: 0 10%;
+    /* 元の translateY を維持し、スマホでの位置ズレを修正 */
+    transform: translateY(-6vh); 
+  }
+
+  @media (max-width: 860px){
+    .novel {
+      transform: translateY(-9vh); /* 画像を参考に調整 */
+      gap: 2.8em;
+    }
   }
 
   .line {
     writing-mode: vertical-rl;
     text-orientation: upright;
-    font-size: 1.05rem; /* 少し大きく */
-    line-height: 1.6;
-    letter-spacing: 0.3em;
+    /* 元の0.8emを維持（繊細さ） */
+    font-size: 0.82rem; 
+    letter-spacing: 0.25em; /* わずかに広げ、読みやすく */
+    line-height: 1.4;
+    color: #3f3f3f; /* わずかに濃くし、可読性を確保 */
     opacity: 0;
-    transform: translateY(10px);
-    filter: blur(5px);
-    animation: revealLine 2.5s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+    /* 元の柔らかい現れ方を継承 */
+    animation: softGlow 2.5s ease-out forwards;
   }
 
-  /* 3行が流れるように揃う */
   .line:nth-child(1) { animation-delay: 0.5s; }
-  .line:nth-child(2) { animation-delay: 1.5s; }
-  .line:nth-child(3) { animation-delay: 2.5s; }
+  .line:nth-child(2) { animation-delay: 1.8s; }
+  .line:nth-child(3) { animation-delay: 3.1s; }
 
-  @keyframes revealLine {
-    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  @keyframes softGlow {
+    0% { opacity: 0; filter: blur(4px); }
+    30% { opacity: 0.7; filter: blur(1px); }
+    100% { opacity: 1; filter: blur(0); }
   }
-
-  /* 下のコンテンツへ誘う矢印（迷子防止） */
-  .scroll-hint {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.7rem;
-    letter-spacing: 0.5em;
-    opacity: 0.4;
-    animation: bounce 2s infinite;
-  }
-  @keyframes bounce { 0%, 100% { bottom: 30px; } 50% { bottom: 40px; } }
 
   /* セクション2：コンテンツ */
   section.works {
     min-height: 100vh;
-    padding: 10vh 0;
-    background: white;
+    padding: 12vh 10vw 8vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.5em;
+    /* 下のグラデーションに自然に溶け込ませる */
+    background: transparent; 
+  }
+
+  .works h2 {
+    font-size: 0.95em;
+    letter-spacing: 0.25em;
+    margin-bottom: 2.5em;
+    color: #666;
+    font-weight: 200;
   }
 
   .work-item {
-    width: 85%;
-    max-width: 400px;
-    padding: 1.5em;
+    margin: 0.8em 0;
+    padding: 1.2em 1.8em;
+    border-left: 1px solid rgba(0,0,0,0.1); /* 元の3pxより細く、繊細に */
+    font-size: 0.88em;
     text-decoration: none;
-    color: var(--text-solid);
-    border: 1px solid #eee;
-    background: #fafafa;
-    font-size: 0.9rem;
-    letter-spacing: 0.2em;
-    transition: 0.4s;
+    color: #4a4a4a;
+    background: rgba(255,255,255,0.6);
+    width: 85%;
+    max-width: 380px;
+    transition: 0.5s cubic-bezier(0.2, 0, 0.2, 1);
   }
-  .work-item:hover { border-color: #aaa; background: #fff; transform: translateX(5px); }
 
-  /* 右上メニューは元の良い部分を継承 */
-  .menu-btn {
-    position: fixed; top: 20px; right: 20px; z-index: 1000;
-    cursor: pointer; padding: 10px;
+  .work-item:hover {
+    background: rgba(245,245,255,0.8);
+    border-left-color: #888;
+    transform: translateX(3px);
   }
-  .menu-btn span { display: block; width: 25px; height: 1px; background: #333; margin: 6px 0; }
+
+  /* ===== 4. ボタンとメニュー：進化した表示 ===== */
+  .menu-btn {
+    position: fixed;
+    top: 22px; right: 25px; /* 元の位置を維持 */
+    width: 24px; height: 18px;
+    cursor: pointer; z-index: 1001;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .menu-btn span {
+    display: block; width: 100%; height: 1.5px;
+    background: rgba(70,70,70,0.7);
+    border-radius: 1px;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* タップ時のアニメーション（×に変わる） */
+  .menu-btn.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg); background: #333; }
+  .menu-btn.active span:nth-child(2) { opacity: 0; }
+  .menu-btn.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); background: #333; }
+
+  .menu-overlay {
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(15px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .menu-overlay.open { display: flex; animation: overlayFade 0.4s ease; }
+
+  .menu-content {
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 1.8em; text-align: left;
+  }
+  .menu-content a {
+    text-decoration: none; color: #555; font-size: 0.9em;
+    letter-spacing: 0.2em; transition: 0.4s;
+    opacity: 0.7;
+  }
+  .menu-content a:hover { color: #222; opacity: 1; letter-spacing: 0.3em; }
+
+  @keyframes overlayFade { from { opacity: 0; } to { opacity: 1; } }
+
+  footer {
+    text-align: center; font-size: 0.7rem; color: #aaa;
+    letter-spacing: 0.1em; padding: 4em 0 2em;
+    background: transparent; z-index: 2; position: relative;
+  }
+
 </style>
 </head>
+
 <body>
-
-<div class="menu-btn" id="menuBtn"><span></span><span></span><span></span></div>
-
-<section class="intro">
-  <div class="ripple-container">
-    <div class="ripple-layer layer1"></div>
-    <div class="ripple-layer layer2"></div>
+  <div class="menu-btn" id="menuBtn">
+    <span></span><span></span><span></span>
   </div>
 
-  <div class="novel-block">
-    <div class="line">これは、迷子になった私を助けてくれた彼と</div>
-    <div class="line">たくさん笑って、ふざけあって、恋人になった私たちが</div>
-    <div class="line">また、他人に戻るまでのお話。</div>
+  <div class="menu-overlay" id="menuOverlay">
+    <div class="menu-content">
+      <a href="home.html">home</a>
+      <a href="Character.html">Character</a>
+      <a href="Story.html">Story</a>
+      <a href="Media.html">Media</a>
+    </div>
   </div>
 
-  <div class="scroll-hint">SCROLL</div>
-</section>
+  <section class="intro">
+    <div class="ripple-container">
+      <div class="ripple-layer layer1"></div>
+      <div class="ripple-layer layer2"></div>
+      <div class="ripple-layer layer3"></div>
+    </div>
 
-<section class="works" id="works">
-  <a href="#" class="work-item">Character Profile</a>
-  <a href="#" class="work-item">Worldbuilding</a>
-  <a href="#" class="work-item">Story</a>
-  <a href="#" class="work-item">Media</a>
-</section>
+    <div class="novel">
+      <div class="line">これは、迷子になった私を助けてくれた彼と</div>
+      <div class="line">たくさん笑って、ふざけあって、恋人になった私たちが</div>
+      <div class="line">また、他人に戻るまでのお話。</div>
+    </div>
+  </section>
+  
+  <section class="works">
+    <h2>Contents</h2>
+    <a href="Character.html" class="work-item">Character Profile</a>
+    <a href="worldbuilding.html" class="work-item">Worldbuilding</a>
+    <a href="Story.html" class="work-item">Story</a>
+    <a href="Media.html" class="work-item">Media</a>
+  </section>
 
+  <footer>#溶けて、そのまま雲隠れ</footer>
+
+  <script>
+    const btn = document.getElementById('menuBtn');
+    const overlay = document.getElementById('menuOverlay');
+
+    btn.onclick = () => {
+      btn.classList.toggle('active');
+      overlay.classList.toggle('open');
+    };
+
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        btn.classList.remove('active');
+        overlay.classList.remove('open');
+      }
+    };
+  </script>
 </body>
 </html>
