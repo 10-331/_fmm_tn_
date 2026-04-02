@@ -6,16 +6,12 @@
     <title>__fmm_tn_ // inception</title>
     <style>
         :root {
-            /* 1. 背景：純白を捨て、少し湿度のある「生成り色」へ */
-            --bg-dream: #f4f3f0;
-            
-            /* 2. 桜の色：躑躅（つつじ）色をベースに、生命力を感じさせる濃さ */
-            --sakura-base: rgba(231, 76, 116, 0.9); /* 濃く、不透明度を上げる */
-            --sakura-light: rgba(255, 182, 193, 0.8);
-            
-            /* 3. 幹の色：錆びた鉄のような、深い煤色 */
-            --trunk-charcoal: rgba(30, 20, 20, 0.3);
-            --text-color: rgba(50, 40, 40, 0.7);
+            /* 1. 背景：湿り気を帯びた、吸い込まれるような白 */
+            --bg-dream: #fdfdfd;
+            /* 2. 桜：躑躅色。土埃に見えないよう、彩度を高く、クリアに */
+            --sakura-rich: #e74c74;
+            --sakura-petal: rgba(255, 182, 193, 0.9);
+            --text-main: #4a4a4a;
         }
 
         * {
@@ -33,165 +29,159 @@
             font-family: "serif", "YuMincho", "Hiragino Mincho ProN", serif;
         }
 
-        /* 記憶のノイズ：古いフィルムのような、ザラッとした質感 */
-        body::before {
-            content: "";
+        /* 視界の端の「影」：土埃ではなく、巨木の根元にいる暗がりの演出 */
+        .vignette {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            opacity: 0.05; /* ノイズを少し強める */
-            z-index: 10;
+            background: radial-gradient(circle at 50% 80%, transparent 20%, rgba(255, 255, 255, 0.8) 100%);
+            z-index: 5;
             pointer-events: none;
-            animation: grain 0.3s steps(1) infinite;
         }
 
-        @keyframes grain {
-            0%, 100% { transform: translate(0, 0); }
-            10% { transform: translate(-1%, -1%); }
-            30% { transform: translate(1%, 1%); }
-            60% { transform: translate(-1%, 1%); }
-            90% { transform: translate(1%, -1%); }
-        }
-
-        /* 4. 「下から見上げる」視界：巨大な幹のテクスチャ */
-        .trunk-vignette {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            /* 幹のざらつきをグラデーションで表現 */
-            background: 
-                radial-gradient(circle at 10% 10%, var(--trunk-charcoal) 0%, transparent 40%),
-                radial-gradient(circle at 90% 10%, var(--trunk-charcoal) 0%, transparent 40%),
-                radial-gradient(circle at 50% 100%, rgba(40,20,20,0.4) 0%, transparent 60%);
-            filter: blur(40px);
+        /* 巨大な「幹」の気配：画面の下半分を重く沈める */
+        .trunk-shadow {
+            position: absolute;
+            bottom: -20vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120vw;
+            height: 100vh;
+            background: linear-gradient(to top, rgba(0,0,0,0.04) 0%, transparent 70%);
+            filter: blur(80px);
             z-index: 1;
-            pointer-events: none;
         }
 
-        /* 5. 桜の花弁（ペタル）：形と影を作り込み、物質感を出す */
+        /* 桜の花弁：形を鋭くし、影を「しっとり」させる */
         .petal {
             position: absolute;
-            background: var(--sakura-base);
-            border-radius: 150% 0 150% 0; /* 花弁の形 */
+            background: var(--sakura-rich);
+            /* 花びらの形をよりリアルに：ハート型に近い非対称 */
+            border-radius: 100% 0% 100% 20% / 100% 20% 100% 0%;
             pointer-events: none;
-            z-index: 4;
-            opacity: 0;
-            /* 重要：影をつけることで、白い背景から物理的に浮き上がらせる（圧） */
-            box-shadow: 1px 2px 10px rgba(0,0,0,0.1);
-            animation: wind-flow linear infinite;
+            z-index: 10;
+            box-shadow: 2px 5px 15px rgba(231, 76, 116, 0.15);
+            animation: drift linear infinite;
         }
 
-        @keyframes wind-flow {
+        @keyframes drift {
             0% {
-                transform: translate(0, -10vh) rotate(0deg) scale(0.6);
+                transform: translate(0, -10vh) rotate(0deg) scale(0.5);
                 opacity: 0;
             }
-            10% { opacity: 1; filter: blur(0px); }
-            80% { opacity: 1; filter: blur(0px); }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
             100% {
-                /* 手前に迫ってくる際、大きく、かつ少しボケる（ピントのズレ） */
-                transform: translate(30vw, 110vh) rotate(540deg) scale(2.2);
+                /* 風に煽られ、手前に「ぶつかる」ように拡大 */
+                transform: translate(25vw, 110vh) rotate(630deg) scale(2.5);
                 opacity: 0;
-                filter: blur(5px);
+                filter: blur(3px);
             }
         }
 
-        /* メインコンテンツ：迷い込んだ後に浮かび上がる */
+        /* 至近距離を横切る「大きな花弁」：これがあるだけで圧が変わる */
+        .petal.foreground {
+            z-index: 100;
+            filter: blur(6px); /* ぼかしてカメラのすぐ前を飛んでいる演出 */
+            opacity: 0.4;
+        }
+
+        /* メインコンテンツ */
         .content {
             position: relative;
-            z-index: 20;
+            z-index: 50;
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             opacity: 0;
-            animation: wake-up 3.5s ease-in forwards;
-            animation-delay: 2s;
+            animation: fadeIn 4s ease-out forwards;
+            animation-delay: 1s;
         }
 
-        @keyframes wake-up {
-            from { opacity: 0; filter: blur(15px); }
-            to { opacity: 1; filter: blur(0px); }
+        @keyframes fadeIn {
+            to { opacity: 1; }
         }
 
         .title {
-            font-size: 1rem;
+            font-size: 1.1rem;
             letter-spacing: 0.8em;
-            color: var(--text-color);
-            margin-bottom: 60px;
+            color: var(--text-main);
+            margin-bottom: 50px;
             font-weight: 200;
-            text-shadow: 0 0 10px white; /* 文字を花弁の中に沈ませない */
+            text-shadow: 0 0 20px white;
         }
 
-        .nav-link {
+        .nav-list {
+            list-style: none;
+            text-align: center;
+        }
+
+        .nav-item {
             display: block;
             font-size: 0.85rem;
-            color: var(--text-color);
+            color: var(--text-main);
             text-decoration: none;
-            margin: 20px 0;
+            margin: 25px 0;
             letter-spacing: 0.4em;
-            transition: 0.8s;
-            position: relative;
+            transition: 1.5s cubic-bezier(0.2, 0, 0.2, 1);
+            opacity: 0.5;
         }
 
-        /* 6. タップ時の反応：夢の境界がハッキングされる（エンジニアの綾の気配） */
-        .nav-link:active {
-            color: #d35400; /* オレンジ（逃避行の色） */
+        .nav-item:active {
+            color: #d35400;
+            opacity: 1;
             letter-spacing: 0.6em;
-            filter: blur(1px);
         }
+
     </style>
 </head>
 <body>
 
-    <div class="trunk-vignette"></div>
+    <div class="vignette"></div>
+    <div class="trunk-shadow"></div>
     
     <div class="content">
         <h1 class="title">__fmm_tn_</h1>
-        <nav>
-            <a href="#" class="nav-link">STORY</a>
-            <a href="#" class="nav-link">WHERE</a>
-            <a href="#" class="nav-link">WORKS</a>
-            <a href="#" class="nav-link">LOG</a>
-        </nav>
+        <ul class="nav-list">
+            <li><a href="#" class="nav-item">STORY</a></li>
+            <li><a href="#" class="nav-item">WHERE</a></li>
+            <li><a href="#" class="nav-list"><a href="#" class="nav-item">WORKS</a></a></li>
+            <li><a href="#" class="nav-item">LOG</a></li>
+        </ul>
     </div>
 
     <script>
-        // 花弁を生成する関数
-        function spawnPetal() {
+        function createPetal() {
             const petal = document.createElement('div');
-            petal.className = 'petal';
             
-            // サイズのばらつき（少し大きく）
-            const size = Math.random() * 9 + 7 + 'px';
+            // 20%の確率で「手前の大きな花びら」にする
+            const isForeground = Math.random() > 0.8;
+            petal.className = isForeground ? 'petal foreground' : 'petal';
+            
+            const sizeBase = isForeground ? 25 : 10;
+            const size = Math.random() * 10 + sizeBase + 'px';
             petal.style.width = size;
             petal.style.height = size;
             
-            // 開始位置（横方向のランダム）
-            petal.style.left = Math.random() * 120 - 10 + 'vw';
+            petal.style.left = Math.random() * 110 - 10 + 'vw';
             
-            // 風の強さ（アニメーション秒数）のばらつき：少し遅く、重く
-            const duration = Math.random() * 5 + 5 + 's';
-            petal.style.animationDuration = duration;
+            // 落下速度：手前ほど速く、奥ほどゆっくり
+            const duration = isForeground ? (Math.random() * 3 + 3) : (Math.random() * 5 + 6);
+            petal.style.animationDuration = duration + 's';
             
-            // 花弁の形のバリエーション
-            if(Math.random() > 0.5) {
-                petal.style.borderRadius = '50% 50% 50% 0'; // 別の花弁の形
-            }
-            
-            // 色のわずかな変化
-            if(Math.random() > 0.6) petal.style.background = 'var(--sakura-light)';
+            // 色のバリエーション
+            if(Math.random() > 0.5) petal.style.background = 'var(--sakura-petal)';
             
             document.body.appendChild(petal);
             
-            // アニメーション終了後に削除
             setTimeout(() => {
                 petal.remove();
             }, duration * 1000);
         }
 
-        // 密度の調整：120msごとに生成（前より多く、密に）
-        setInterval(spawnPetal, 120);
+        // 150msごとに生成。手前の花びらが混じることで「土埃」感を消す。
+        setInterval(createPetal, 150);
     </script>
 </body>
 </html>
