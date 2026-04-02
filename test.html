@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>AUTO_SCAN // AYA_S</title>
+<title>ANALYSIS_SEQUENCE // AYA_S</title>
 <style>
   :root {
-    --bg: #030508;
+    --bg: #020406;
     --accent: #00f2ff;
     --text: #e0faff;
     --warn: #ff3e6c;
@@ -14,157 +14,162 @@
 
   html, body {
     margin: 0; padding: 0;
-    font-family: "Hiragino Sans", "Meiryo", "Courier New", monospace;
+    font-family: "Hiragino Sans", "Meiryo", monospace;
     background: var(--bg);
     color: var(--text);
     height: 100dvh; width: 100%;
     overflow: hidden;
   }
 
-  /* 画面全体のノイズ感 */
-  body::before {
+  /* 画面全体の走査線 */
+  body::after {
     content: "";
     position: fixed; inset: 0;
-    background: 
-      linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
-      linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-    background-size: 100% 3px, 3px 100%;
+    background: linear-gradient(rgba(0, 242, 255, 0.03) 50%, transparent 50%);
+    background-size: 100% 4px;
     pointer-events: none; z-index: 100;
   }
 
   #terminal {
     height: 100dvh;
-    padding: 30px 20px 100px;
+    padding: 40px 20px 120px;
     box-sizing: border-box;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 12px;
   }
 
   .log-line {
-    font-size: 0.8rem;
-    line-height: 1.5;
+    font-size: 0.85rem;
+    line-height: 1.6;
     opacity: 0;
-    transform: translateX(-10px);
-    animation: slideIn 0.2s ease forwards;
+    transform: translateY(5px);
+    animation: fadeIn 0.3s forwards;
   }
 
-  @keyframes slideIn {
-    to { opacity: 1; transform: translateX(0); }
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .accent { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
-  .warn { color: var(--warn); text-shadow: 0 0 8px var(--warn); }
-  .dim { opacity: 0.5; font-size: 0.7rem; }
+  /* ローディングバーの演出 */
+  .loader {
+    display: inline-block;
+    width: 150px;
+    height: 4px;
+    background: rgba(0, 242, 255, 0.1);
+    position: relative;
+    vertical-align: middle;
+    margin-left: 10px;
+    overflow: hidden;
+  }
+  .loader::after {
+    content: "";
+    position: absolute; left: -100%; top: 0;
+    width: 100%; height: 100%;
+    background: var(--accent);
+    animation: loading 0.8s ease-in-out forwards;
+  }
+  @keyframes loading {
+    100% { left: 0; }
+  }
+
+  .accent { color: var(--accent); font-weight: bold; }
+  .warn { color: var(--warn); }
+  .dim { opacity: 0.4; font-size: 0.75rem; }
 
   .char-img {
     display: block;
-    max-width: 85%;
+    max-width: 90%;
     margin: 20px auto;
     border: 1px solid var(--accent);
-    box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
-    filter: brightness(1.1) contrast(1.1);
+    filter: brightness(1.2) contrast(1.1);
+    opacity: 0;
+    animation: fadeIn 1s 0.5s forwards;
   }
 
-  /* 起動ボタン */
+  /* 最初のボタン */
   #bootOverlay {
     position: fixed; inset: 0;
-    background: rgba(3, 5, 8, 0.95);
+    background: var(--bg);
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
     z-index: 1000;
-    cursor: pointer;
   }
-
   .boot-btn {
     border: 1px solid var(--accent);
-    padding: 20px 40px;
+    padding: 15px 40px;
     color: var(--accent);
-    letter-spacing: 0.3em;
     font-size: 0.9rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .boot-btn::after {
-    content: "";
-    position: absolute; top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 242, 255, 0.2), transparent);
-    animation: scan 2s infinite;
-  }
-
-  @keyframes scan {
-    100% { left: 100%; }
+    cursor: pointer;
+    background: transparent;
   }
 </style>
 </head>
 <body>
 
 <div id="bootOverlay">
-  <div class="boot-btn">解析を開始する</div>
-  <p class="dim" style="margin-top: 20px;">[ TAP TO START SCRAPING ]</p>
+  <button class="boot-btn" onclick="startAnalysis()">解析プロトコルを実行</button>
 </div>
 
-<div id="terminal">
-  </div>
+<div id="terminal"></div>
 
 <script>
   const terminal = document.getElementById('terminal');
   const bootOverlay = document.getElementById('bootOverlay');
 
   const logData = [
-    { t: ">>> 外部ネットワーク接続... 成功", c: "dim" },
-    { t: ">>> ターゲット：笹井 綾 (AYA_SASAI)", c: "accent" },
-    { t: ">>> 属性データを展開中...", c: "dim" },
-    { t: "【基本情報】", c: "accent" },
-    { t: "年齢：22歳 / 身長：145cm", c: "" },
-    { t: "職業：エンジニア（HAMAメタバース企業勤務）", c: "" },
-    { t: "【行動記録】", c: "accent" },
-    { t: "・極度の方向音痴。ナビゲーションの再試行回数：過多", c: "warn" },
-    { t: "・AI技術への深い知識。対ロボット感情：冷淡", c: "warn" },
-    { t: "【警告】", c: "accent" },
-    { t: "・特定セクターの記憶データに深刻なノイズを確認", c: "warn" },
-    { t: "・「溶けて、そのまま雲隠れ」というフレーズを検出", c: "dim" },
-    { t: ">>> 視覚情報の再構築を開始...", c: "dim" },
-    { type: "image", src: "assets/profile/aya2.PNG" },
-    { t: ">>> 解析完了。全データをキャッシュしました。", c: "accent" },
-    { t: "SYSTEM_READY.", c: "dim" }
+    { text: ">>> システム接続中...", type: "dim" },
+    { text: "対象：笹井 綾 (AYA_SASAI) を補足", type: "accent" },
+    { text: "---", type: "dim" },
+    { text: "属性データを解析中... ", hasLoader: true },
+    { text: "【個体データ】年齢: 22 / 身長: 145cm", type: "normal" },
+    { text: "【所属情報】エンジニア (HAMA Metax)", type: "normal" },
+    { text: "---", type: "dim" },
+    { text: "行動ログを解析中... ", hasLoader: true },
+    { text: "注意：極度の方向音痴。現在地把握能力に欠陥。", type: "warn" },
+    { text: "記録：AI技術に博識。対人感情に特異点あり。", type: "warn" },
+    { text: "警告：過去ログに深刻なデータの空白を検出。", type: "warn" },
+    { text: "---", type: "dim" },
+    { text: "外見データを復元中... ", hasLoader: true },
+    { isImage: true, src: "assets/profile/aya2.PNG" },
+    { text: ">>> 全解析工程が完了しました。", type: "accent" }
   ];
 
-  let index = 0;
+  async function startAnalysis() {
+    bootOverlay.style.display = 'none';
 
-  function runAnalysis() {
-    bootOverlay.style.display = 'none'; // 重なりを消す
-    
-    const interval = setInterval(() => {
-      if (index >= logData.length) {
-        clearInterval(interval);
-        return;
-      }
-
-      const item = logData[index];
-      const div = document.createElement('div');
-      div.className = 'log-line';
-      if (item.c) div.classList.add(item.c);
-
-      if (item.type === "image") {
+    for (const item of logData) {
+      const line = document.createElement('div');
+      line.className = 'log-line ' + (item.type || '');
+      
+      if (item.isImage) {
         const img = document.createElement('img');
         img.src = item.src;
         img.className = 'char-img';
-        div.appendChild(img);
+        line.appendChild(img);
+        terminal.appendChild(line);
+        await sleep(1500); // 画像表示前の溜め
       } else {
-        div.textContent = item.t;
+        line.textContent = item.text;
+        if (item.hasLoader) {
+          const loader = document.createElement('span');
+          loader.className = 'loader';
+          line.appendChild(loader);
+          terminal.appendChild(line);
+          await sleep(1000); // ローディング演出の時間
+        } else {
+          terminal.appendChild(line);
+          await sleep(600); // 次の行へのウェイト
+        }
       }
-
-      terminal.appendChild(div);
       terminal.scrollTo({ top: terminal.scrollHeight, behavior: 'smooth' });
-      index++;
-    }, 400); // 0.4秒ごとに次の行が出る（ポンポン出るリズム）
+    }
   }
 
-  bootOverlay.addEventListener('click', runAnalysis);
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 </script>
 
 </body>
