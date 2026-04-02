@@ -3,145 +3,184 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>FRAGMENT_SCAN // AYA</title>
+<title>OBSERVATION_UNIT_01</title>
 <style>
   :root {
     --bg: #fdfeff;
-    --accent: #7abfff;
-    --text: #4a5568;
+    --accent: #8eb8ff;
+    --warn: #ff8e8e;
   }
 
   html, body {
-    margin: 0; padding: 0;
-    background: var(--bg);
-    color: var(--text);
+    margin: 0; padding: 0; width: 100%; height: 100dvh;
+    background: var(--bg); color: #444;
     font-family: "Hiragino Mincho ProN", serif;
-    height: 100%; width: 100%;
-    overflow: hidden; touch-action: none; /* スクロールを禁止して干渉に集中 */
+    overflow: hidden; touch-action: none;
   }
 
-  /* --- 背面：解析された「真実」のレイヤー --- */
-  #underlay {
+  /* 1. ジャイロ連動レイヤー（パララックス） */
+  #world {
     position: fixed; inset: 0;
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    padding: 40px;
-    z-index: 1;
+    display: flex; justify-content: center; align-items: center;
+    transition: transform 0.1s ease-out;
   }
 
-  .char-img {
-    max-width: 80%; height: auto;
-    filter: brightness(1.1) saturate(0.8);
-    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  /* 彼女の姿（中景） */
+  .subject {
+    position: absolute; width: 80%; height: auto;
+    filter: brightness(1.1) contrast(0.9);
+    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    z-index: 2;
+    transition: transform 0.2s ease-out;
   }
 
-  .secret-log {
-    margin-top: 20px;
-    font-size: 0.85rem;
-    letter-spacing: 0.2em;
-    line-height: 2;
-    text-align: center;
-    color: var(--accent);
+  /* 解析ログ（遠景） */
+  #log-stream {
+    position: absolute; width: 100%; height: 100%;
+    padding: 20px; box-sizing: border-box;
+    font-family: monospace; font-size: 0.6rem; color: var(--accent);
+    opacity: 0.3; z-index: 1;
+    display: flex; flex-direction: column; gap: 4px;
   }
 
-  /* --- 前面：白い霧（キャンバス） --- */
+  /* 2. 前面の霧（スクラッチ用） */
   #fogCanvas {
-    position: fixed; inset: 0;
-    z-index: 10;
-    cursor: crosshair;
+    position: fixed; inset: 0; z-index: 10;
   }
 
-  /* UI演出 */
-  .guide {
-    position: fixed; bottom: 40px; width: 100%;
-    text-align: center; z-index: 20;
-    font-size: 0.7rem; color: #aaa;
-    letter-spacing: 0.3em;
-    pointer-events: none;
-    animation: blink 2s infinite;
+  /* 3. 長押しゲージ */
+  #hold-ring {
+    position: fixed; width: 80px; height: 80px;
+    border: 2px solid var(--accent); border-radius: 50%;
+    display: none; z-index: 100; pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  #hold-fill {
+    width: 100%; height: 100%; background: var(--accent);
+    border-radius: 50%; transform: scale(0); opacity: 0.3;
   }
 
-  @keyframes blink { 50% { opacity: 0.3; } }
-
-  .side-code {
-    position: fixed; top: 20px; left: 20px;
-    font-family: monospace; font-size: 0.6rem;
-    opacity: 0.2; z-index: 5;
+  /* ガイド表示 */
+  .ui-overlay {
+    position: fixed; bottom: 30px; width: 100%;
+    text-align: center; z-index: 50;
+    font-size: 0.7rem; letter-spacing: 0.2em; color: #999;
   }
 </style>
 </head>
 <body>
 
-<div class="side-code">ERR_DATA_CORRUPTION // RECOVERING_VIA_TOUCH...</div>
-<div class="guide">指先で、霧を拭ってください</div>
+<div id="log-stream"></div>
 
-<div id="underlay">
-  <img src="assets/profile/aya2.PNG" alt="Aya" class="char-img">
-  <div class="secret-log">
-    【 笹井 綾 / AYA_SASAI 】<br>
-    エンジニア。22歳。<br>
-    ── 霧が晴れても、彼女はそこにいない。
-  </div>
+<div id="world">
+  <img src="assets/profile/aya2.PNG" class="subject" id="subject">
 </div>
 
 <canvas id="fogCanvas"></canvas>
 
+<div id="hold-ring"><div id="hold-fill"></div></div>
+
+<div class="ui-overlay" id="guide">
+  傾けて覗き、指で霧を払い、<br>彼女を長押しして解析を完遂せよ
+</div>
+
 <script>
   const canvas = document.getElementById('fogCanvas');
   const ctx = canvas.getContext('2d');
-  let isDrawing = false;
+  const subject = document.getElementById('subject');
+  const logStream = document.getElementById('log-stream');
+  const ring = document.getElementById('hold-ring');
+  const fill = document.getElementById('hold-fill');
+  const guide = document.getElementById('guide');
 
-  // キャンバスサイズを画面に合わせる
-  function resize() {
+  let isTouching = false;
+  let holdTimer = null;
+  let holdProgress = 0;
+
+  // 初期化
+  function init() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    fillFog();
-  }
-
-  // 霧（白いレイヤー）で塗りつぶす
-  function fillFog() {
-    ctx.fillStyle = '#fff'; // 完全に真っ白な霧
+    ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // わずかに質感を出すためのノイズ（ダサさを消す隠し味）
-    for (let i = 0; i < 500; i++) {
-      ctx.fillStyle = `rgba(200, 220, 255, ${Math.random() * 0.05})`;
-      ctx.beginPath();
-      ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2, 0, Math.PI * 2);
-      ctx.fill();
+    // 背景ログのダミー生成
+    for(let i=0; i<50; i++) {
+      const line = document.createElement('div');
+      line.textContent = `SCANNING_SECTOR_${Math.random().toString(16).substr(2,5)}... OK`;
+      logStream.appendChild(line);
     }
   }
 
-  // 「拭う」処理：透明な円を描く（destination-out）
+  // 1. スクラッチ演出
   function scratch(x, y) {
     ctx.globalCompositeOperation = 'destination-out';
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, 40);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = grad;
     ctx.beginPath();
-    // ぼかしを効かせて「柔らかく」拭う
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 40);
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    ctx.fillStyle = gradient;
-    ctx.arc(x, y, 40, 0, Math.PI * 2);
+    ctx.arc(x, y, 40, 0, Math.PI*2);
     ctx.fill();
   }
 
-  // イベントリスナー（スマホ・PC両対応）
-  function getPos(e) {
-    const t = e.touches ? e.touches[0] : e;
-    return { x: t.clientX, y: t.clientY };
+  // 2. ジャイロ（傾き）連動
+  window.addEventListener('deviceorientation', (e) => {
+    const x = e.beta / 5;  // 前後
+    const y = e.gamma / 5; // 左右
+    subject.style.transform = `translate(${y}px, ${x}px) scale(1.05)`;
+    logStream.style.transform = `translate(${-y}px, ${-x}px)`;
+  });
+
+  // 3. 長押し解析
+  function startHold(x, y) {
+    ring.style.display = 'block';
+    ring.style.left = x + 'px';
+    ring.style.top = y + 'px';
+    holdProgress = 0;
+    
+    holdTimer = setInterval(() => {
+      holdProgress += 2;
+      fill.style.transform = `scale(${holdProgress / 100})`;
+      if (holdProgress >= 100) {
+        completeAnalysis();
+        clearInterval(holdTimer);
+      }
+    }, 20);
   }
 
-  canvas.addEventListener('touchstart', (e) => { isDrawing = true; const p = getPos(e); scratch(p.x, p.y); });
-  canvas.addEventListener('touchmove', (e) => { if (isDrawing) { const p = getPos(e); scratch(p.x, p.y); } });
-  canvas.addEventListener('touchend', () => isDrawing = false);
+  function completeAnalysis() {
+    guide.innerHTML = "<span style='color:var(--accent)'>ANALYSIS COMPLETE: 笹井 綾 を観測しました</span>";
+    document.body.style.backgroundColor = "#eef4ff";
+    // 画面全体をクリアにする
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+  }
 
-  canvas.addEventListener('mousedown', (e) => { isDrawing = true; const p = getPos(e); scratch(p.x, p.y); });
-  canvas.addEventListener('mousemove', (e) => { if (isDrawing) { const p = getPos(e); scratch(p.x, p.y); } });
-  canvas.addEventListener('mouseup', () => isDrawing = false);
+  function stopHold() {
+    clearInterval(holdTimer);
+    ring.style.display = 'none';
+    fill.style.transform = `scale(0)`;
+  }
 
-  window.addEventListener('resize', resize);
-  resize();
+  // イベント登録
+  canvas.addEventListener('touchstart', (e) => {
+    isTouching = true;
+    const p = e.touches[0];
+    scratch(p.clientX, p.clientY);
+    startHold(p.clientX, p.clientY);
+  });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if(!isTouching) return;
+    const p = e.touches[0];
+    scratch(p.clientX, p.clientY);
+    // 動いたら長押しキャンセル（精密な操作を要求）
+    if (holdProgress < 90) stopHold(); 
+  });
+
+  canvas.addEventListener('touchend', stopHold);
+
+  window.onload = init;
 </script>
-
 </body>
 </html>
