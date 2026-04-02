@@ -1,186 +1,150 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>OBSERVATION_UNIT_01</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DEVICE_SYNC // AYA</title>
 <style>
-  :root {
-    --bg: #fdfeff;
-    --accent: #8eb8ff;
-    --warn: #ff8e8e;
-  }
-
-  html, body {
-    margin: 0; padding: 0; width: 100%; height: 100dvh;
-    background: var(--bg); color: #444;
+  :root { --bg: #f4f7f9; --accent: #8eb8ff; --text: #4a5568; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
     font-family: "Hiragino Mincho ProN", serif;
-    overflow: hidden; touch-action: none;
+    height: 100dvh; overflow: hidden; touch-action: none;
   }
 
-  /* 1. ジャイロ連動レイヤー（パララックス） */
-  #world {
-    position: fixed; inset: 0;
-    display: flex; justify-content: center; align-items: center;
-    transition: transform 0.1s ease-out;
+  /* 重力で動くデータの破片 */
+  .particle {
+    position: absolute; width: 40px; height: 40px;
+    background: rgba(142, 184, 255, 0.1);
+    border: 1px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.5rem; pointer-events: none;
   }
 
-  /* 彼女の姿（中景） */
-  .subject {
-    position: absolute; width: 80%; height: auto;
-    filter: brightness(1.1) contrast(0.9);
-    mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-    z-index: 2;
-    transition: transform 0.2s ease-out;
+  /* キャラクターメッセージ */
+  #msg-box {
+    position: fixed; bottom: 100px; width: 80%; left: 10%;
+    background: rgba(255,255,255,0.8); backdrop-filter: blur(10px);
+    padding: 20px; border-radius: 15px; border: 1px solid var(--accent);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    z-index: 100; opacity: 0; transform: translateY(20px);
+    transition: 0.5s;
   }
 
-  /* 解析ログ（遠景） */
-  #log-stream {
-    position: absolute; width: 100%; height: 100%;
-    padding: 20px; box-sizing: border-box;
-    font-family: monospace; font-size: 0.6rem; color: var(--accent);
-    opacity: 0.3; z-index: 1;
-    display: flex; flex-direction: column; gap: 4px;
+  /* 画面全体のノイズ（シェイクで消える） */
+  #noise-layer {
+    position: fixed; inset: 0; z-index: 50;
+    background: url('https://www.transparenttextures.com/patterns/p6.png');
+    opacity: 0.3; pointer-events: none;
   }
 
-  /* 2. 前面の霧（スクラッチ用） */
-  #fogCanvas {
-    position: fixed; inset: 0; z-index: 10;
-  }
-
-  /* 3. 長押しゲージ */
-  #hold-ring {
-    position: fixed; width: 80px; height: 80px;
-    border: 2px solid var(--accent); border-radius: 50%;
-    display: none; z-index: 100; pointer-events: none;
-    transform: translate(-50%, -50%);
-  }
-  #hold-fill {
-    width: 100%; height: 100%; background: var(--accent);
-    border-radius: 50%; transform: scale(0); opacity: 0.3;
-  }
-
-  /* ガイド表示 */
-  .ui-overlay {
-    position: fixed; bottom: 30px; width: 100%;
-    text-align: center; z-index: 50;
-    font-size: 0.7rem; letter-spacing: 0.2em; color: #999;
+  .status-bar {
+    position: fixed; top: 20px; right: 20px; font-family: monospace; font-size: 0.7rem;
   }
 </style>
 </head>
 <body>
 
-<div id="log-stream"></div>
+<div id="noise-layer"></div>
+<div class="status-bar" id="battery-ui">BATTERY: --%</div>
 
-<div id="world">
-  <img src="assets/profile/aya2.PNG" class="subject" id="subject">
-</div>
-
-<canvas id="fogCanvas"></canvas>
-
-<div id="hold-ring"><div id="hold-fill"></div></div>
-
-<div class="ui-overlay" id="guide">
-  傾けて覗き、指で霧を払い、<br>彼女を長押しして解析を完遂せよ
+<div id="msg-box">
+  <div id="char-name" style="font-size: 0.7rem; color: var(--accent); margin-bottom: 5px;">AYA_SASAI</div>
+  <div id="text">......接続を確認。</div>
 </div>
 
 <script>
-  const canvas = document.getElementById('fogCanvas');
-  const ctx = canvas.getContext('2d');
-  const subject = document.getElementById('subject');
-  const logStream = document.getElementById('log-stream');
-  const ring = document.getElementById('hold-ring');
-  const fill = document.getElementById('hold-fill');
-  const guide = document.getElementById('guide');
+  const msgBox = document.getElementById('msg-box');
+  const textEl = document.getElementById('text');
+  const noise = document.getElementById('noise-layer');
+  const batteryUi = document.getElementById('battery-ui');
 
-  let isTouching = false;
-  let holdTimer = null;
-  let holdProgress = 0;
+  // 1. バッテリー読み取り & セリフ
+  async function checkBattery() {
+    if (!navigator.getBattery) return;
+    const battery = await navigator.getBattery();
+    const level = Math.floor(battery.level * 100);
+    batteryUi.textContent = `BATTERY: ${level}%`;
 
-  // 初期化
-  function init() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    let quote = "";
+    if (level > 80) quote = `${level}%......。元気な端末。これなら長時間の解析も耐えられそう。`;
+    else if (level > 40) quote = `${level}%？ 中途半端......。今のうちに、充電するか悩むね。`;
+    else quote = `残り${level}%......。消えちゃう前に、私を見つけて。`;
     
-    // 背景ログのダミー生成
-    for(let i=0; i<50; i++) {
-      const line = document.createElement('div');
-      line.textContent = `SCANNING_SECTOR_${Math.random().toString(16).substr(2,5)}... OK`;
-      logStream.appendChild(line);
+    showMsg(quote);
+  }
+
+  function showMsg(txt) {
+    textEl.textContent = txt;
+    msgBox.style.opacity = "1";
+    msgBox.style.transform = "translateY(0)";
+  }
+
+  // 2. 重力シミュレーション（簡易版）
+  const particles = [];
+  function createParticles() {
+    for(let i=0; i<5; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = "DATA";
+      document.body.appendChild(p);
+      particles.push({ el: p, x: Math.random()*300, y: Math.random()*500, vx: 0, vy: 0 });
     }
   }
 
-  // 1. スクラッチ演出
-  function scratch(x, y) {
-    ctx.globalCompositeOperation = 'destination-out';
-    const grad = ctx.createRadialGradient(x, y, 0, x, y, 40);
-    grad.addColorStop(0, 'rgba(255,255,255,1)');
-    grad.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(x, y, 40, 0, Math.PI*2);
-    ctx.fill();
-  }
+  // 3. ジャイロ・加速度センサー（シェイク & 傾き）
+  let lastX, lastY, lastZ;
+  let moveCount = 0;
 
-  // 2. ジャイロ（傾き）連動
-  window.addEventListener('deviceorientation', (e) => {
-    const x = e.beta / 5;  // 前後
-    const y = e.gamma / 5; // 左右
-    subject.style.transform = `translate(${y}px, ${x}px) scale(1.05)`;
-    logStream.style.transform = `translate(${-y}px, ${-x}px)`;
-  });
+  window.addEventListener('devicemotion', (e) => {
+    const acc = e.accelerationIncludingGravity;
+    if (!acc) return;
 
-  // 3. 長押し解析
-  function startHold(x, y) {
-    ring.style.display = 'block';
-    ring.style.left = x + 'px';
-    ring.style.top = y + 'px';
-    holdProgress = 0;
-    
-    holdTimer = setInterval(() => {
-      holdProgress += 2;
-      fill.style.transform = `scale(${holdProgress / 100})`;
-      if (holdProgress >= 100) {
-        completeAnalysis();
-        clearInterval(holdTimer);
+    // 重力で粒子を動かす
+    particles.forEach(p => {
+      p.vx += acc.x * 0.1;
+      p.vy -= acc.y * 0.1;
+      p.x += p.vx; p.y += p.vy;
+      // 壁バウンド
+      if(p.x < 0 || p.x > window.innerWidth - 40) p.vx *= -0.5;
+      if(p.y < 0 || p.y > window.innerHeight - 40) p.vy *= -0.5;
+      p.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
+    });
+
+    // シェイク検知（ノイズを飛ばす）
+    let delta = Math.abs(acc.x - lastX) + Math.abs(acc.y - lastY);
+    if (delta > 20) {
+      moveCount++;
+      if (moveCount > 5) {
+        noise.style.opacity = "0"; // 振るとノイズが晴れる
+        showMsg("......ん、端末を振った？ ノイズが、少し消えたみたい。");
+        vibrate(50);
       }
-    }, 20);
-  }
-
-  function completeAnalysis() {
-    guide.innerHTML = "<span style='color:var(--accent)'>ANALYSIS COMPLETE: 笹井 綾 を観測しました</span>";
-    document.body.style.backgroundColor = "#eef4ff";
-    // 画面全体をクリアにする
-    ctx.clearRect(0,0,canvas.width, canvas.height);
-  }
-
-  function stopHold() {
-    clearInterval(holdTimer);
-    ring.style.display = 'none';
-    fill.style.transform = `scale(0)`;
-  }
-
-  // イベント登録
-  canvas.addEventListener('touchstart', (e) => {
-    isTouching = true;
-    const p = e.touches[0];
-    scratch(p.clientX, p.clientY);
-    startHold(p.clientX, p.clientY);
+    }
+    lastX = acc.x; lastY = acc.y; lastZ = acc.z;
   });
 
-  canvas.addEventListener('touchmove', (e) => {
-    if(!isTouching) return;
-    const p = e.touches[0];
-    scratch(p.clientX, p.clientY);
-    // 動いたら長押しキャンセル（精密な操作を要求）
-    if (holdProgress < 90) stopHold(); 
+  // バイブレーション（Android & 一部ブラウザ。iOSは現在制限が厳しい）
+  function vibrate(ms) {
+    if (navigator.vibrate) navigator.vibrate(ms);
+  }
+
+  // 4. フリップ（画面を伏せるとリセット/隠す）
+  window.addEventListener('deviceorientation', (e) => {
+    if (Math.abs(e.beta) < 20 && Math.abs(e.gamma) < 20) {
+        // 画面が水平（伏せられた/置かれた）
+        msgBox.style.opacity = "0";
+    }
   });
 
-  canvas.addEventListener('touchend', stopHold);
-
-  window.onload = init;
+  // iOSのための権限リクエストボタン
+  document.body.onclick = () => {
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+      DeviceMotionEvent.requestPermission();
+    }
+    checkBattery();
+    createParticles();
+  };
 </script>
 </body>
 </html>
