@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>__fmm_tn_ // Layer 0</title>
+    <style>
+        :root {
+            --bg-white: #fdfdfd;
+            --sakura-pink: rgba(255, 200, 210, 0.4);
+            --deep-orange: #d35400;
+            --text-gray: rgba(100, 100, 100, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-white);
+            font-family: "serif", "YuMincho", "Hiragino Mincho ProN", serif;
+        }
+
+        /* 画面全体を覆う微細なノイズ質感 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 0);
+            background-size: 4px 4px;
+            opacity: 0.2;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* 視界の端をぼかすビネット（圧と没入感） */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 40%, rgba(255, 255, 255, 0.8) 100%);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        /* 背景に沈む巨大な「記憶」の残影 */
+        .background-text {
+            position: fixed;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18vw;
+            color: rgba(0, 0, 0, 0.015);
+            white-space: nowrap;
+            letter-spacing: -0.2em;
+            z-index: 1;
+            user-select: none;
+            filter: blur(2px);
+        }
+
+        /* 夢の中の大樹（抽象表現） */
+        .tree-core {
+            position: absolute;
+            bottom: -10vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 70vh;
+            background: linear-gradient(to top, rgba(0,0,0,0.05), transparent);
+            z-index: 2;
+        }
+
+        /* 舞い落ちる花びら */
+        .petal {
+            position: absolute;
+            background-color: var(--sakura-pink);
+            border-radius: 150% 0 150% 0;
+            pointer-events: none;
+            z-index: 4;
+            filter: blur(0.5px);
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translate(0, -10vh) rotate(0deg) skewX(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translate(100px, 100vh) rotate(720deg) skewX(20deg);
+                opacity: 0;
+            }
+        }
+
+        /* メインナビゲーション */
+        .nav-container {
+            position: relative;
+            z-index: 20;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .site-title {
+            font-size: 1.2rem;
+            letter-spacing: 0.5em;
+            color: var(--text-gray);
+            margin-bottom: 60px;
+            font-weight: 200;
+            transition: 1s;
+        }
+
+        .menu-item {
+            font-size: 0.9rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            margin: 15px 0;
+            letter-spacing: 0.3em;
+            position: relative;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .menu-item:active {
+            color: var(--deep-orange);
+            letter-spacing: 0.5em;
+            filter: blur(1px);
+        }
+
+        /* タップした瞬間の「夢の揺らぎ」 */
+        .ripple {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(211, 84, 0, 0.1);
+            transform: scale(0);
+            animation: ripple-effect 1.2s ease-out;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes ripple-effect {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-text">DREAM_LOG_2055</div>
+    <div class="tree-core"></div>
+    
+    <div class="nav-container">
+        <h1 class="site-title">__fmm_tn_</h1>
+        <a href="#" class="menu-item">STORY</a>
+        <a href="#" class="menu-item">WHERE</a>
+        <a href="#" class="menu-item">WORKS</a>
+        <a href="#" class="menu-item">LOG</a>
+    </div>
+
+    <script>
+        // 花びらの生成
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            
+            const size = Math.random() * 10 + 5 + 'px';
+            petal.style.width = size;
+            petal.style.height = size;
+            
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.animationDuration = Math.random() * 5 + 5 + 's';
+            petal.style.opacity = Math.random();
+            
+            document.body.appendChild(petal);
+            
+            setTimeout(() => {
+                petal.remove();
+            }, 10000);
+        }
+
+        setInterval(createPetal, 300);
+
+        // タップエフェクト：夢の境界がわずかに熱を持つ
+        document.addEventListener('touchstart', (e) => {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            const touch = e.touches[0];
+            
+            const size = 100;
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = touch.clientX - size/2 + 'px';
+            ripple.style.top = touch.clientY - size/2 + 'px';
+            
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 1200);
+        });
+    </script>
+</body>
+</html>
