@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>__fmm_tn_ // Layer 0</title>
+    <title>__fmm_tn_ // inception</title>
     <style>
         :root {
-            --bg-white: #fdfdfd;
-            --sakura-pink: rgba(255, 200, 210, 0.4);
+            --bg-white: #fcfcfc;
+            /* 桜の色：少し湿度と重みのある濃い桃色 */
+            --sakura-deep: rgba(231, 76, 116, 0.6);
+            --trunk-shadow: rgba(40, 30, 30, 0.08);
             --deep-orange: #d35400;
-            --text-gray: rgba(100, 100, 100, 0.6);
+            --text-main: rgba(80, 70, 70, 0.7);
         }
 
         * {
@@ -27,80 +29,68 @@
             font-family: "serif", "YuMincho", "Hiragino Mincho ProN", serif;
         }
 
-        /* 画面全体を覆う微細なノイズ質感 */
+        /* 視界の「歪み」と「ノイズ」：夢の不確実さ */
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 0);
-            background-size: 4px 4px;
-            opacity: 0.2;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
             z-index: 10;
             pointer-events: none;
         }
 
-        /* 視界の端をぼかすビネット（圧と没入感） */
-        body::after {
-            content: "";
+        /* 見上げる視点のビネット：周辺を白く飛ばして中央の「圧」を強調 */
+        .vignette {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, transparent 40%, rgba(255, 255, 255, 0.8) 100%);
+            background: radial-gradient(circle at 50% 70%, transparent 20%, rgba(255, 255, 255, 0.9) 100%);
             z-index: 5;
             pointer-events: none;
         }
 
-        /* 背景に沈む巨大な「記憶」の残影 */
-        .background-text {
-            position: fixed;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 18vw;
-            color: rgba(0, 0, 0, 0.015);
-            white-space: nowrap;
-            letter-spacing: -0.2em;
-            z-index: 1;
-            user-select: none;
-            filter: blur(2px);
-        }
-
-        /* 夢の中の大樹（抽象表現） */
-        .tree-core {
+        /* 巨大な「幹」：画面下部からせり出す重厚な影 */
+        .giant-trunk {
             position: absolute;
             bottom: -10vh;
             left: 50%;
             transform: translateX(-50%);
-            width: 2px;
-            height: 70vh;
-            background: linear-gradient(to top, rgba(0,0,0,0.05), transparent);
-            z-index: 2;
+            width: 40vw;
+            height: 110vh;
+            background: linear-gradient(to top, var(--trunk-shadow) 0%, transparent 80%);
+            border-radius: 50% 50% 0 0;
+            filter: blur(40px);
+            z-index: 1;
         }
 
-        /* 舞い落ちる花びら */
+        /* 花びら：色が濃くなり、舞い方に「重力」を持たせる */
         .petal {
             position: absolute;
-            background-color: var(--sakura-pink);
+            background-color: var(--sakura-deep);
             border-radius: 150% 0 150% 0;
             pointer-events: none;
             z-index: 4;
-            filter: blur(0.5px);
-            animation: fall linear infinite;
+            filter: blur(0.3px);
+            box-shadow: 0 0 5px rgba(231, 76, 116, 0.2);
+            animation: fall-down linear infinite;
         }
 
-        @keyframes fall {
+        @keyframes fall-down {
             0% {
-                transform: translate(0, -10vh) rotate(0deg) skewX(0deg);
+                transform: translate(0, -10vh) rotate(0deg) scale(0.8);
                 opacity: 0;
             }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
             100% {
-                transform: translate(100px, 100vh) rotate(720deg) skewX(20deg);
+                /* 見上げる視線なので、手前（下）に来るほど大きく、少しボケる */
+                transform: translate(15vw, 110vh) rotate(540deg) scale(1.5);
                 opacity: 0;
+                filter: blur(2px);
             }
         }
 
-        /* メインナビゲーション */
+        /* ナビゲーション：あえて「幹」の影が薄くなる中段に配置 */
         .nav-container {
             position: relative;
             z-index: 20;
@@ -109,79 +99,92 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding-top: 10vh;
         }
 
         .site-title {
-            font-size: 1.2rem;
-            letter-spacing: 0.5em;
-            color: var(--text-gray);
-            margin-bottom: 60px;
+            font-size: 1.1rem;
+            letter-spacing: 0.8em;
+            color: var(--text-main);
+            margin-bottom: 5vh;
             font-weight: 200;
-            transition: 1s;
+            text-shadow: 0 0 15px rgba(255,255,255,0.8);
+        }
+
+        .menu-list {
+            list-style: none;
+            text-align: center;
         }
 
         .menu-item {
-            font-size: 0.9rem;
-            color: var(--text-gray);
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-main);
             text-decoration: none;
-            margin: 15px 0;
-            letter-spacing: 0.3em;
-            position: relative;
-            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 25px 0;
+            letter-spacing: 0.4em;
+            transition: 0.8s cubic-bezier(0.2, 0, 0.2, 1);
+            opacity: 0.6;
         }
 
+        /* タップ時の違和感（圧） */
         .menu-item:active {
             color: var(--deep-orange);
-            letter-spacing: 0.5em;
-            filter: blur(1px);
+            transform: scale(0.95);
+            filter: blur(2px);
+            opacity: 1;
         }
 
-        /* タップした瞬間の「夢の揺らぎ」 */
-        .ripple {
+        /* 隠された「本名」の残滓：背景に溶け込ませる */
+        .latent-word {
             position: fixed;
-            border-radius: 50%;
-            background: rgba(211, 84, 0, 0.1);
-            transform: scale(0);
-            animation: ripple-effect 1.2s ease-out;
-            pointer-events: none;
-            z-index: 100;
-        }
-
-        @keyframes ripple-effect {
-            to {
-                transform: scale(4);
-                opacity: 0;
-            }
+            bottom: 5vh;
+            right: 5vw;
+            font-size: 0.7rem;
+            color: rgba(0, 0, 0, 0.03);
+            letter-spacing: 0.5em;
+            z-index: 2;
+            writing-mode: vertical-rl;
         }
     </style>
 </head>
 <body>
 
-    <div class="background-text">DREAM_LOG_2055</div>
-    <div class="tree-core"></div>
+    <div class="vignette"></div>
+    <div class="giant-trunk"></div>
+    <div class="latent-word">誰モ知ラナイ夢</div>
     
     <div class="nav-container">
         <h1 class="site-title">__fmm_tn_</h1>
-        <a href="#" class="menu-item">STORY</a>
-        <a href="#" class="menu-item">WHERE</a>
-        <a href="#" class="menu-item">WORKS</a>
-        <a href="#" class="menu-item">LOG</a>
+        <ul class="menu-list">
+            <li><a href="#" class="menu-item">STORY</a></li>
+            <li><a href="#" class="menu-item">WHERE</a></li>
+            <li><a href="#" class="menu-item">WORKS</a></li>
+            <li><a href="#" class="menu-item">LOG</a></li>
+        </ul>
     </div>
 
     <script>
-        // 花びらの生成
+        // 花びらの生成：見上げる視点を意識したランダム性
         function createPetal() {
             const petal = document.createElement('div');
             petal.className = 'petal';
             
-            const size = Math.random() * 10 + 5 + 'px';
+            const size = Math.random() * 8 + 6 + 'px';
             petal.style.width = size;
             petal.style.height = size;
             
-            petal.style.left = Math.random() * 100 + 'vw';
-            petal.style.animationDuration = Math.random() * 5 + 5 + 's';
-            petal.style.opacity = Math.random();
+            // 幹の周辺（中央寄り）から多く降るように調整
+            const startX = (Math.random() * 120) - 10; 
+            petal.style.left = startX + 'vw';
+            
+            // 落下速度に「個体差（重み）」を出す
+            const duration = Math.random() * 4 + 6 + 's';
+            petal.style.animationDuration = duration;
+            
+            // 花びらごとに微妙に色を変えて「湿度」を出す
+            const opacity = Math.random() * 0.5 + 0.3;
+            petal.style.opacity = opacity;
             
             document.body.appendChild(petal);
             
@@ -190,21 +193,13 @@
             }, 10000);
         }
 
-        setInterval(createPetal, 300);
+        // 密度の調整：180msごとに生成
+        setInterval(createPetal, 180);
 
-        // タップエフェクト：夢の境界がわずかに熱を持つ
-        document.addEventListener('touchstart', (e) => {
-            const ripple = document.createElement('div');
-            ripple.className = 'ripple';
-            const touch = e.touches[0];
-            
-            const size = 100;
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = touch.clientX - size/2 + 'px';
-            ripple.style.top = touch.clientY - size/2 + 'px';
-            
-            document.body.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 1200);
+        // スクロールによる微細な「視差」：スマホを動かしている感覚
+        document.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            document.querySelector('.giant-trunk').style.transform = `translateX(-50%) translateY(${scrolled * 0.1}px)`;
         });
     </script>
 </body>
