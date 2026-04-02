@@ -3,188 +3,172 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Aya Sasai // Profile</title>
+<title>Character // AYA</title>
 <style>
   :root {
-    --bg-base: #fdfdfd;
+    --glass-bg: rgba(255, 255, 255, 0.75);
     --accent: #e74c74;
-    --text-main: #333;
-    --glass: rgba(255, 255, 255, 0.7);
+    --text: #333;
   }
 
   html, body {
     margin: 0; padding: 0;
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-    background: var(--bg-base);
-    color: var(--text-main);
-    overflow-x: hidden;
+    background: #f8e9e9;
+    color: var(--text);
+    /* スクロールの跳ね返りで下地が見えないように */
+    overscroll-behavior-y: none;
   }
 
-  /* 背景のグラデーションを薄く固定 */
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 50%, #e8f0f8 100%);
-    opacity: 0.5; z-index: -1;
-  }
-
-  /* --- 1. ビジュアル：画面いっぱいの存在感 --- */
-  .hero-visual {
-    width: 100%;
-    height: 90vh; /* スマホで見たとき、少しだけ下のコンテンツが見える絶妙な高さ */
-    position: relative;
-    overflow: hidden;
-    background: #fff;
+  /* --- 1. 背景固定：彼女を常に「そこ」に置く --- */
+  .fixed-visual {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100dvh; /* 動的ビューポート */
+    z-index: 1;
     display: flex;
     justify-content: center;
+    align-items: flex-start; /* 上寄せ */
+    background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 100%);
   }
 
   .char-img {
-    height: 110%; /* 縦長画像に合わせる */
+    height: 100%;
     width: auto;
-    object-fit: cover;
-    object-position: center 15%; /* 最初は顔を中心に */
-    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.1));
-    transition: transform 0.3s ease-out;
+    object-fit: contain;
+    /* スマホで顔が一番いい位置に来るように調整 */
+    object-position: center 15%; 
+    filter: drop-shadow(0 10px 40px rgba(0,0,0,0.08));
+    transition: filter 0.8s ease;
   }
 
-  /* 画面に重なる名前（浮遊感） */
-  .hero-name {
-    position: absolute;
-    bottom: 10%;
-    left: 8%;
-    z-index: 10;
-    writing-mode: vertical-rl;
-    letter-spacing: 0.5em;
-  }
-  .hero-name h1 { font-size: 1.8rem; font-weight: normal; margin: 0; text-shadow: 0 0 15px #fff; }
-  .hero-name span { font-size: 0.7rem; opacity: 0.5; margin-top: 10px; letter-spacing: 0.2em; }
-
-  /* --- 2. プロフィール部：下から迫り上がる「圧」 --- */
-  .container {
+  /* --- 2. スクロール層：文字だけが動く --- */
+  .scroll-layer {
     position: relative;
-    z-index: 20;
-    margin-top: -10vh; /* 画像に少し被せる */
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    z-index: 2;
+    width: 100%;
+    /* 最初の表示で顔が見えるよう、大きな余白を空ける */
+    padding-top: 65dvh; 
   }
 
-  .profile-card {
-    width: min(500px, 100%);
-    background: var(--glass);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255,255,255,0.4);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.05);
-    padding: 35px 25px;
+  .content-sheet {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 30px 30px 0 0; /* 上だけ丸めて「引き出し」感を出す */
+    padding: 40px 25px 100px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
+    min-height: 100vh;
+  }
+
+  .name-area {
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  .name-area h1 {
+    font-size: 1.4rem; font-weight: normal; margin: 0;
+    letter-spacing: 0.3em;
+  }
+  .name-area span {
+    font-size: 0.7rem; color: #999; letter-spacing: 0.2em;
+  }
+
+  .status-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 40px;
+    justify-content: center;
+  }
+  .status-tag {
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(0,0,0,0.05);
+    padding: 6px 15px;
+    border-radius: 99px;
+    font-size: 0.8rem;
+  }
+  .status-tag b { font-weight: normal; color: #888; margin-right: 8px; font-size: 0.6rem; }
+
+  .bio-text {
+    font-size: 0.9rem;
+    line-height: 2.2;
+    color: #444;
+    text-align: justify;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .secret-link {
+    display: block;
+    margin: 30px auto 0;
+    text-align: center;
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    border: 1px solid var(--accent);
+    width: fit-content;
+    padding: 8px 25px;
     border-radius: 2px;
   }
 
-  .status-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 40px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    padding-bottom: 30px;
-  }
-
-  .status-item label {
-    display: block;
-    font-size: 0.6rem;
-    color: #999;
-    letter-spacing: 0.2em;
-    margin-bottom: 5px;
-  }
-
-  .status-item span {
-    font-size: 0.95rem;
-    letter-spacing: 0.05em;
-  }
-
-  .bio-section {
-    line-height: 2.1;
-    font-size: 0.9rem;
-    color: #444;
-    text-align: justify;
-  }
-
-  /* 記憶の曖昧さへの導線 */
-  .secret-trigger {
-    display: inline-block;
-    margin-top: 20px;
-    font-size: 0.8rem;
-    color: var(--accent);
-    text-decoration: none;
-    border-bottom: 1px solid var(--accent);
-    padding-bottom: 2px;
-    opacity: 0.7;
-    transition: 0.3s;
-  }
-  .secret-trigger:hover { opacity: 1; letter-spacing: 0.1em; }
-
-  /* メニュー（元の位置を考慮しつつ最小限に） */
-  .nav-btn {
-    position: fixed; top: 20px; right: 20px;
+  /* メニュー：透過して邪魔しない */
+  .menu-dot {
+    position: fixed; top: 25px; right: 25px;
     z-index: 100;
-    mix-blend-mode: difference; /* 背景が白でも黒でも見える魔法 */
-    cursor: pointer;
+    width: 35px; height: 35px;
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(5px);
+    border-radius: 50%;
+    display: grid; place-items: center;
   }
-  .nav-btn span { display: block; width: 25px; height: 1px; background: #fff; margin: 8px; }
 
-  @media (max-width: 480px) {
-    .hero-name h1 { font-size: 1.5rem; }
-    .profile-card { padding: 30px 20px; }
-    .status-grid { gap: 15px; }
-  }
 </style>
 </head>
 <body>
 
-<div class="nav-btn"><span></span><span></span></div>
-
-<section class="hero-visual">
-  <img src="assets/profile/aya2.PNG" alt="Aya Sasai" class="char-img" id="heroImg">
-  <div class="hero-name">
-    <h1>笹井 綾</h1>
-    <span>AYA SASAI</span>
-  </div>
-</section>
-
-<div class="container">
-  <article class="profile-card">
-    <div class="status-grid">
-      <div class="status-item"><label>BIRTH</label><span>09.20</span></div>
-      <div class="status-item"><label>AGE</label><span>22</span></div>
-      <div class="status-item"><label>HEIGHT</label><span>145cm</span></div>
-      <div class="status-item"><label>OCCUPATION</label><span>Engineer</span></div>
-      <div class="status-item" style="grid-column: span 2;"><label>PARTNER</label><span>叢雲 添</span></div>
-    </div>
-
-    <div class="bio-section">
-      <p>転職に伴い、2054年の冬が終わる頃にHAMAにやってきた女性。メタバース企業に勤めているが、本人は技術には詳しく、方向音痴で、どこか浮世離れしている。
-      <br><br>
-      箱入り娘ゆえの世間知らずさと、AIに対する妙に冷めた視線。そのギャップの理由は、彼女自身も気づいていない「曖昧な記憶」にあるのかもしれない。</p>
-      
-      <a href="Secret.html" class="secret-trigger">▶ 記憶の深層へアクセス</a>
-    </div>
-  </article>
+<div class="menu-dot" id="menuBtn">
+  <div style="width:18px; height:1px; background:#333; box-shadow: 0 5px 0 #333, 0 -5px 0 #333;"></div>
 </div>
 
-<footer>
-  <p style="text-align: center; font-size: 0.7rem; color: #aaa; padding: 40px 0;">#溶けて、そのまま雲隠れ</p>
-</footer>
+<div class="fixed-visual" id="visualRoot">
+  <img src="assets/profile/aya2.PNG" alt="Aya" class="char-img" id="ayaImg">
+</div>
+
+<main class="scroll-layer">
+  <article class="content-sheet">
+    <div class="name-area">
+      <span>CHARACTER_01</span>
+      <h1>笹井 綾</h1>
+      <span>AYA SASAI</span>
+    </div>
+
+    <div class="status-list">
+      <div class="status-tag"><b>AGE</b>22</div>
+      <div class="status-tag"><b>HEIGHT</b>145cm</div>
+      <div class="status-tag"><b>JOB</b>Engineer</div>
+      <div class="status-tag"><b>PARTNER</b>So Murakumo</div>
+    </div>
+
+    <div class="bio-text">
+      転職に伴い、2054年の冬が終わる頃にHAMAにやってきた女性。メタバース企業に勤めているが、本人は技術には詳しく、方向音痴で、どこか浮世離れしている。<br><br>
+      箱入り娘ゆえの世間知らずさと、AIに対する妙に冷めた視線。そのギャップの理由は、彼女自身も気づいていない「曖昧な記憶」にあるのかもしれない。
+      
+      <a href="Secret.html" class="secret-link">一部の記憶が曖昧</a>
+    </div>
+  </article>
+</main>
 
 <script>
-  // スクロールに合わせて画像をわずかにズーム、または移動させる演出
-  // これで「静止画」に「圧」が出る
+  // スクロール量に応じて、背後の彼女の「ピント」や「明暗」を操作する
+  // 文字を読んでいる時は彼女が少し遠のき、上に戻るとはっきり見える演出
   window.addEventListener('scroll', () => {
     const scroll = window.scrollY;
-    const img = document.getElementById('heroImg');
-    // 下にスクロールするほど、画像がゆっくり拡大される
-    img.style.transform = `scale(${1 + scroll / 5000}) translateY(${scroll / 20}px)`;
+    const img = document.getElementById('ayaImg');
+    const opacity = 1 - Math.min(scroll / 500, 0.4); // 読み進めると少し薄くなる
+    const blur = Math.min(scroll / 100, 4); // 読み進めると少しボケる
+    
+    img.style.filter = `blur(${blur}px) opacity(${opacity})`;
   });
 </script>
 
