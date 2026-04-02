@@ -6,12 +6,16 @@
     <title>__fmm_tn_ // inception</title>
     <style>
         :root {
-            --bg-white: #f7f7f7;
-            /* 桜の色：透き通るようでいて、どこか吸い込まれる濃い桃色 */
-            --sakura-base: rgba(255, 182, 193, 0.6);
-            --sakura-deep: rgba(231, 76, 116, 0.5);
-            --shadow-sepia: rgba(60, 50, 50, 0.07);
-            --text-color: rgba(90, 80, 80, 0.6);
+            /* 1. 背景：純白を捨て、少し湿度のある「生成り色」へ */
+            --bg-dream: #f4f3f0;
+            
+            /* 2. 桜の色：躑躅（つつじ）色をベースに、生命力を感じさせる濃さ */
+            --sakura-base: rgba(231, 76, 116, 0.9); /* 濃く、不透明度を上げる */
+            --sakura-light: rgba(255, 182, 193, 0.8);
+            
+            /* 3. 幹の色：錆びた鉄のような、深い煤色 */
+            --trunk-charcoal: rgba(30, 20, 20, 0.3);
+            --text-color: rgba(50, 40, 40, 0.7);
         }
 
         * {
@@ -25,20 +29,20 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: var(--bg-white);
+            background-color: var(--bg-dream);
             font-family: "serif", "YuMincho", "Hiragino Mincho ProN", serif;
         }
 
-        /* 1. 記憶のノイズ：古い夢のような質感 */
+        /* 記憶のノイズ：古いフィルムのような、ザラッとした質感 */
         body::before {
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            opacity: 0.05; /* ノイズを少し強める */
             z-index: 10;
             pointer-events: none;
-            animation: grain 0.5s steps(1) infinite;
+            animation: grain 0.3s steps(1) infinite;
         }
 
         @keyframes grain {
@@ -49,48 +53,49 @@
             90% { transform: translate(1%, -1%); }
         }
 
-        /* 2. 「見上げる」視界：巨大な幹の影 */
-        .trunk-overlay {
+        /* 4. 「下から見上げる」視界：巨大な幹のテクスチャ */
+        .trunk-vignette {
             position: fixed;
-            bottom: -20%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 140vw;
-            height: 120vh;
-            background: radial-gradient(circle at 50% 100%, var(--shadow-sepia) 0%, transparent 70%);
-            filter: blur(60px);
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* 幹のざらつきをグラデーションで表現 */
+            background: 
+                radial-gradient(circle at 10% 10%, var(--trunk-charcoal) 0%, transparent 40%),
+                radial-gradient(circle at 90% 10%, var(--trunk-charcoal) 0%, transparent 40%),
+                radial-gradient(circle at 50% 100%, rgba(40,20,20,0.4) 0%, transparent 60%);
+            filter: blur(40px);
             z-index: 1;
             pointer-events: none;
         }
 
-        /* 3. 風に舞う花びら：奥から手前へ押し寄せる */
+        /* 5. 桜の花弁（ペタル）：形と影を作り込み、物質感を出す */
         .petal {
             position: absolute;
             background: var(--sakura-base);
-            border-radius: 150% 0 150% 0;
+            border-radius: 150% 0 150% 0; /* 花弁の形 */
             pointer-events: none;
             z-index: 4;
-            filter: blur(1px);
-            box-shadow: 0 0 10px rgba(255, 192, 203, 0.3);
+            opacity: 0;
+            /* 重要：影をつけることで、白い背景から物理的に浮き上がらせる（圧） */
+            box-shadow: 1px 2px 10px rgba(0,0,0,0.1);
             animation: wind-flow linear infinite;
         }
 
         @keyframes wind-flow {
             0% {
-                transform: translate(0, -10vh) rotate(0deg) scale(0.5);
+                transform: translate(0, -10vh) rotate(0deg) scale(0.6);
                 opacity: 0;
             }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
+            10% { opacity: 1; filter: blur(0px); }
+            80% { opacity: 1; filter: blur(0px); }
             100% {
-                /* 風で横に流されながら、手前に迫ってくる */
-                transform: translate(40vw, 110vh) rotate(720deg) scale(2);
+                /* 手前に迫ってくる際、大きく、かつ少しボケる（ピントのズレ） */
+                transform: translate(30vw, 110vh) rotate(540deg) scale(2.2);
                 opacity: 0;
-                filter: blur(4px);
+                filter: blur(5px);
             }
         }
 
-        /* 4. メインコンテンツ：迷い込んだ後に浮かび上がる */
+        /* メインコンテンツ：迷い込んだ後に浮かび上がる */
         .content {
             position: relative;
             z-index: 20;
@@ -100,12 +105,12 @@
             justify-content: center;
             align-items: center;
             opacity: 0;
-            animation: wake-up 4s ease-in forwards;
-            animation-delay: 1.5s;
+            animation: wake-up 3.5s ease-in forwards;
+            animation-delay: 2s;
         }
 
         @keyframes wake-up {
-            from { opacity: 0; filter: blur(10px); }
+            from { opacity: 0; filter: blur(15px); }
             to { opacity: 1; filter: blur(0px); }
         }
 
@@ -115,43 +120,31 @@
             color: var(--text-color);
             margin-bottom: 60px;
             font-weight: 200;
+            text-shadow: 0 0 10px white; /* 文字を花弁の中に沈ませない */
         }
 
         .nav-link {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-color);
             text-decoration: none;
             margin: 20px 0;
             letter-spacing: 0.4em;
-            transition: 1s;
+            transition: 0.8s;
+            position: relative;
         }
 
+        /* 6. タップ時の反応：夢の境界がハッキングされる（エンジニアの綾の気配） */
         .nav-link:active {
-            color: #d35400;
+            color: #d35400; /* オレンジ（逃避行の色） */
             letter-spacing: 0.6em;
-        }
-
-        /* 5. 画面の明滅：呼吸のようなゆらぎ */
-        .breathing-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            z-index: 100;
-            pointer-events: none;
-            animation: breath 8s ease-in-out infinite;
-        }
-
-        @keyframes breath {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 0.05; }
+            filter: blur(1px);
         }
     </style>
 </head>
 <body>
 
-    <div class="breathing-overlay"></div>
-    <div class="trunk-overlay"></div>
+    <div class="trunk-vignette"></div>
     
     <div class="content">
         <h1 class="title">__fmm_tn_</h1>
@@ -164,25 +157,30 @@
     </div>
 
     <script>
-        // 花びらを生成する関数
+        // 花弁を生成する関数
         function spawnPetal() {
             const petal = document.createElement('div');
             petal.className = 'petal';
             
-            // サイズのばらつき
-            const size = Math.random() * 7 + 5 + 'px';
+            // サイズのばらつき（少し大きく）
+            const size = Math.random() * 9 + 7 + 'px';
             petal.style.width = size;
             petal.style.height = size;
             
             // 開始位置（横方向のランダム）
-            petal.style.left = Math.random() * 120 - 20 + 'vw';
+            petal.style.left = Math.random() * 120 - 10 + 'vw';
             
-            // 風の強さ（アニメーション秒数）のばらつき
-            const duration = Math.random() * 5 + 4 + 's';
+            // 風の強さ（アニメーション秒数）のばらつき：少し遅く、重く
+            const duration = Math.random() * 5 + 5 + 's';
             petal.style.animationDuration = duration;
             
+            // 花弁の形のバリエーション
+            if(Math.random() > 0.5) {
+                petal.style.borderRadius = '50% 50% 50% 0'; // 別の花弁の形
+            }
+            
             // 色のわずかな変化
-            if(Math.random() > 0.7) petal.style.background = 'var(--sakura-deep)';
+            if(Math.random() > 0.6) petal.style.background = 'var(--sakura-light)';
             
             document.body.appendChild(petal);
             
@@ -192,17 +190,8 @@
             }, duration * 1000);
         }
 
-        // 一定間隔で花びらを降らせる
-        setInterval(spawnPetal, 150);
-
-        // 懐かしい「揺らぎ」：スマホの傾きに合わせて幹が微動する（簡易版）
-        window.addEventListener('deviceorientation', (event) => {
-            const x = event.beta;  // 傾き
-            const trunk = document.querySelector('.trunk-overlay');
-            if(trunk) {
-                trunk.style.transform = `translateX(calc(-50% + ${x * 0.2}px))`;
-            }
-        });
+        // 密度の調整：120msごとに生成（前より多く、密に）
+        setInterval(spawnPetal, 120);
     </script>
 </body>
 </html>
