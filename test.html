@@ -1,280 +1,177 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Profile - Aya Sasai</title>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
-  :root{
-    --bg1:#fcfcfc;
-    --bg2:#f1f5f9;
-    --bg3:#e8f0f8;
-    --card:rgba(255,255,255,.85);
-    --shadow:0 20px 50px rgba(100,110,140,.1);
-    --line:rgba(160,180,200,.2);
-    --line2:rgba(160,180,200,.3);
-    --text:#333333;
-    --muted:#888888;
-    --accent:#a0c0e0;
+  :root {
+    --bg-color: #ffffff;
+    --text-main: #333;
+    --text-sub: #888;
+    --accent: #a0c0e0;
   }
 
-  html,body{
-    margin:0; padding:0;
-    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-    color:var(--text);
-    background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%);
-    min-height:100vh;
+  body {
+    background-color: var(--bg-color);
+    margin: 0; padding: 0;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    width: 100vw; height: 100vh;
+    overflow: hidden;
   }
 
-  .page{
-    display:grid;
-    place-items:center;
-    padding:80px 20px;
+  /* 画面全体のFlexコンテナ */
+  .profile-wrapper {
+    display: flex;
+    flex-direction: row-reverse;
+    width: 100%;
+    height: 100%;
   }
 
-  .wrap{
-    width:min(1100px, 94vw);
-    display:grid;
-    grid-template-columns: 460px 1fr;
-    gap:40px;
-    align-items:start;
+  /* 右側：テキストエリア（縦書き） */
+  .text-content-area {
+    writing-mode: vertical-rl;
+    height: 100%;
+    padding: 12vh 4vw;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
   }
 
-  /* --- 左：ビジュアル（立ち絵聖域） --- */
-  .visual-card{
-    position:relative;
-    border-radius:24px;
-    overflow:hidden;
-    box-shadow:var(--shadow);
-    border:1px solid var(--line);
-    background:#fff;
-    height: 720px;
-    cursor: zoom-in;
+  /* 名前・キャッチコピー */
+  .section-symbol {
+    margin-left: 5rem;
+    flex-shrink: 0;
+  }
+  .name-large { font-size: 2.2rem; letter-spacing: 0.6em; line-height: 1.2; }
+  .name-en { 
+    writing-mode: horizontal-tb;
+    font-family: sans-serif; font-size: 0.7rem; color: var(--text-sub); 
+    margin-top: 1.5rem; letter-spacing: 0.4em; 
+  }
+  .catch-copy {
+    margin-top: 2rem;
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    letter-spacing: 0.2em;
   }
 
-  .visual-frame{
-    position:absolute;
-    inset:12px;
-    border-radius:16px;
-    border:1px solid rgba(160,180,200,.15);
-    overflow:hidden;
-    background:linear-gradient(135deg, #fff 0%, #f9fbff 100%);
+  /* ステータス（整理されたアーカイブ） */
+  .section-status {
+    margin-left: 4rem;
+    padding-right: 2rem;
+    border-right: 1px solid #f0f0f0;
   }
+  .status-item { margin-bottom: 2.5rem; }
+  .status-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 1.2rem; display: block; font-family: sans-serif; }
+  .status-value { font-size: 0.9rem; letter-spacing: 0.1em; }
 
-  .char-viewport{
-    position:absolute;
-    inset:0;
-    display:flex;
-    justify-content:center;
-    align-items:flex-end;
+  /* 観測記録（詳細文章） */
+  .section-story {
+    margin-left: 3rem;
+    max-width: 30vw;
   }
-
-  .char-img{
-    width:auto;
-    height:100%;
-    max-width:none;
-    object-fit: contain;
-    object-position: bottom;
-    /* 初期状態：顔付近をズーム */
-    transform-origin: center 15%; 
-    transform: scale(2.8) translateY(120px);
-    transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
-    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.05));
+  .story-text { 
+    font-size: 0.85rem; 
+    line-height: 2.8; 
+    letter-spacing: 0.12em;
+    text-align: justify;
   }
-
-  /* 全身モード */
-  .visual-card.is-full .char-img{
-    transform: scale(1) translateY(0);
-  }
-  .visual-card.is-full { cursor: zoom-out; }
-
-  .zoom-ui{
-    position:absolute;
-    right:24px; bottom:24px;
-    z-index:5;
-  }
-
-  .btn{
-    font-family:inherit;
-    border:none; cursor:pointer;
-    border-radius:999px;
-    padding:10px 20px;
-    font-size: 0.75rem;
-    letter-spacing:.1em;
-    background:rgba(255,255,255,.8);
-    border:1px solid var(--line);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: all .3s ease;
-  }
-  .btn:hover{ background:#fff; transform: translateY(-2px); }
-
-  /* --- 右：プロフィール（整理された情報） --- */
-  .info-card{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:24px;
-    box-shadow:var(--shadow);
-    padding:40px;
-    backdrop-filter: blur(12px);
-  }
-
-  .info-head{ margin-bottom: 30px; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
-  .name-en { font-family: sans-serif; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.3em; margin-bottom: 8px; display: block;}
-  .name{ font-size:1.8rem; letter-spacing:.3em; margin:0; font-weight: normal; }
-  .meta{ color:var(--muted); font-size:.85rem; margin-top: 12px; letter-spacing: 0.1em; }
-
-  .sheet-title{
-    font-size:.7rem; letter-spacing:.2em; color:var(--accent);
-    margin-bottom: 15px; font-family: sans-serif;
-  }
-
-  .profile-dl{
-    display:grid;
-    grid-template-columns: 10em 1fr;
-    margin-bottom: 30px;
-  }
-  .profile-dl dt, .profile-dl dd{
-    padding:14px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.04);
-    font-size:.9rem;
-  }
-  .profile-dl dt{ color:var(--muted); font-size: 0.75rem; letter-spacing: 0.1em; }
-  .profile-dl dd{ letter-spacing: 0.05em; }
-
-  .note{
-    border-top: 1px solid var(--line);
-    padding-top: 25px;
-  }
-  .note p{
-    font-size:.9rem; line-height:2.2; letter-spacing:.05em;
-    color: #444; white-space:pre-line;
-  }
-
-  .memory-link{
+  .memory-link {
     color: var(--accent);
-    cursor:pointer;
     text-decoration: underline;
-    transition: 0.3s;
+    cursor: pointer;
+    transition: opacity 0.3s;
   }
-  .memory-link:hover{ opacity: 0.7; }
+  .memory-link:hover { opacity: 0.6; }
 
-  /* メニュー系 */
-  .menu-button{
-    position:fixed; top:30px; right:30px;
-    width:24px; height:18px;
-    display:flex; flex-direction:column; justify-content:space-between;
-    cursor:pointer; z-index:1001;
+  /* 左側：立ち絵エリア（聖域） */
+  .illust-area {
+    width: 42vw;
+    height: 100%;
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
   }
-  .menu-button span{ height:1px; width:100%; background: #333; transition: .3s; }
 
-  .menu-overlay{
-    position:fixed; inset:0; background: rgba(255,255,255,0.9);
-    display:none; align-items:center; justify-content:center; z-index:1000;
-    backdrop-filter: blur(10px);
+  .illust-image {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 92vh;
+    object-fit: contain;
+    object-position: bottom left;
+    mask-image: linear-gradient(to top, transparent, black 12%);
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.03));
   }
-  .menu-content{ display:flex; flex-direction:column; gap: 2rem; text-align: center; }
-  .menu-content a{ text-decoration:none; color:#333; font-size:1.2rem; letter-spacing:0.2em; transition:.3s; }
 
-  @media (max-width: 960px){
-    .wrap{ grid-template-columns: 1fr; }
-    .visual-card{ height: 500px; }
-    .info-card{ padding: 30px 20px; }
-    .profile-dl{ grid-template-columns: 8em 1fr; }
+  /* アニメーション */
+  .fade {
+    animation: fadeAnim 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+  }
+  @keyframes fadeAnim {
+    0% { opacity: 0; transform: translateY(-15px); filter: blur(6px); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+
+  footer {
+    position: fixed;
+    bottom: 20px;
+    right: 30px;
+    font-size: 0.7rem;
+    color: #ccc;
+    letter-spacing: 0.2em;
+    writing-mode: horizontal-tb;
   }
 </style>
 </head>
-
 <body>
-  <div class="page">
-    <div class="wrap">
 
-      <section class="visual-card" id="visualCard">
-        <div class="visual-frame">
-          <div class="char-viewport">
-            <img src="assets/profile/aya2.PNG" alt="笹井 綾" class="char-img" id="charImg" />
-          </div>
-        </div>
-        <div class="zoom-ui">
-          <button class="btn" id="zoomBtn" type="button">VIEW FULL SIZE</button>
-        </div>
-      </section>
+<div class="profile-wrapper">
+  <div class="text-content-area">
+    <header class="section-symbol fade" style="animation-delay: 0.3s;">
+      <h1 class="name-large">笹井 綾</h1>
+      <div class="name-en">SUBJECT_AYA_0814</div>
+      <p class="catch-copy">今がすべての方向音痴なムードメーカー</p>
+    </header>
 
-      <section class="info-card">
-        <div class="info-head">
-          <span class="name-en">SUBJECT_AYA_0814</span>
-          <h1 class="name">笹井 綾</h1>
-          <p class="meta">「逃げ場は、いつだって白紙の中にあった」</p>
-        </div>
+    <div class="section-status fade" style="animation-delay: 1s;">
+      <div class="status-item">
+        <span class="status-label">BIRTH / AGE</span>
+        <span class="status-value">08.14 / 19</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">HEIGHT</span>
+        <span class="status-value">158cm</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">OCCUPATION</span>
+        <span class="status-value">エンジニア</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">PARTNER</span>
+        <span class="status-value">叢雲 添</span>
+      </div>
+    </div>
 
-        <div class="sheet">
-          <h2 class="sheet-title">BASIC ARCHIVE</h2>
-          <dl class="profile-dl">
-            <dt>BIRTHDAY</dt><dd>August, 14</dd>
-            <dt>AGE</dt><dd>19</dd>
-            <dt>HEIGHT</dt><dd>158cm</dd>
-            <dt>FAVORITE</dt><dd>雲の観察、微炭酸</dd>
-            <dt>PARTNER</dt><dd>叢雲 添</dd>
-          </dl>
-
-          <div class="note">
-            <h2 class="sheet-title">OBSERVATION</h2>
-            <p>2055年の熱気から逃れるように、彼女はただ、空の色が溶けるのを待っていた。
-メタバース企業に勤めるエンジニアだが、AI以外の技術には無頓着。
-極度の方向音痴で、HAMAの街角でよく途方に暮れている姿が目撃される。
-
-どこか現実感の薄い佇まいは、自分を「溶けかけのアイスクリーム」と称する彼女の死生観に起因しているのかもしれない。
-<span class="memory-link" id="memoryLink">一部の記録に深刻な欠落</span>が見られるが、本人はそれを「身軽でいい」と笑い飛ばしている。
-            </p>
-          </div>
-        </div>
-      </section>
-
+    <div class="section-story fade" style="animation-delay: 1.6s;">
+      <div class="story-text">
+        転職に伴い、2054年の冬が終わる頃にHAMAへやってきた。
+        メタバース企業に勤めているが、自部署は業務内容が異なるため、関連知識は皆無に近い。<br><br>
+        極度の方向音痴で、よく街中で途方に暮れている。
+        箱入り娘ゆえに一般常識も怪しいが、なぜかAIについては異様に博識。<br><br>
+        <span class="memory-link" onclick="location.href='Secret.html'">一部の記憶が曖昧</span>だが、本人は「身軽でいい」と特に気にしていない様子。
+      </div>
     </div>
   </div>
 
-  <div class="menu-button" id="menuButton"><span></span><span></span><span></span></div>
-  <div class="menu-overlay" id="menuOverlay">
-    <div class="menu-content">
-      <a href="home.html">HOME</a>
-      <a href="Character.html">CHARACTER</a>
-      <a href="Story.html">STORY</a>
-      <a href="Media.html">MEDIA</a>
-    </div>
+  <div class="illust-area">
+    <img src="assets/profile/aya2.PNG" class="illust-image fade" style="animation-delay: 0.7s;" alt="笹井 綾">
   </div>
+</div>
 
-  <script>
-    const visualCard = document.getElementById('visualCard');
-    const zoomBtn = document.getElementById('zoomBtn');
-    let isFull = false;
+<footer>#溶けてそのまま雲隠れ</footer>
 
-    function toggleZoom() {
-      isFull = !isFull;
-      visualCard.classList.toggle('is-full', isFull);
-      zoomBtn.textContent = isFull ? 'VIEW CLOSE-UP' : 'VIEW FULL SIZE';
-    }
-
-    visualCard.addEventListener('click', toggleZoom);
-    zoomBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleZoom();
-    });
-
-    const menuBtn = document.getElementById('menuButton');
-    const overlay = document.getElementById('menuOverlay');
-    menuBtn.addEventListener('click', () => {
-      const isOpen = overlay.style.display === 'flex';
-      overlay.style.display = isOpen ? 'none' : 'flex';
-    });
-
-    const memoryLink = document.getElementById('memoryLink');
-    if (memoryLink) {
-      memoryLink.addEventListener('click', (e) => {
-        e.stopPropagation();
-        window.location.href = 'Secret.html';
-      });
-    }
-  </script>
 </body>
 </html>
