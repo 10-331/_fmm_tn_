@@ -3,10 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>#溶けてそのまま雲隠れ</title>
 <style>
   :root {
     --bg-color: #ffffff;
     --text-color: #333;
+    --accent-color: #88a0b8; /* 残る言葉の色 */
   }
 
   html, body {
@@ -38,7 +40,7 @@
 
   #l5 { margin-right: 4.5rem; }
 
-  /* 文字のアニメーション：出現と消失の両方に対応 */
+  /* 文字のアニメーション：出現・消失・結晶化 */
   .char {
     display: inline-block;
     opacity: 0;
@@ -47,7 +49,8 @@
     transition: 
       opacity 2s ease, 
       filter 2.5s ease, 
-      transform 2s ease;
+      transform 2s ease,
+      color 1s ease; /* 色の編集用 */
   }
 
   /* 出現時 */
@@ -57,12 +60,24 @@
     transform: translateY(0);
   }
 
-  /* 消去時：さらに深く滲んで消える */
+  /* 【新規】結晶化する文字（NOVELSなどに変わる文字） */
+  .char.is-crystal {
+    color: var(--accent-color) !important;
+    font-weight: bold;
+    filter: blur(0px) !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    /* 組み換えアニメーション用にtransitionを上書き */
+    transition: all 2.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
+  }
+
+  /* 【新規】溶けて消える文字 */
   .char.is-dissolving {
     opacity: 0 !important;
-    filter: blur(15px) !important;
-    transform: translateY(10px) !important;
-    transition: opacity 3s ease, filter 3.5s ease, transform 3s ease;
+    filter: blur(12px) !important;
+    transform: translateY(15px) !important;
+    /* 消える速度を向上 */
+    transition: opacity 1.5s ease, filter 2.0s ease, transform 1.5s ease;
   }
 
   /* メニュー：最初は隠しておく */
@@ -73,26 +88,21 @@
     transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 2.5rem;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 4s ease;
+    transition: opacity 3s ease;
     text-align: center;
   }
 
   .menu-item {
     text-decoration: none;
-    color: #888;
-    font-size: 0.75rem;
-    letter-spacing: 0.4em;
-    border-bottom: 1px solid transparent;
-    padding-bottom: 4px;
-    transition: all 0.5s;
-  }
-
-  .menu-item:hover {
-    color: #333;
-    border-bottom: 1px solid #eee;
+    color: var(--accent-color);
+    font-size: 0.8rem;
+    letter-spacing: 0.5em;
+    font-family: sans-serif; /* メニューは英字で */
+    opacity: 0; /* 最初は透明 */
+    transition: opacity 2s ease;
   }
 
   @media (max-width: 600px) {
@@ -112,26 +122,30 @@
   <div class="line" id="l5">また、他人に戻るまでのお話。</div>
 
   <nav id="main-menu">
-    <a href="./novel.html" class="menu-item">NOVELS</a>
-    <a href="./profile.html" class="menu-item">ARCHIVE</a>
-    <a href="./gallery.html" class="menu-item">PICTURES</a>
+    <a href="./novel.html" class="menu-item" id="m1">NOVELS</a>
+    <a href="./profile.html" class="menu-item" id="m2">PROFILE</a>
+    <a href="./pictures.html" class="menu-item" id="m3">PICTURES</a>
   </nav>
 </div>
 
 <script>
+  // 1. テキスト分解（一文字ずつspanに）
   function splitText(elementId) {
     const el = document.getElementById(elementId);
     const text = el.innerText;
     el.innerHTML = '';
-    text.split('').forEach(char => {
+    text.split('').forEach((char, index) => {
       const span = document.createElement('span');
       span.className = 'char';
       span.innerText = char;
+      // 後の組み換え用にIDを振る
+      span.id = `${elementId}-${index}`;
       el.appendChild(span);
     });
   }
 
-  async function animateLine(elementId, speed = 100) {
+  // 2. 一行ずつ出現
+  async function animateLine(elementId, speed = 90) {
     const chars = document.getElementById(elementId).querySelectorAll('.char');
     for (let char of chars) {
       char.classList.add('is-visible');
@@ -139,42 +153,88 @@
     }
   }
 
-  async function dissolveAll() {
-    const allChars = Array.from(document.querySelectorAll('.char'));
-    // ランダムな順序で消していくことで「溶ける」感じを出す
-    const shuffled = allChars.sort(() => Math.random() - 0.5);
-    for (let char of shuffled) {
-      char.classList.add('is-dissolving');
-      await new Promise(r => setTimeout(r, 50)); // 消える速度
+  const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // 【中核】言葉の組み換え（トランスフォーム）ロジック
+  async function transformLyricsToMenu() {
+    const stage = document.getElementById('mv-stage');
+    const menu = document.getElementById('main-menu');
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    // --- STEP A: 全文の中から、残す言葉（結晶）を決める ---
+    // ここで、あらすじの文字からメニューの文字を「見出す」
+    const crystalPairs = [
+      // { lyricId: 'l1-0', menuId: 'm1', char: 'こ' -> 'N' }, // 概念的な組み換え
+      { lyricId: 'l2-6', char: '私' }, // NOVELSの'N'の役割
+      { lyricId: 'l2-7', char: 'を' },
+      { lyricId: 'l3-0', char: 'た' },
+      { lyricId: 'l3-1', char: 'く' },
+      { lyricId: 'l4-0', char: '恋' },
+      { lyricId: 'l4-1', char: '人' },
+      { lyricId: 'l5-2', char: '他' },
+      { lyricId: 'l5-3', char: '人' }
+    ];
+
+    const allChars = document.querySelectorAll('.char');
+    const crystalIds = crystalPairs.map(p => p.lyricId);
+
+    // --- STEP B: 結晶化と溶解（消える速度向上） ---
+    // 残る文字に色をつけ、それ以外を高速で溶かす
+    for (let char of allChars) {
+      if (crystalIds.includes(char.id)) {
+        char.classList.add('is-crystal');
+      } else {
+        char.classList.add('is-dissolving');
+      }
     }
+    await wait(2000); // 溶解を待つ
+
+    // --- STEP C: 組み換え（物理的な移動） ---
+    // 残った文字を、メニューの位置へ移動させる（MV的なトランスフォーム）
+    crystalPairs.forEach((pair, index) => {
+      const lyricChar = document.getElementById(pair.lyricId);
+      // メニューアイテム（N, P, P）の中心位置を取得
+      const targetMenu = menuItems[Math.floor(index / 3)]; 
+      const targetRect = targetMenu.getBoundingClientRect();
+      const currentRect = lyricChar.getBoundingClientRect();
+
+      // 移動距離を計算（縦書き・上揃えからの移動）
+      const deltaX = targetRect.left - currentRect.left + (targetRect.width / 2);
+      const deltaY = targetRect.top - currentRect.top;
+
+      // 物理的な移動（CSS Transform）
+      lyricChar.style.transform = `translate(${deltaX}px, ${deltaY}px) rotateX(180deg)`;
+      lyricChar.style.opacity = "0"; // 移動しながら溶けていく
+    });
+
+    // --- STEP D: 現実（メニュー）の浮上 ---
+    await wait(2500); // 移動の余韻
+    menu.style.opacity = "1";
+    menuItems.forEach(item => item.style.opacity = "1");
+    menu.style.pointerEvents = "auto";
   }
+
 
   window.addEventListener('load', async () => {
     ['l1', 'l2', 'l3', 'l4', 'l5'].forEach(splitText);
     
-    await new Promise(r => setTimeout(r, 1500));
+    await wait(1500);
 
-    // 1. 記憶の構築（右上から順に）
-    await animateLine('l1', 120); await new Promise(r => setTimeout(r, 500));
-    await animateLine('l2', 90);  await new Promise(r => setTimeout(r, 500));
-    await animateLine('l3', 90);  await new Promise(r => setTimeout(r, 500));
-    await animateLine('l4', 90);
+    // 1. 記憶の構築（テンポよく）
+    await animateLine('l1', 110); await wait(400);
+    await animateLine('l2', 80);  await wait(400);
+    await animateLine('l3', 80);  await wait(400);
+    await animateLine('l4', 80);
     
-    await new Promise(r => setTimeout(r, 2000)); // 「私たちが」の余韻
+    await wait(2000); // 「私たちが」の余韻
     
-    await animateLine('l5', 130);
+    await animateLine('l5', 120);
 
-    // 2. 全文が出揃った後の「最期の余韻」
-    await new Promise(r => setTimeout(r, 4000));
+    // 2. 全文が出揃った後の余韻（少し長めに）
+    await wait(4000);
 
-    // 3. 溶けて消える（雲隠れ）
-    await dissolveAll();
-
-    // 4. メニューが静かに浮かび上がる
-    await new Promise(r => setTimeout(r, 1000));
-    const menu = document.getElementById('main-menu');
-    menu.style.opacity = "1";
-    menu.style.pointerEvents = "auto";
+    // 3. 【新規】言葉の組み換え演出
+    await transformLyricsToMenu();
   });
 </script>
 
