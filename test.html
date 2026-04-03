@@ -2,125 +2,121 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>#溶けてそのまま雲隠れ</title>
 <style>
   html, body {
     margin: 0; padding: 0;
     width: 100%; height: 100%;
     overflow: hidden;
-    background-color: #fdfcf7; /* ローディングから一貫した静かな色 */
+    background-color: #fdfcf7; /* すべてを包み込む単一の色 */
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
     color: #333;
   }
 
-  .world-container {
+  .mv-stage {
     display: flex;
-    flex-direction: row-reverse;
-    width: 300vw; /* さらに広大な「間」を確保 */
+    flex-direction: row-reverse; /* 右（過去・導入）から左（未来・アーカイブ）へ */
+    width: 400vw; /* 圧倒的な余白のための広大な横幅 */
     height: 100vh;
     position: absolute;
     right: 0;
     will-change: transform;
   }
 
-  /* プロローグセクション */
-  .section-prologue {
+  /* MVのカット（セクション） */
+  section {
     width: 100vw;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 15vh;
+    padding-top: 20vh;
+    box-sizing: border-box;
   }
 
-  .vertical-text {
+  .vertical-lyrics {
     writing-mode: vertical-rl;
-    line-height: 4; /* 行間をさらに広げ、呼吸を深く */
-    letter-spacing: 0.35em;
+    line-height: 4.5;      /* 歌詞のようなゆったりとした行間 */
+    letter-spacing: 0.4em; /* 一文字ずつを噛みしめる間隔 */
+    font-size: 1.1rem;
   }
 
-  /* 「私たちが」から「他人に戻る」までの物理的な断絶 */
-  .void-space {
-    height: 50vh; /* 画面の半分以上を何もない空白に */
+  /* 「私たちが」の後にくる、物理的かつ絶望的な空白 */
+  .the-void {
+    height: 60vh; 
     display: block;
   }
 
-  .tag {
-    margin-top: 8em;
-    font-size: 0.75em;
-    color: #a0a0a0;
+  .hashtag {
+    margin-top: 10em;
+    font-size: 0.8em;
+    color: #b0b0b0;
     font-family: sans-serif;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.2em;
+    opacity: 0.6;
   }
 
-  /* 次の世界へ行くまでの広大な空白 */
-  .section-spacer {
-    width: 100vw; /* 1画面分まるごと「無」の空間 */
+  /* 何も映らない、ただ時間が流れるだけの空間（MVの間の部分） */
+  .spacer-cloud {
+    width: 150vw; 
   }
 
-  .section-archive {
+  /* 最後に辿り着く、他人に戻った後のデータ */
+  .section-end {
     width: 100vw;
-    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  .archive-placeholder {
-    font-size: 0.8em;
-    letter-spacing: 0.4em;
-    color: #ccc;
-    font-family: sans-serif;
-  }
-
-  /* 最初の出現もゆっくりと */
-  .fade-in {
-    animation: fadeInText 4s ease forwards;
+  /* フェードイン演出 */
+  .lyric-fade {
+    animation: lyricAppear 5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     opacity: 0;
   }
 
-  @keyframes fadeInText {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  @keyframes lyricAppear {
+    0% { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
   }
 </style>
 </head>
 <body>
 
-<div class="world-container" id="stage">
-  <section class="section-archive">
-    <div class="archive-placeholder">RECONSTRUCTION_IN_PROGRESS...</div>
+<div class="mv-stage" id="camera">
+  <section class="section-end">
+    <div style="letter-spacing: 0.5em; color: #ccc; font-size: 0.8em;">
+      AYA SASAI ARCHIVE // DATA LOADED.
+    </div>
   </section>
 
-  <div class="section-spacer"></div>
+  <div class="spacer-cloud"></div>
 
-  <section class="section-prologue fade-in">
-    <div class="vertical-text">
+  <section class="lyric-fade">
+    <div class="vertical-lyrics">
       <p>これは、</p>
       <p>迷子になった私を助けてくれた彼と</p>
       <p>たくさん笑って、ふざけあって、</p>
       <p>恋人になった私たちが</p>
       
-      <span class="void-space"></span>
+      <span class="the-void"></span>
       
       <p>また、他人に戻るまでのお話。</p>
-      <div class="tag">#溶けてそのまま雲隠れ</div>
+      <div class="hashtag">#溶けてそのまま雲隠れ</div>
     </div>
   </section>
 </div>
 
 <script>
-  const stage = document.getElementById('stage');
+  const camera = document.getElementById('camera');
 
   window.addEventListener('load', () => {
-    // 最初の文字を読ませる時間をたっぷりと（4.5秒）
+    // 最初の「私たちが」を読み終え、余韻に浸るまでの5秒
     setTimeout(() => {
-      // 12秒かけて、歩くよりも遅いスピードで世界を流す
-      // cubic-bezierの数値を調整し、動き出しをさらに「ためる」
-      stage.style.transition = "transform 12s cubic-bezier(0.4, 0, 0.2, 1)"; 
-      stage.style.transform = "translateX(200vw)"; /* スペーサー分を含めて移動 */
-    }, 4500);
+      // 20秒かけて、視界から文字がフェードアウトし、
+      // 長い空白を経て次のデータへ辿り着く「カメラワーク」
+      camera.style.transition = "transform 20s cubic-bezier(0.37, 0, 0.63, 1)"; 
+      camera.style.transform = "translateX(300vw)";
+    }, 5000);
   });
 </script>
 
