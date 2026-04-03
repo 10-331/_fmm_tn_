@@ -2,65 +2,78 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#溶けてそのまま雲隠れ // ARCHIVE</title>
 <style>
+  /* 昨日の「淡いグラデーション」と「明朝体」を継承 */
   html, body {
     margin: 0; padding: 0;
     width: 100%; height: 100%;
-    /* 横スクロールを許容する構成 */
-    overflow-x: auto; 
-    overflow-y: hidden;
+    overflow: hidden; /* 勝手なスクロールを禁止し、JSで制御する */
     background: linear-gradient(90deg, #f8e9e9 0%, #f1ecf6 100%);
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    color: #333;
   }
 
-  /* 横に長いコンテナ */
-  .horizontal-wrapper {
+  /* 横に並ぶ世界：[プロローグ] [アーカイブ] */
+  .world-container {
     display: flex;
-    width: 300vw; /* 3画面分くらいの長さ */
+    width: 200vw; /* 2画面分 */
     height: 100vh;
+    position: relative;
+    will-change: transform; /* アニメーションの最適化 */
   }
 
-  /* セクション：縦書きプロローグ */
-  .section-intro {
+  /* セクション1：プロローグ（縦書き中央・上揃え） */
+  .section-prologue {
     width: 100vw;
     height: 100vh;
     display: flex;
     justify-content: center; /* 水平中央 */
     align-items: flex-start; /* 上揃え */
-    padding-top: 15vh;
+    padding-top: 15vh;        /* 天からのマージン */
+    box-sizing: border-box;
   }
 
   .vertical-text {
     writing-mode: vertical-rl;
     line-height: 3;
-    letter-spacing: 0.2em;
-    color: #444;
-    transition: opacity 1s ease;
+    letter-spacing: 0.25em;
+    font-size: 1.05rem;
   }
 
   .tag {
-    margin-top: 3em;
+    margin-top: 4em;
     font-size: 0.8em;
     color: #88a0b8;
     font-family: sans-serif;
+    letter-spacing: 0.1em;
   }
 
-  /* 次のセクション（例：現在のアーカイブ） */
-  .section-main {
+  /* セクション2：現在のアーカイブ（ここへ流れていく） */
+  .section-archive {
     width: 100vw;
     height: 100vh;
+    background: rgba(255, 255, 255, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(5px);
   }
 
+  .archive-placeholder {
+    font-size: 0.9em;
+    letter-spacing: 0.2em;
+    color: #999;
+    border-left: 1px solid #ccc;
+    padding-left: 20px;
+  }
 </style>
 </head>
 <body>
 
-<div class="horizontal-wrapper" id="scrollContainer">
-  <section class="section-intro">
+<div class="world-container" id="stage">
+  <section class="section-prologue">
     <div class="vertical-text">
       <p>これは、</p>
       <p>迷子になった私を助けてくれた彼と</p>
@@ -72,25 +85,29 @@
     </div>
   </section>
 
-  <section class="section-main">
-    <div style="font-size: 0.9em; letter-spacing: 0.1em; color: #666;">
-      [ ARCHIVE: 22yo / ENGINEER / HAMA ]
+  <section class="section-archive">
+    <div class="archive-placeholder">
+      SASAI AYA // DATA_LOG: 2055_HAMA
     </div>
   </section>
 </div>
 
 <script>
+  const stage = document.getElementById('stage');
+
   window.addEventListener('load', () => {
-    // 2秒待機
+    // 1. 2秒間、静止して読ませる
     setTimeout(() => {
-      // 左（横方向）へスクロール開始
-      // スムーズに1画面分(window.innerWidth)移動させる
-      window.scrollTo({
-        left: window.innerWidth,
-        behavior: 'smooth'
-      });
-    }, 2000); 
+      startCloudScroll();
+    }, 2000);
   });
+
+  function startCloudScroll() {
+    // 2. CSS Transitionを使って「雲が流れるような」一定速度の移動を実現
+    // スムーズな加速減速を排除（linear）することで、メタ的な「流転」を表現
+    stage.style.transition = "transform 6s linear"; 
+    stage.style.transform = "translateX(-100vw)";
+  }
 </script>
 
 </body>
