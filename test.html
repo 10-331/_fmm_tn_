@@ -3,67 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>#溶けてそのまま雲隠れ // ARCHIVE</title>
+<title>#溶けてそのまま雲隠れ</title>
 <style>
   html, body {
     margin: 0; padding: 0;
     width: 100%; height: 100%;
     overflow: hidden;
-    background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 100%);
+    /* 全体を統一感のある淡い色に。色の切り替わりを排除 */
+    background-color: #fdfcf7; 
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
     color: #333;
   }
 
-  /* 右方向にコンテンツを広げるため、
-     flex-directionをrow-reverseにするか、配置を工夫します。
-  */
   .world-container {
     display: flex;
-    flex-direction: row-reverse; /* 右側に「次」を配置 */
-    width: 200vw;
+    flex-direction: row-reverse;
+    width: 250vw; /* 余白のためにさらに横幅を確保 */
     height: 100vh;
     position: absolute;
-    right: 0; /* 最初は右端（プロローグ）を表示 */
+    right: 0;
     will-change: transform;
   }
 
-  /* セクション：プロローグ */
+  /* プロローグセクション */
   .section-prologue {
     width: 100vw;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 15vh;
+    padding-top: 12vh;
   }
 
   .vertical-text {
     writing-mode: vertical-rl;
-    line-height: 3;
-    letter-spacing: 0.25em;
+    line-height: 3.5; /* 行間をさらに広く */
+    letter-spacing: 0.3em; /* 字間もゆったりと */
+  }
+
+  /* 「恋人」と「他人」の間の、決定的な空白 */
+  .time-gap {
+    margin-top: 30vh; /* 圧倒的な縦の余白 */
+    display: block;
   }
 
   .tag {
-    margin-top: 4em;
-    font-size: 0.8em;
-    color: #88a0b8;
+    margin-top: 6em;
+    font-size: 0.75em;
+    color: #a0a0a0;
     font-family: sans-serif;
+    letter-spacing: 0.1em;
   }
 
-  /* セクション：メインアーカイブ（プロローグの右側に隠れている） */
+  /* メインアーカイブへの接続（余白としての100vwを挟む） */
+  .section-spacer {
+    width: 50vw; /* 完全に何もない「間」の空間 */
+  }
+
   .section-archive {
     width: 100vw;
     height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.2);
   }
 
   .archive-placeholder {
-    font-size: 0.9em;
-    letter-spacing: 0.2em;
-    color: #999;
+    font-size: 0.85em;
+    letter-spacing: 0.3em;
+    color: #bbb;
+    font-family: sans-serif;
+  }
+
+  /* ふわっと文字が浮かび上がる演出（色の断絶を防ぐ） */
+  .fade-in {
+    animation: fadeInIntro 3s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeInIntro {
+    to { opacity: 1; }
   }
 </style>
 </head>
@@ -71,18 +90,20 @@
 
 <div class="world-container" id="stage">
   <section class="section-archive">
-    <div class="archive-placeholder">
-      [ SCROLL_TO_DATA... ]
-    </div>
+    <div class="archive-placeholder">MEMORY_RECONSTRUCTION...</div>
   </section>
 
-  <section class="section-prologue">
+  <div class="section-spacer"></div>
+
+  <section class="section-prologue fade-in">
     <div class="vertical-text">
       <p>これは、</p>
       <p>迷子になった私を助けてくれた彼と</p>
       <p>たくさん笑って、ふざけあって、</p>
       <p>恋人になった私たちは</p>
-      <br>
+      
+      <span class="time-gap"></span>
+      
       <p>また、他人に戻るまでのお話。</p>
       <div class="tag">#溶けてそのまま雲隠れ</div>
     </div>
@@ -93,13 +114,12 @@
   const stage = document.getElementById('stage');
 
   window.addEventListener('load', () => {
-    // 2秒の「静寂」
+    // 3秒待機（フェードインを待つ時間を含めて長めに）
     setTimeout(() => {
-      // 右方向（正の方向）へ滑らかにスライド
-      // ease-in-out を使うことで、動き出しと止まり際に「しなり」を持たせる
-      stage.style.transition = "transform 4.5s cubic-bezier(0.45, 0, 0.55, 1)"; 
-      stage.style.transform = "translateX(100vw)";
-    }, 2000);
+      // 8秒かけて、極めて緩やかに、そして重々しく流れる
+      stage.style.transition = "transform 8.5s cubic-bezier(0.25, 0.1, 0.25, 1)"; 
+      stage.style.transform = "translateX(150vw)"; /* スペーサー分も含めて移動 */
+    }, 3500);
   });
 </script>
 
