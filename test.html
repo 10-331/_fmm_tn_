@@ -1,211 +1,190 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AYA SASAI // ARCHIVE</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600&family=Noto+Sans+JP:wght@300;600&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SASAI AYA // ARCHIVE</title>
+<style>
+  /* 昨日のベースデザインを継承 */
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    background: linear-gradient(180deg, #f8e9e9 0%, #f1ecf6 40%, #e8f0f8 100%);
+    color: #333;
+    overflow-x: hidden;
+    transition: background 1s ease;
+  }
 
-        :root {
-            --bg-gradient: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
-            --accent: #ffd700;
-            --text: #2c2c2c;
-            --glass: rgba(255, 255, 255, 0.7);
-            --blur: 15px;
-        }
+  /* ⚡ フィラーモード（赤い浸食） */
+  body.is-filler {
+    background: linear-gradient(180deg, #1a0505 0%, #000000 100%);
+    color: #e0e0e0;
+  }
 
-        body.is-filler {
-            --bg-gradient: radial-gradient(circle at center, #1a0505 0%, #000000 100%);
-            --accent: #c71585;
-            --text: #e0e0e0;
-            --glass: rgba(0, 0, 0, 0.6);
-            --blur: 20px;
-        }
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 5vh 0;
+  }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            color: var(--text);
-            font-family: 'Inter', 'Noto Sans JP', sans-serif;
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
+  /* ガラスの質感と透過度を調整 */
+  .profile-box {
+    background: rgba(255, 252, 240, 0.75);
+    border-radius: 12px;
+    padding: 30px 40px;
+    box-shadow: 0 0 25px rgba(255, 230, 180, 0.2);
+    position: relative;
+    z-index: 1;
+    transition: all 0.5s ease;
+    max-width: 500px;
+    width: 90%;
+  }
 
-        /* 背景に溶け込む大きなタイポグラフィ */
-        .bg-text {
-            position: fixed;
-            font-size: 15vw;
-            font-weight: 900;
-            opacity: 0.03;
-            z-index: -1;
-            white-space: nowrap;
-            user-select: none;
-        }
+  body.is-filler .profile-box {
+    background: rgba(20, 0, 0, 0.8);
+    box-shadow: 0 0 25px rgba(178, 34, 34, 0.4);
+    border: 1px solid #b22222;
+  }
 
-        /* グラスモルフィズムを採用したナビ */
-        nav {
-            position: fixed;
-            top: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--glass);
-            backdrop-filter: blur(var(--blur));
-            padding: 0.8rem 2.5rem;
-            border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.2);
-            z-index: 100;
-            display: flex;
-            gap: 2rem;
-        }
+  .profile-image {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    transition: filter 0.5s ease;
+  }
 
-        nav a {
-            color: var(--text);
-            text-decoration: none;
-            font-size: 0.9rem;
-            letter-spacing: 0.1rem;
-            transition: color 0.3s;
-        }
-        nav a:hover { color: var(--accent); }
+  body.is-filler .profile-image {
+    filter: grayscale(100%) contrast(1.2) sepia(50%) hue-rotate(-50deg);
+  }
 
-        /* キャラクター配置：浮遊感 */
-        .main-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            height: 100vh;
-            align-items: center;
-            padding: 0 10%;
-        }
+  h1 { font-size: 1.1em; letter-spacing: 0.15em; margin: 1.5em 0 0.5em; text-align: center; }
+  p { font-size: 0.85em; line-height: 2; margin: 0.5em 0; text-align: center; }
 
-        .visual-area {
-            position: relative;
-            height: 85vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-        }
+  /* ギミック：記憶の綻び */
+  .memory-link {
+    cursor: pointer;
+    color: #888;
+    border-bottom: 1px dotted #ccc;
+    transition: all 0.3s ease;
+  }
+  .memory-link:hover { color: #b22222; border-bottom-color: #b22222; }
 
-        .standing-picture {
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.1));
-            transition: all 1s ease;
-        }
+  /* ⚡ グリッチエフェクト（昨日のコードを流用） */
+  .glitch {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; mix-blend-mode: screen; z-index: 9999;
+    pointer-events: none; opacity: 0;
+  }
+  @keyframes glitchEffect {
+    0% { transform: none; opacity: 0; }
+    10% { transform: skewX(10deg); opacity: 1; }
+    50% { transform: translate(-5px, 2px); }
+    100% { transform: none; opacity: 0; }
+  }
 
-        /* 情報エリア：サクサク読める整理されたレイアウト */
-        .content-area {
-            padding-left: 5%;
-            z-index: 10;
-        }
+  /* 🍔 メニュー（昨日のデザイン） */
+  .menu-button {
+    position: fixed; top: 25px; right: 25px; width: 30px; height: 18px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    cursor: pointer; z-index: 1001;
+  }
+  .menu-button span { height: 2px; width: 100%; background: #666; transition: 0.3s; }
+  body.is-filler .menu-button span { background: #b22222; }
 
-        .content-area h1 {
-            font-size: 4rem;
-            margin: 0;
-            letter-spacing: -0.1rem;
-        }
-
-        .description {
-            font-size: 1rem;
-            line-height: 1.8;
-            max-width: 400px;
-            margin-top: 2rem;
-            font-weight: 300;
-        }
-
-        /* 状態切り替えスイッチ（さりげなく、でも意図的に） */
-        .world-shifter {
-            position: fixed;
-            bottom: 3rem;
-            right: 3rem;
-            width: 50px;
-            height: 50px;
-            border: 1px solid var(--accent);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s;
-        }
-        .world-shifter::after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            background: var(--accent);
-            border-radius: 50%;
-        }
-        .world-shifter:hover { background: var(--accent); box-shadow: 0 0 20px var(--accent); }
-
-        /* ノイズエフェクト（Fillerモード時のみ） */
-        .noise-overlay {
-            position: fixed;
-            inset: 0;
-            background: url('https://loading.io/asset/521744') ; /* ダミー、実際はノイズ素材 */
-            opacity: 0;
-            pointer-events: none;
-            mix-blend-mode: overlay;
-        }
-        body.is-filler .noise-overlay { opacity: 0.05; }
-
-    </style>
+  .menu-overlay {
+    position: fixed; inset: 0; background: rgba(240,240,240,0.4);
+    backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 1000;
+  }
+  .menu-content {
+    background: rgba(255,255,255,0.9); padding: 40px 60px; border-radius: 12px;
+    display: flex; flex-direction: column; gap: 1.5em;
+  }
+  .menu-content a { text-decoration: none; color: #444; font-size: 0.9em; letter-spacing: 0.1em; }
+</style>
 </head>
 <body>
 
-<div class="bg-text" id="bg-name">SASAI AYA</div>
-<div class="noise-overlay"></div>
+  <div class="container">
+    <div class="profile-box" id="profileBox">
+      <img src="assets/img/aya_22.png" id="charaImg" alt="笹井綾" class="profile-image">
 
-<nav>
-    <a href="#about">ABOUT</a>
-    <a href="#novel">NOVEL</a>
-    <a href="#game">GAME</a>
-    <a href="#data">DATA</a>
-</nav>
-
-<div class="main-container">
-    <div class="visual-area">
-        <img src="assets/img/aya_22.png" id="main-chara" class="standing-picture">
+      <h1 id="charaName">笹井 綾（ささい あや）</h1>
+      <p id="charaStatus">22歳 / 145cm / A型</p>
+      <p id="charaBio1">単純明快という言葉がよく似合う女の子。</p>
+      <p id="charaBio2">現在はmahorova設立社に勤務。</p>
+      <p id="charaBio3">エンジニアとして基幹業務の設計･開発をしている。</p>
+      <p><span class="memory-link" onclick="triggerGlitch()">一部の記憶が曖昧</span>だが……</p>
     </div>
+  </div>
 
-    <div class="content-area">
-        <div id="label" style="font-size: 0.8rem; color: var(--accent); font-weight: 600;">ACTIVE ENGINEER</div>
-        <h1 id="name">笹井 綾</h1>
-        <p class="description" id="bio">
-            「思い立ったが吉日！」を地で行く、HAMAの新人エンジニア。<br>
-            2055年の春、新しい名前と新しい人生を持って、この街にやってきた。
-        </p>
+  <div class="glitch" id="glitch"></div>
+
+  <div class="menu-button" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()">
+    <div class="menu-content">
+      <a href="index.html">🏠 HOME</a>
+      <a href="works.html">📖 NOVELS (SS / Main)</a>
+      <a href="feature.html">🎮 EXPERIENCE (Feature)</a>
+      <a href="chat.html" id="hiddenLink" style="display:none;">👁️ CONTACT (■■■)</a>
     </div>
-</div>
+  </div>
 
-<div class="world-shifter" onclick="shiftWorld()"></div>
-
-<script>
-    function shiftWorld() {
+  <script>
+    function triggerGlitch() {
+        const glitch = document.getElementById('glitch');
         const body = document.body;
-        const img = document.getElementById('main-chara');
-        const name = document.getElementById('name');
-        const bio = document.getElementById('bio');
-        const label = document.getElementById('label');
-        const bg = document.getElementById('bg-name');
+        
+        glitch.style.animation = 'glitchEffect 0.3s ease';
+        glitch.style.opacity = '1';
 
-        body.classList.toggle('is-filler');
+        setTimeout(() => {
+            body.classList.toggle('is-filler');
+            updateContent(body.classList.contains('is-filler'));
+            glitch.style.opacity = '0';
+            glitch.style.animation = 'none';
+        }, 250);
+    }
 
-        if(body.classList.contains('is-filler')) {
-            img.src = 'assets/img/aya_filler.png';
-            name.innerText = 'filler';
-            label.innerText = 'RECOVERY TARGET';
-            bio.innerHTML = '感情の異常発達を確認。回収対象。<br>360名の村から消失。名前は、もうない。';
-            bg.innerText = '■■■■■■';
+    function updateContent(isFiller) {
+        const name = document.getElementById('charaName');
+        const img = document.getElementById('charaImg');
+        const bio1 = document.getElementById('charaBio1');
+        const bio2 = document.getElementById('charaBio2');
+        const bio3 = document.getElementById('charaBio3');
+        const hiddenLink = document.getElementById('hiddenLink');
+
+        if (isFiller) {
+            name.innerText = "■■■ / filler";
+            img.src = "assets/img/aya_filler.png";
+            bio1.innerText = "感情の異常発達を確認。回収対象。";
+            bio2.innerText = "360名の村。消失。名前はない。";
+            bio3.innerText = "「……私を、壊して」";
+            hiddenLink.style.display = 'block'; // フィラー対話へのリンク解禁
         } else {
-            img.src = 'assets/img/aya_22.png';
-            name.innerText = '笹井 綾';
-            label.innerText = 'ACTIVE ENGINEER';
-            bio.innerHTML = '「思い立ったが吉日！」を地で行く、HAMAの新人エンジニア。<br>2055年の春、新しい名前と新しい人生を持って、この街にやってきた。';
-            bg.innerText = 'SASAI AYA';
+            name.innerText = "笹井 綾（ささい あや）";
+            img.src = "assets/img/aya_22.png";
+            bio1.innerText = "単純明快という言葉がよく似合う女の子。";
+            bio2.innerText = "現在はmahorova設立社に勤務。";
+            bio3.innerText = "エンジニアとして基幹業務の設計･開発をしている。";
+            hiddenLink.style.display = 'none';
         }
     }
-</script>
 
+    function toggleMenu() {
+        const overlay = document.getElementById('menuOverlay');
+        overlay.style.display = (overlay.style.display === 'flex') ? 'none' : 'flex';
+    }
+  </script>
 </body>
 </html>
