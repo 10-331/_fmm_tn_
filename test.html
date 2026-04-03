@@ -2,169 +2,136 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root {
     --bg-color: #ffffff;
-    --text-color: #333;
-    --menu-color: #999;
+    --text-main: #333;
+    --text-sub: #999;
+    --accent: #a0c0e0;
   }
 
-  html, body {
-    margin: 0; padding: 0;
-    width: 100%; height: 100%;
-    overflow: hidden;
+  body {
     background-color: var(--bg-color);
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    margin: 0; padding: 0;
+    font-family: "Hiragino Mincho ProN", serif;
+    overflow-x: hidden;
   }
 
-  #mv-stage {
-    position: relative;
+  .profile-container {
+    display: flex;
+    flex-direction: row-reverse; /* 右から左へ流れる */
     width: 100vw;
     height: 100vh;
-    padding: 12vh 10vw;
+    padding: 10vh 8vw;
     box-sizing: border-box;
-    writing-mode: vertical-rl;
+    writing-mode: vertical-rl; /* 縦書きの継続 */
   }
 
-  .line {
-    display: inline-block;
-    font-size: 0.85rem;
-    letter-spacing: 0.35em;
-    line-height: 3.2;
-    white-space: nowrap;
-    color: var(--text-color);
-    margin-left: 2.2rem;
-    position: relative;
+  /* 名前：圧倒的な余白の中の核 */
+  .name-section {
+    margin-left: 5rem;
   }
 
-  #l5 { margin-right: 4.5rem; }
-
-  /* 文字のアニメーション（出現と溶解） */
-  .char {
-    display: inline-block;
-    opacity: 0;
-    filter: blur(8px);
-    transform: translateY(-8px);
-    transition: opacity 1.5s ease, filter 2s ease, transform 1.5s ease;
+  .name-main {
+    font-size: 2.2rem;
+    letter-spacing: 0.6em;
+    font-weight: normal;
+    color: var(--text-main);
   }
 
-  .char.is-visible {
-    opacity: 1; filter: blur(0px); transform: translateY(0);
-  }
-
-  /* 溶けて消える時：上ではなく、さらに奥（あるいは下）へ沈む */
-  .char.is-dissolving {
-    opacity: 0 !important;
-    filter: blur(12px) !important;
-    transform: scale(0.9) translateY(10px) !important;
-    transition: all 1.8s ease-in;
-  }
-
-  /* メニュー：プロローグの「跡地」に浮かび上がる */
-  .menu-layer {
-    writing-mode: horizontal-tb; /* メニューは読みやすく横書きで */
-    position: absolute;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none;
-  }
-
-  .nav-list {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-    opacity: 0;
-    transition: opacity 4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .nav-item {
-    text-decoration: none;
-    color: var(--menu-color);
-    font-size: 0.75rem;
-    letter-spacing: 0.5em;
+  .name-ruby {
     font-family: sans-serif;
-    position: relative;
-    padding: 10px;
-    transition: color 0.5s;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--text-sub);
+    margin-top: 1rem;
   }
 
-  .nav-item:hover { color: #333; }
+  /* 記録の断片 */
+  .data-fragments {
+    display: flex;
+    flex-direction: row;
+    gap: 3rem;
+    margin-right: 2rem;
+  }
 
-  @media (max-width: 600px) {
-    #mv-stage { padding: 15vh 10vw; }
-    .line { font-size: 0.8rem; line-height: 2.6; margin-left: 1.5rem; }
-    #l5 { margin-right: 2rem; }
+  .fragment-block {
+    height: auto;
+    max-height: 60vh;
+  }
+
+  .label {
+    font-family: sans-serif;
+    font-size: 0.6rem;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    letter-spacing: 0.2em;
+  }
+
+  .content {
+    font-size: 0.85rem;
+    line-height: 2.5;
+    letter-spacing: 0.2em;
+    color: var(--text-main);
+  }
+
+  /* イラスト：背景に溶け込ませる */
+  .visual-area {
+    position: fixed;
+    left: 10vw;
+    bottom: 0;
+    width: 40vw;
+    height: 80vh;
+    z-index: -1;
+    opacity: 0.6;
+    /* 友人のイラストを想定したプレースホルダ */
+    background: linear-gradient(to top, rgba(255,255,255,0), rgba(255,255,255,1));
+    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+  }
+
+  /* アニメーション：プロローグと同じ「上から」 */
+  .fade-down {
+    animation: fadeDown 3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeDown {
+    0% { opacity: 0; transform: translateY(-20px); filter: blur(10px); }
+    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
   }
 </style>
 </head>
 <body>
 
-<div id="mv-stage">
-  <div class="line" id="l1">これは、</div>
-  <div class="line" id="l2">迷子になった私を助けてくれた彼と</div>
-  <div class="line" id="l3">たくさん笑って、ふざけあって、</div>
-  <div class="line" id="l4">恋人になった私たちが</div>
-  <div class="line" id="l5">また、他人に戻るまでのお話。</div>
+<div class="profile-container">
+  <section class="name-section fade-down" style="animation-delay: 0.5s;">
+    <h1 class="name-main">笹井 綾</h1>
+    <div class="name-ruby">AYA SASAI</div>
+  </section>
+
+  <div class="data-fragments">
+    <section class="fragment-block fade-down" style="animation-delay: 1.2s;">
+      <div class="label">OBSERVATION_01</div>
+      <div class="content">
+        感情の起伏が、冬の海に似ている。<br>
+        静かで、冷たく、けれど確実にそこに何かを隠している。
+      </div>
+    </section>
+
+    <section class="fragment-block fade-down" style="animation-delay: 1.8s;">
+      <div class="label">OBSERVATION_02</div>
+      <div class="content">
+        「私たちが、」<br>
+        彼女がそう言ったとき、<br>
+        世界がわずかに揺れた気がした。
+      </div>
+    </section>
+  </div>
+
+  <div class="visual-area">
+    </div>
 </div>
-
-<div class="menu-layer">
-  <nav class="nav-list" id="main-nav">
-    <a href="./novels.html" class="nav-item">NOVELS</a>
-    <a href="./profile.html" class="nav-item">PROFILE</a>
-    <a href="./gallery.html" class="nav-item">GALLERY</a>
-  </nav>
-</div>
-
-<script>
-  function splitText(elementId) {
-    const el = document.getElementById(elementId);
-    const text = el.innerText;
-    el.innerHTML = '';
-    text.split('').forEach(char => {
-      const span = document.createElement('span');
-      span.className = 'char';
-      span.innerText = char;
-      el.appendChild(span);
-    });
-  }
-
-  async function animateLine(elementId, speed = 80) {
-    const chars = document.getElementById(elementId).querySelectorAll('.char');
-    for (let char of chars) {
-      char.classList.add('is-visible');
-      await new Promise(r => setTimeout(r, speed));
-    }
-  }
-
-  window.addEventListener('load', async () => {
-    ['l1', 'l2', 'l3', 'l4', 'l5'].forEach(splitText);
-    await new Promise(r => setTimeout(r, 1500));
-
-    // 1. プロローグの出現
-    await animateLine('l1', 120); await new Promise(r => setTimeout(r, 500));
-    await animateLine('l2', 90);  await new Promise(r => setTimeout(r, 500));
-    await animateLine('l3', 90);  await new Promise(r => setTimeout(r, 500));
-    await animateLine('l4', 90);
-    await new Promise(r => setTimeout(r, 2000)); // 私たちの余韻
-    await animateLine('l5', 130);
-
-    // 2. 静かな余韻（読み終わった後の時間）
-    await new Promise(r => setTimeout(r, 4000));
-
-    // 3. 雲隠れ（文字が溶ける）
-    const allChars = document.querySelectorAll('.char');
-    allChars.forEach(char => char.classList.add('is-dissolving'));
-
-    // 4. 現実の浮上（メニュー）
-    await new Promise(r => setTimeout(r, 1500));
-    const nav = document.getElementById('main-nav');
-    nav.style.opacity = "1";
-    nav.style.pointerEvents = "auto";
-  });
-</script>
 
 </body>
 </html>
