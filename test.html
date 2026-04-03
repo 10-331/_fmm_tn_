@@ -9,8 +9,7 @@
     margin: 0; padding: 0;
     width: 100%; height: 100%;
     overflow: hidden;
-    /* 全体を統一感のある淡い色に。色の切り替わりを排除 */
-    background-color: #fdfcf7; 
+    background-color: #fdfcf7; /* ローディングから一貫した静かな色 */
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
     color: #333;
   }
@@ -18,7 +17,7 @@
   .world-container {
     display: flex;
     flex-direction: row-reverse;
-    width: 250vw; /* 余白のためにさらに横幅を確保 */
+    width: 300vw; /* さらに広大な「間」を確保 */
     height: 100vh;
     position: absolute;
     right: 0;
@@ -32,32 +31,32 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 12vh;
+    padding-top: 15vh;
   }
 
   .vertical-text {
     writing-mode: vertical-rl;
-    line-height: 3.5; /* 行間をさらに広く */
-    letter-spacing: 0.3em; /* 字間もゆったりと */
+    line-height: 4; /* 行間をさらに広げ、呼吸を深く */
+    letter-spacing: 0.35em;
   }
 
-  /* 「恋人」と「他人」の間の、決定的な空白 */
-  .time-gap {
-    margin-top: 30vh; /* 圧倒的な縦の余白 */
+  /* 「私たちが」から「他人に戻る」までの物理的な断絶 */
+  .void-space {
+    height: 50vh; /* 画面の半分以上を何もない空白に */
     display: block;
   }
 
   .tag {
-    margin-top: 6em;
+    margin-top: 8em;
     font-size: 0.75em;
     color: #a0a0a0;
     font-family: sans-serif;
     letter-spacing: 0.1em;
   }
 
-  /* メインアーカイブへの接続（余白としての100vwを挟む） */
+  /* 次の世界へ行くまでの広大な空白 */
   .section-spacer {
-    width: 50vw; /* 完全に何もない「間」の空間 */
+    width: 100vw; /* 1画面分まるごと「無」の空間 */
   }
 
   .section-archive {
@@ -69,20 +68,21 @@
   }
 
   .archive-placeholder {
-    font-size: 0.85em;
-    letter-spacing: 0.3em;
-    color: #bbb;
+    font-size: 0.8em;
+    letter-spacing: 0.4em;
+    color: #ccc;
     font-family: sans-serif;
   }
 
-  /* ふわっと文字が浮かび上がる演出（色の断絶を防ぐ） */
+  /* 最初の出現もゆっくりと */
   .fade-in {
-    animation: fadeInIntro 3s ease forwards;
+    animation: fadeInText 4s ease forwards;
     opacity: 0;
   }
 
-  @keyframes fadeInIntro {
-    to { opacity: 1; }
+  @keyframes fadeInText {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 </head>
@@ -90,7 +90,7 @@
 
 <div class="world-container" id="stage">
   <section class="section-archive">
-    <div class="archive-placeholder">MEMORY_RECONSTRUCTION...</div>
+    <div class="archive-placeholder">RECONSTRUCTION_IN_PROGRESS...</div>
   </section>
 
   <div class="section-spacer"></div>
@@ -100,9 +100,9 @@
       <p>これは、</p>
       <p>迷子になった私を助けてくれた彼と</p>
       <p>たくさん笑って、ふざけあって、</p>
-      <p>恋人になった私たちは</p>
+      <p>恋人になった私たちが</p>
       
-      <span class="time-gap"></span>
+      <span class="void-space"></span>
       
       <p>また、他人に戻るまでのお話。</p>
       <div class="tag">#溶けてそのまま雲隠れ</div>
@@ -114,12 +114,13 @@
   const stage = document.getElementById('stage');
 
   window.addEventListener('load', () => {
-    // 3秒待機（フェードインを待つ時間を含めて長めに）
+    // 最初の文字を読ませる時間をたっぷりと（4.5秒）
     setTimeout(() => {
-      // 8秒かけて、極めて緩やかに、そして重々しく流れる
-      stage.style.transition = "transform 8.5s cubic-bezier(0.25, 0.1, 0.25, 1)"; 
-      stage.style.transform = "translateX(150vw)"; /* スペーサー分も含めて移動 */
-    }, 3500);
+      // 12秒かけて、歩くよりも遅いスピードで世界を流す
+      // cubic-bezierの数値を調整し、動き出しをさらに「ためる」
+      stage.style.transition = "transform 12s cubic-bezier(0.4, 0, 0.2, 1)"; 
+      stage.style.transform = "translateX(200vw)"; /* スペーサー分を含めて移動 */
+    }, 4500);
   });
 </script>
 
