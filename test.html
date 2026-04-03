@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>#溶けてそのまま雲隠れ</title>
 <style>
-  /* 色の断絶を完全に排除するためのベースカラー */
+  /* あの夏の「白飛びした質感」を出すためのベース */
   :root {
-    --bg-color: #fdfcf7;
-    --text-color: #333;
-    --sub-color: #b0b0b0;
+    --bg-color: #ffffff;
+    --text-color: #222;
+    --accent-blue: #88a0b8; /* 雲隠れの青 */
   }
 
   html, body {
@@ -17,127 +18,129 @@
     overflow: hidden;
     background-color: var(--bg-color);
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-    color: var(--text-color);
-    -webkit-font-smoothing: antialiased;
   }
 
-  /* MVのカメラワーク（横移動）を制御するステージ */
-  .mv-viewport {
-    display: flex;
-    flex-direction: row-reverse;
-    width: 400vw; /* モバイルでも広大な「間」を維持 */
-    height: 100%;
-    position: absolute;
-    right: 0;
-    will-change: transform;
-  }
-
-  section {
+  /* 文字を叩きつけるステージ */
+  #mv-stage {
+    position: relative;
     width: 100vw;
-    height: 100%;
+    height: 100vh;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center; /* モバイルの横中央 */
-    padding-top: 15vh;
-    box-sizing: border-box;
-  }
-
-  /* 縦書きの歌詞：モバイルでも「詰まり」を感じさせない設定 */
-  .vertical-lyrics {
-    writing-mode: vertical-rl;
-    height: auto;
-    max-height: 70vh; /* 画面下部に余裕を持たせる */
-    line-height: 3.5; /* モバイルの幅に合わせた最適な行間 */
-    letter-spacing: 0.35em;
-    font-size: 1.1rem;
-    white-space: nowrap;
-  }
-
-  /* 決定的な空白：vhではなくremで「物理的な距離」を確保 */
-  .the-void {
-    display: block;
-    height: 12rem; 
-  }
-
-  .hashtag {
-    margin-top: 5rem;
-    font-size: 0.75rem;
-    color: var(--sub-color);
-    font-family: sans-serif;
-    letter-spacing: 0.15em;
-    opacity: 0.6;
-    writing-mode: vertical-rl; /* タグも縦書きで統一 */
-  }
-
-  /* 1画面分まるごとの空白（MVの「間」） */
-  .spacer {
-    width: 150vw;
-  }
-
-  .section-end {
-    width: 100vw;
-    display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
   }
 
-  .data-text {
-    font-family: sans-serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.4em;
-    color: var(--sub-color);
-    transform: rotate(90deg); /* モバイルなら縦に置くのもアリ */
+  /* 縦書きの歌詞：画面中央に大きく配置 */
+  .lyrics {
+    writing-mode: vertical-rl;
+    font-size: 1.8rem; /* モバイルでもしっかり「刺さる」大きさ */
+    letter-spacing: 0.5em;
+    line-height: 2;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 0.5s ease-in-out;
   }
 
-  /* 浮き上がるような出現 */
-  .fade-in {
-    animation: lyricAppear 4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* アクティブな文字だけを表示 */
+  .is-active {
+    opacity: 1;
+  }
+
+  /* 「私たちが」のあとの、長い長い空白のための黒い画面（演出） */
+  .black-out {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    opacity: 0;
+    z-index: 100;
+    pointer-events: none;
+    transition: opacity 2s ease;
+  }
+
+  .tag {
+    position: absolute;
+    bottom: 10vh;
+    right: 5vw;
+    font-size: 0.8rem;
+    color: var(--accent-blue);
+    writing-mode: horizontal-tb;
     opacity: 0;
   }
 
-  @keyframes lyricAppear {
-    0% { opacity: 0; transform: translateY(15px); filter: blur(4px); }
-    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  /* 最後にアーカイブへ繋がるボタン */
+  #to-archive {
+    opacity: 0;
+    text-decoration: none;
+    color: #999;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    border: 1px solid #eee;
+    padding: 10px 20px;
+    transition: opacity 2s ease;
+  }
+
+  @media (max-width: 600px) {
+    .lyrics { font-size: 1.4rem; line-height: 1.5; }
   }
 </style>
 </head>
 <body>
 
-<div class="mv-viewport" id="camera">
-  <section class="section-end">
-    <div class="data-text">ARCHIVE_LOADING...</div>
-  </section>
-
-  <div class="spacer"></div>
-
-  <section class="fade-in">
-    <div class="vertical-lyrics">
-      <p>これは、</p>
-      <p>迷子になった私を助けてくれた彼と</p>
-      <p>たくさん笑って、ふざけあって、</p>
-      <p>恋人になった私たちが</p>
-      
-      <span class="the-void"></span>
-      
-      <p>また、他人に戻るまでのお話。</p>
-      <div class="hashtag">#溶けてそのまま雲隠れ</div>
-    </div>
-  </section>
+<div id="mv-stage">
+  <div class="lyrics" id="l1">これは、</div>
+  <div class="lyrics" id="l2">迷子になった私を助けてくれた彼と</div>
+  <div class="lyrics" id="l3">たくさん笑って、ふざけあって、</div>
+  <div class="lyrics" id="l4">恋人になった私たちが</div>
+  
+  <div class="lyrics" id="l5" style="font-size: 2.2rem; font-weight: bold;">また、他人に戻るまでのお話。</div>
+  
+  <div class="tag" id="tag">#溶けてそのまま雲隠れ</div>
+  <a href="archive.html" id="to-archive">ENTER_ARCHIVE</a>
 </div>
 
-<script>
-  const camera = document.getElementById('camera');
+<div class="black-out" id="black"></div>
 
-  window.addEventListener('load', () => {
-    // 最初の読み込み待機（5秒）
-    setTimeout(() => {
-      // 25秒かけて、モバイルの狭い視界をゆっくりと通り過ぎる
-      // スピードをさらに落とし、微かな微動を感じさせる
-      camera.style.transition = "transform 25s cubic-bezier(0.4, 0, 0.2, 1)"; 
-      camera.style.transform = "translateX(300vw)";
-    }, 5000);
-  });
+<script>
+  const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  async function startMV() {
+    const l1 = document.getElementById('l1');
+    const l2 = document.getElementById('l2');
+    const l3 = document.getElementById('l3');
+    const l4 = document.getElementById('l4');
+    const l5 = document.getElementById('l5');
+    const tag = document.getElementById('tag');
+    const btn = document.getElementById('to-archive');
+    const black = document.getElementById('black');
+
+    // 演出スタート
+    await wait(1500);
+    l1.classList.add('is-active'); await wait(2000); l1.classList.remove('is-active');
+    
+    l2.classList.add('is-active'); await wait(2500); l2.classList.remove('is-active');
+    
+    l3.classList.add('is-active'); await wait(2500); l3.classList.remove('is-active');
+    
+    // 「私たちが」への強調
+    l4.classList.add('is-active'); await wait(3000); l4.classList.remove('is-active');
+
+    // 【重要】圧倒的な空白の時間
+    // ここでMVのように一瞬画面が暗くなる、あるいは何も映らない時間が続く
+    await wait(5000); 
+
+    // 最後の一文：ここだけ少し長く、強く
+    l5.classList.add('is-active'); 
+    tag.style.opacity = "0.6";
+    await wait(5000);
+    
+    // アーカイブへの導線が静かに現れる
+    l5.style.transition = "opacity 3s ease";
+    l5.style.opacity = "0";
+    await wait(2000);
+    btn.style.opacity = "1";
+  }
+
+  window.addEventListener('load', startMV);
 </script>
 
 </body>
