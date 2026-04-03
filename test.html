@@ -19,7 +19,6 @@
     overflow: hidden;
   }
 
-  /* レイアウト構造 */
   .profile-wrapper {
     display: flex;
     flex-direction: row-reverse;
@@ -27,7 +26,7 @@
     height: 100%;
   }
 
-  /* テキストエリア（縦書き） */
+  /* 右側：テキストエリア（縦書き） */
   .text-content-area {
     writing-mode: vertical-rl;
     height: 100%;
@@ -35,9 +34,9 @@
     display: flex;
     flex-direction: row;
     flex-grow: 1;
+    z-index: 20; /* 文字を画像より上に（重なる場合のみ） */
   }
 
-  /* 名前セクション */
   .section-symbol { margin-left: 5rem; flex-shrink: 0; }
   .name-large { font-size: 2.2rem; letter-spacing: 0.5em; line-height: 1.2; }
   .name-en { 
@@ -47,13 +46,11 @@
   }
   .catch-copy { margin-top: 2rem; font-size: 0.8rem; color: var(--text-sub); letter-spacing: 0.1em; }
 
-  /* プロフィール項目 */
   .section-status { margin-left: 4.5rem; border-right: 1px solid #f2f2f2; padding-right: 2.5rem; }
   .status-item { margin-bottom: 2.5rem; }
   .status-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 1.2rem; display: block; font-family: sans-serif; }
   .status-value { font-size: 0.9rem; letter-spacing: 0.05em; }
 
-  /* 詳細テキスト */
   .section-story { margin-left: 3rem; max-width: 32vw; }
   .story-text { font-size: 0.88rem; line-height: 2.8; letter-spacing: 0.08em; text-align: justify; }
 
@@ -61,13 +58,11 @@
     color: var(--accent);
     text-decoration: underline;
     cursor: pointer;
-    transition: opacity 0.3s;
   }
-  .memory-link:hover { opacity: 0.6; }
 
-  /* 立ち絵エリア（聖域） */
+  /* 左側：立ち絵聖域 */
   .illust-area {
-    width: 44vw;
+    width: 45vw;
     height: 100%;
     position: relative;
     flex-shrink: 0;
@@ -78,16 +73,15 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 94vh;
+    height: 95vh;
     object-fit: contain;
     object-position: bottom left;
-    /* 足元をボカす */
+    /* 足元の透過処理 */
     mask-image: linear-gradient(to top, transparent, black 15%);
     -webkit-mask-image: linear-gradient(to top, transparent, black 15%);
     z-index: 10;
   }
 
-  /* フェード */
   .fade {
     animation: fadeAnim 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     opacity: 0;
@@ -108,7 +102,6 @@
 
 <div class="profile-wrapper">
   <div class="text-content-area">
-    
     <header class="section-symbol fade" style="animation-delay: 0.4s;">
       <h1 class="name-large">笹井 綾</h1>
       <div class="name-en">SUBJECT_AYA_0814</div>
@@ -136,18 +129,17 @@
 
     <div class="section-story fade" style="animation-delay: 1.6s;">
       <div class="story-text">
-        転職に伴い、2054年の冬が終わる頃にHAMAへやってきた。
-        メタバース企業に勤めるが、自部署は業務内容が異なるため関連知識は乏しい。<br><br>
+        転職に伴い、2054年の冬が終わる頃にHAMAへやってきた女性。
+        メタバース企業に勤めているが、自部署は業務内容が異なるため関連知識は乏しい。<br><br>
         交友関係は広く外出も多いが、極度の方向音痴のため街中でよく途方に暮れている。
-        一般常識に疎い箱入り娘だが、なぜかAIについては異様に博識で、ペットロボに対しても少し冷たい様子を見せる。<br><br>
-        <span class="memory-link" onclick="location.href='Secret.html'">一部の記憶が曖昧</span>だが、本人は「身軽でいい」と特に気にしていない。
+        一般常識に疎い箱入り娘だが、なぜかAIについては異様に博識。<br><br>
+        <span class="memory-link" onclick="location.href='Secret.html'">一部の記憶が曖昧</span>だが、本人は「身軽でいい」と笑っている。
       </div>
     </div>
-
   </div>
 
   <div class="illust-area">
-    <img src="Assets/profile/aya2.PNG" class="illust-image fade" style="animation-delay: 0.8s;" alt="笹井 綾">
+    <img src="assets/profile/aya2.PNG" class="illust-image fade" style="animation-delay: 0.8s;" alt="笹井 綾">
   </div>
 </div>
 
