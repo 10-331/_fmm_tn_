@@ -1,40 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
 <style>
-  /* 縦書きのセクション */
-  .prologue-section {
+  html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    /* 横スクロールを許容する構成 */
+    overflow-x: auto; 
+    overflow-y: hidden;
+    background: linear-gradient(90deg, #f8e9e9 0%, #f1ecf6 100%);
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+  }
+
+  /* 横に長いコンテナ */
+  .horizontal-wrapper {
+    display: flex;
+    width: 300vw; /* 3画面分くらいの長さ */
+    height: 100vh;
+  }
+
+  /* セクション：縦書きプロローグ */
+  .section-intro {
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center; /* 水平中央 */
     align-items: flex-start; /* 上揃え */
-    height: 80vh;           /* 画面の高さに余裕を持たせる */
-    padding-top: 10vh;      /* 上からのマージン */
-    background: transparent;
+    padding-top: 15vh;
   }
 
   .vertical-text {
-    writing-mode: vertical-rl; /* 縦書き・右から左 */
-    text-orientation: mixed;
-    line-height: 2.5;          /* 行間を広めに取って「サクサク」読ませる */
-    letter-spacing: 0.15em;    /* 文字間を空けて空気感を作る */
-    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    writing-mode: vertical-rl;
+    line-height: 3;
+    letter-spacing: 0.2em;
     color: #444;
+    transition: opacity 1s ease;
   }
 
   .tag {
-    margin-top: 2em;           /* 縦書きなので「下」への余白 */
-    font-size: 0.85em;
-    color: #88a0b8;            /* 雲隠れをイメージした淡い青 */
-    font-family: sans-serif;   /* タグとしての記号性を出すため */
+    margin-top: 3em;
+    font-size: 0.8em;
+    color: #88a0b8;
+    font-family: sans-serif;
   }
-</style>
 
-<section class="prologue-section">
-  <div class="vertical-text">
-    <p>これは、</p>
-    <p>迷子になった私を助けてくれた彼と</p>
-    <p>たくさん笑って、ふざけあって、</p>
-    <p>恋人になった私たちは</p>
-    <br>
-    <p>また、他人に戻るまでのお話。</p>
-    
-    <div class="tag">#溶けてそのまま雲隠れ</div>
-  </div>
-</section>
+  /* 次のセクション（例：現在のアーカイブ） */
+  .section-main {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.2);
+  }
+
+</style>
+</head>
+<body>
+
+<div class="horizontal-wrapper" id="scrollContainer">
+  <section class="section-intro">
+    <div class="vertical-text">
+      <p>これは、</p>
+      <p>迷子になった私を助けてくれた彼と</p>
+      <p>たくさん笑って、ふざけあって、</p>
+      <p>恋人になった私たちは</p>
+      <br>
+      <p>また、他人に戻るまでのお話。</p>
+      <div class="tag">#溶けてそのまま雲隠れ</div>
+    </div>
+  </section>
+
+  <section class="section-main">
+    <div style="font-size: 0.9em; letter-spacing: 0.1em; color: #666;">
+      [ ARCHIVE: 22yo / ENGINEER / HAMA ]
+    </div>
+  </section>
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    // 2秒待機
+    setTimeout(() => {
+      // 左（横方向）へスクロール開始
+      // スムーズに1画面分(window.innerWidth)移動させる
+      window.scrollTo({
+        left: window.innerWidth,
+        behavior: 'smooth'
+      });
+    }, 2000); 
+  });
+</script>
+
+</body>
+</html>
