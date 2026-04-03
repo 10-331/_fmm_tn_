@@ -23,36 +23,34 @@
     position: relative;
     width: 100vw;
     height: 100vh;
-    display: flex;
-    justify-content: center; /* 横方向中央 */
-    align-items: flex-start;  /* 上揃え */
-    padding-top: 15vh;
     box-sizing: border-box;
   }
 
-  /* 全体コンテナ：縦書き・右から左へ行が並ぶ */
-  .lyrics-wrapper {
-    writing-mode: vertical-rl;
-    height: 70vh;
-    display: flex;
-    flex-direction: row; /* 縦書き設定下では右から左へ並ぶ */
-  }
-
+  /* 各行の配置：MVのように少しずつ位置をずらして「間」を作る */
   .line {
-    display: block;
-    font-size: 0.95rem; /* もう一回り小さく */
-    letter-spacing: 0.35em;
-    line-height: 3.2;    /* 行間を広めに取って「間」を作る */
+    position: absolute;
+    font-size: 0.85rem; /* さらに一回り小さく */
+    letter-spacing: 0.2em;
+    line-height: 1.8;
     white-space: nowrap;
-    opacity: 1; /* 行自体は常に存在させる */
+    color: var(--text-color);
   }
 
-  /* 一文字ずつの出現アニメーション（上から滲み落ちる） */
+  /* 配置の指定（MV的なレイアウト） */
+  #l1 { top: 20%; left: 15%; }
+  #l2 { top: 30%; left: 18%; }
+  #l3 { top: 40%; left: 21%; }
+  #l4 { top: 50%; left: 24%; }
+  
+  /* 最後の一文は少し離れた場所に、静かに */
+  #l5 { top: 70%; left: 30%; }
+
+  /* 一文字ずつの出現（上から滲み落ちる） */
   .char {
     display: inline-block;
     opacity: 0;
     filter: blur(6px);
-    transform: translateY(-5px);
+    transform: translateY(-8px);
     transition: opacity 1.2s ease-out, filter 1.5s ease-out, transform 1.2s ease-out;
   }
 
@@ -60,11 +58,6 @@
     opacity: 1;
     filter: blur(0px);
     transform: translateY(0);
-  }
-
-  /* 「私たちが」の後の物理的な「行」としての空白 */
-  .spacer-line {
-    width: 4rem; /* 画面上の横方向の空白 */
   }
 
   #to-archive {
@@ -77,31 +70,30 @@
     padding-bottom: 4px;
     position: absolute;
     bottom: 8vh;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 15%;
     transition: opacity 3s ease;
     font-family: sans-serif;
   }
 
   @media (max-width: 600px) {
-    .line { font-size: 0.9rem; line-height: 2.8; }
-    .spacer-line { width: 3rem; }
+    .line { font-size: 0.75rem; letter-spacing: 0.15em; }
+    #l1 { left: 10%; }
+    #l2 { left: 12%; }
+    #l3 { left: 14%; }
+    #l4 { left: 16%; }
+    #l5 { left: 20%; }
   }
 </style>
 </head>
 <body>
 
 <div id="mv-stage">
-  <div class="lyrics-wrapper">
-    <div class="line" id="l1">これは、</div>
-    <div class="line" id="l2">迷子になった私を助けてくれた彼と</div>
-    <div class="line" id="l3">たくさん笑って、ふざけあって、</div>
-    <div class="line" id="l4">恋人になった私たちが</div>
-    
-    <div class="spacer-line"></div>
-    
-    <div class="line" id="l5">また、他人に戻るまでのお話。</div>
-  </div>
+  <div class="line" id="l1">これは、</div>
+  <div class="line" id="l2">迷子になった私を助けてくれた彼と</div>
+  <div class="line" id="l3">たくさん笑って、ふざけあって、</div>
+  <div class="line" id="l4">恋人になった私たちが</div>
+  
+  <div class="line" id="l5">また、他人に戻るまでのお話。</div>
 
   <a href="archive.html" id="to-archive">ENTER_ARCHIVE</a>
 </div>
@@ -119,7 +111,7 @@
     });
   }
 
-  async function animateLine(elementId, charSpeed = 90) {
+  async function animateLine(elementId, charSpeed = 70) {
     const el = document.getElementById(elementId);
     const chars = el.querySelectorAll('.char');
     for (let char of chars) {
@@ -129,30 +121,28 @@
   }
 
   window.addEventListener('load', async () => {
-    // 初期化：全行を分解
     ['l1', 'l2', 'l3', 'l4', 'l5'].forEach(splitText);
     
-    await new Promise(r => setTimeout(r, 1500)); // 最初の静寂
+    await new Promise(r => setTimeout(r, 1500)); 
 
-    // 既に出た文字は残したまま、次々に現れる
+    // 前の文章を残したまま、階段状に現れる
     await animateLine('l1', 100);
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 400));
     
-    await animateLine('l2', 80);
-    await new Promise(r => setTimeout(r, 500));
+    await animateLine('l2', 70);
+    await new Promise(r => setTimeout(r, 400));
     
-    await animateLine('l3', 80);
-    await new Promise(r => setTimeout(r, 500));
+    await animateLine('l3', 70);
+    await new Promise(r => setTimeout(r, 400));
     
-    await animateLine('l4', 80);
+    await animateLine('l4', 70);
 
-    // 「私たちが」のあとの、物語的な沈黙
-    await new Promise(r => setTimeout(r, 3000)); 
+    // 「私たちが」のあとの、ほどよい空白（MV的なテンポ）
+    await new Promise(r => setTimeout(r, 2500)); 
 
-    await animateLine('l5', 120);
+    await animateLine('l5', 100);
 
-    // 余韻のあと、ボタンを表示
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 1500));
     document.getElementById('to-archive').style.opacity = "1";
   });
 </script>
