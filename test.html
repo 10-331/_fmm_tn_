@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>#溶けてそのまま雲隠れ - AYA SASAI</title>
 <style>
   :root {
     --bg-color: #ffffff;
@@ -20,69 +21,73 @@
     color: var(--text-main);
   }
 
+  /* 画面全体のステージ */
   .container {
     display: flex;
-    flex-direction: row-reverse; /* 右から左への視線誘導 */
+    flex-direction: row-reverse; /* 右から左へ流れる */
     width: 100%; height: 100%;
-    padding: 10vh 8vw;
+    padding: 12vh 5vw; /* 上下の余白 */
     box-sizing: border-box;
-    writing-mode: vertical-rl;
+    writing-mode: vertical-rl; /* 縦書きの継続 */
   }
 
-  /* --- [1] 右端：シンボルエリア --- */
+  /* --- [1] 右端：シンボルエリア（名前） --- */
   .section-symbol {
-    margin-left: 6rem;
+    margin-left: 5rem;
     flex-shrink: 0;
   }
   .name-large { font-size: 2.4rem; letter-spacing: 0.6em; }
   .name-en { font-family: sans-serif; font-size: 0.8rem; color: var(--text-sub); margin-top: 1.5rem; letter-spacing: 0.4em; }
 
-  /* --- [2] 中央：ステータスエリア（整列させて見やすく） --- */
-  .section-status {
+  /* --- [2] 中央左：物語エリア（立ち絵の隣に） --- */
+  .section-story {
     margin-left: 4rem;
+    height: 70vh;
+    display: flex;
+    justify-content: flex-end; /* 上揃え */
     padding-right: 2rem;
-    border-right: 1px solid #f0f0f0; /* 区切り線で情報の固まりを明示 */
+    border-right: 1px solid #f0f0f0; /* 区切り線 */
   }
-  .status-item {
-    margin-bottom: 2.5rem;
-    line-height: 1.5;
+  .story-text {
+    font-size: 0.85rem;
+    line-height: 2.8;
+    letter-spacing: 0.15em;
   }
+
+  /* --- [3] 中央：ステータスエリア --- */
+  .section-status {
+    margin-left: auto; /* 立ち絵との間に広大な余白を */
+    padding-right: 3rem;
+  }
+  .status-item { margin-bottom: 2.8rem; line-height: 1.5; }
   .status-label {
     font-family: sans-serif;
     font-size: 0.65rem;
     color: var(--accent);
-    margin-bottom: 1rem;
+    margin-bottom: 1.2rem;
     display: block;
   }
   .status-value { font-size: 0.9rem; letter-spacing: 0.1em; }
 
-  /* --- [3] 左側：ビジュアル＆ストーリーエリア --- */
-  .section-story {
-    margin-left: auto; /* 残りのスペースを埋める */
-    display: flex;
-    flex-direction: row; /* 縦書き内での並び */
-  }
 
-  .story-text {
-    width: 25vw;
-    font-size: 0.85rem;
-    line-height: 2.8;
-    letter-spacing: 0.15em;
-    padding-right: 2rem;
-  }
-
-  .illust-wrapper {
+  /* --- [4] 左端：立ち絵エリア（絶対に被らせない） --- */
+  .section-illust {
     position: fixed;
     left: 0; bottom: 0;
-    width: 40vw; height: 90vh;
-    z-index: -1;
+    width: 38vw; /* 立ち絵専用の領域（ここに文字は入らない） */
+    height: 90vh;
+    display: flex;
+    justify-content: flex-end; /* 下揃え */
+    z-index: 10; /* 最前面へ */
   }
+  
   .illust-image {
     width: 100%; height: 100%;
-    object-fit: contain;
-    opacity: 0.7;
-    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+    object-fit: contain; /* アスペクト比を保つ */
+    /* 顔周りはクリアに、足元だけを溶け込ませる */
+    mask-image: linear-gradient(to top, transparent, black 15%);
   }
+
 
   /* アニメーション（右上から順に） */
   .fade {
@@ -103,6 +108,15 @@
     <div class="name-en">SASAI AYA</div>
   </header>
 
+  <div class="section-story fade" style="animation-delay: 1.5s;">
+    <div class="story-text">
+      「逃げ場は、いつだって白紙の中にあった」<br><br>
+      彼女の言葉は、いつもどこか遠い場所を指している。<br>
+      2055年の熱気から逃れるように、<br>
+      彼女はただ、空の色が溶けるのを待っていた。
+    </div>
+  </div>
+
   <div class="section-status fade" style="animation-delay: 1s;">
     <div class="status-item">
       <span class="status-label">AGE / BIRTH</span>
@@ -118,16 +132,7 @@
     </div>
   </div>
 
-  <div class="section-story fade" style="animation-delay: 1.5s;">
-    <div class="story-text">
-      「逃げ場は、いつだって白紙の中にあった」<br><br>
-      彼女の言葉は、いつもどこか遠い場所を指している。<br>
-      2055年の熱気から逃れるように、<br>
-      彼女はただ、空の色が溶けるのを待っていた。
-    </div>
-  </div>
-
-  <div class="illust-wrapper fade" style="animation-delay: 0.8s;">
+  <div class="section-illust fade" style="animation-delay: 0.8s;">
     <img src="aya_stand_illust.png" class="illust-image" alt="笹井綾 立ち絵">
   </div>
 </div>
