@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>#溶けてそのまま雲隠れ</title>
 <style>
   :root {
     --bg-color: #ffffff;
-    --text-color: #333;
+    --text-color: #333; /* 儚さを出すために、完全な黒ではない黒 */
     --accent-blue: #a0c0e0;
   }
 
@@ -27,12 +28,13 @@
     align-items: center;
   }
 
+  /* 縦書きの歌詞：モバイルでも「詰まり」を感じさせない大きさ */
   .lyrics-container {
     writing-mode: vertical-rl;
-    font-size: 1.1rem;
-    letter-spacing: 0.35em;
-    line-height: 2.8;
-    height: 65vh;
+    font-size: 1.1rem; /* 文字サイズを「儚く」小さく調整 */
+    letter-spacing: 0.35em; /* 字間を広げて呼吸を置く */
+    line-height: 2.8;        /* 行間を広げて「間」を作る */
+    height: 65vh;         /* 画面下部に余裕を持たせる */
     opacity: 0;
     position: absolute;
     transition: opacity 0.8s ease-in-out; /* 消える時は少し早めに */
@@ -40,17 +42,21 @@
     pointer-events: none;
   }
 
+  /* アクティブな文字だけを表示 */
   .is-active { opacity: 1; }
 
-  /* 一文字ずつの出現アニメーション（速度向上） */
+  /* 【重要】一文字ずつの出現アニメーション（速度向上 & 上からの出現） */
   .char {
     display: inline-block;
     opacity: 0;
-    filter: blur(4px);
-    transform: translateY(3px);
+    filter: blur(4px); /* 滲んだ状態から */
+    /* 下から浮かび上がる(Y:3px)のではなく、
+       上から静かに落ちてくる(Y:-3px) */
+    transform: translateY(-3px); 
     transition: opacity 0.8s ease-out, filter 0.8s ease-out, transform 0.8s ease-out;
   }
 
+  /* 文字が現れた状態 */
   .char.is-visible {
     opacity: 1;
     filter: blur(0px);
@@ -60,7 +66,7 @@
   /* 「私たちが」の後の空白：物理的な距離 */
   .the-void {
     display: block;
-    height: 15rem; 
+    height: 15rem; /* 画面半分以上を何もない空白に */
   }
 
   #to-archive {
@@ -89,11 +95,14 @@
   <div class="lyrics-container" id="l2">迷子になった私を助けてくれた彼と</div>
   <div class="lyrics-container" id="l3">たくさん笑って、ふざけあって、</div>
   <div class="lyrics-container" id="l4">恋人になった私たちが</div>
+  
   <div class="lyrics-container" id="l5">また、他人に戻るまでのお話。</div>
+  
   <a href="archive.html" id="to-archive">ENTER_ARCHIVE</a>
 </div>
 
 <script>
+  // テキストを `<span>` で囲んで一文字ずつ分解する関数
   function splitText(elementId) {
     const el = document.getElementById(elementId);
     const text = el.innerText;
@@ -106,38 +115,56 @@
     });
   }
 
+  // 分解した文字を、テンポよく、上から滲み出すように表示させる関数
   async function showLine(elementId, charSpeed = 120, lineWait = 1200) {
     const el = document.getElementById(elementId);
     const chars = el.querySelectorAll('.char');
+    
+    // 一文全体をフェードイン
     el.classList.add('is-active');
     
+    // 一文字ずつの出現
     for (let char of chars) {
       char.classList.add('is-visible');
       await new Promise(r => setTimeout(r, charSpeed)); // 1文字出す速度
     }
-    await new Promise(r => setTimeout(r, lineWait)); // 出し切った後の「間」
+    
+    // 出し切った後の「間」
+    await new Promise(r => setTimeout(r, lineWait)); 
+    
+    // 一文全体をフェードアウト
     el.classList.remove('is-active');
-    await new Promise(r => setTimeout(r, 600)); // 消えてから次に行くまでの「間」
+    
+    // 消えてから次に行くまでの「間」
+    await new Promise(r => setTimeout(r, 600)); 
   }
 
-  window.addEventListener('load', async () => {
+  const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+  async function startMV() {
+    // 1. 全テキストを分解
     ['l1', 'l2', 'l3', 'l4', 'l5'].forEach(splitText);
     
-    await new Promise(r => setTimeout(r, 1000)); // 起動時の静寂
+    await wait(1000); // 起動時の静寂（色の断絶を消す）
 
+    // テンポよくスルスルと流れるような速さ
     await showLine('l1', 100, 800);
     await showLine('l2', 80, 1000);
     await showLine('l3', 80, 1000);
     await showLine('l4', 80, 1500); // 「私たちが」
 
-    // 【重要】ここが二人の空白
+    // 【重要】ここが二人の空白（テンポ感を優先し、4.5秒へ短縮）
     // 物理的な距離はCSS（the-void）ではなく、この「時間」で表現
     await new Promise(r => setTimeout(r, 4500)); 
 
-    await showLine('l5', 120, 3000); // 最後は少しだけ丁寧に
+    // 最後の一文：ここだけ少しゆっくり、弱々しく
+    await showLine('l5', 120, 3000); 
 
+    // アーカイブへの導線が静かに現れる
     document.getElementById('to-archive').style.opacity = "1";
-  });
+  }
+
+  window.addEventListener('load', startMV);
 </script>
 
 </body>
