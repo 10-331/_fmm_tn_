@@ -7,7 +7,7 @@
 <style>
   :root {
     --bg-color: #ffffff;
-    --text-color: #333; /* 儚さを出すために、完全な黒ではない黒 */
+    --text-color: #333;
     --accent-blue: #a0c0e0;
   }
 
@@ -24,85 +24,89 @@
     width: 100vw;
     height: 100vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center; /* 横方向中央 */
+    align-items: flex-start;  /* 上揃え */
+    padding-top: 15vh;
+    box-sizing: border-box;
   }
 
-  /* 縦書きの歌詞：モバイルでも「詰まり」を感じさせない大きさ */
-  .lyrics-container {
+  /* 全体コンテナ：縦書き・右から左へ行が並ぶ */
+  .lyrics-wrapper {
     writing-mode: vertical-rl;
-    font-size: 1.1rem; /* 文字サイズを「儚く」小さく調整 */
-    letter-spacing: 0.35em; /* 字間を広げて呼吸を置く */
-    line-height: 2.8;        /* 行間を広げて「間」を作る */
-    height: 65vh;         /* 画面下部に余裕を持たせる */
-    opacity: 0;
-    position: absolute;
-    transition: opacity 0.8s ease-in-out; /* 消える時は少し早めに */
-    white-space: nowrap;
-    pointer-events: none;
+    height: 70vh;
+    display: flex;
+    flex-direction: row; /* 縦書き設定下では右から左へ並ぶ */
   }
 
-  /* アクティブな文字だけを表示 */
-  .is-active { opacity: 1; }
+  .line {
+    display: block;
+    font-size: 0.95rem; /* もう一回り小さく */
+    letter-spacing: 0.35em;
+    line-height: 3.2;    /* 行間を広めに取って「間」を作る */
+    white-space: nowrap;
+    opacity: 1; /* 行自体は常に存在させる */
+  }
 
-  /* 【重要】一文字ずつの出現アニメーション（速度向上 & 上からの出現） */
+  /* 一文字ずつの出現アニメーション（上から滲み落ちる） */
   .char {
     display: inline-block;
     opacity: 0;
-    filter: blur(4px); /* 滲んだ状態から */
-    /* 下から浮かび上がる(Y:3px)のではなく、
-       上から静かに落ちてくる(Y:-3px) */
-    transform: translateY(-3px); 
-    transition: opacity 0.8s ease-out, filter 0.8s ease-out, transform 0.8s ease-out;
+    filter: blur(6px);
+    transform: translateY(-5px);
+    transition: opacity 1.2s ease-out, filter 1.5s ease-out, transform 1.2s ease-out;
   }
 
-  /* 文字が現れた状態 */
   .char.is-visible {
     opacity: 1;
     filter: blur(0px);
     transform: translateY(0);
   }
 
-  /* 「私たちが」の後の空白：物理的な距離 */
-  .the-void {
-    display: block;
-    height: 15rem; /* 画面半分以上を何もない空白に */
+  /* 「私たちが」の後の物理的な「行」としての空白 */
+  .spacer-line {
+    width: 4rem; /* 画面上の横方向の空白 */
   }
 
   #to-archive {
     opacity: 0;
     text-decoration: none;
     color: #ccc;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     letter-spacing: 0.3em;
     border-bottom: 1px solid #eee;
     padding-bottom: 4px;
     position: absolute;
     bottom: 8vh;
-    transition: opacity 2s ease;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity 3s ease;
     font-family: sans-serif;
   }
 
   @media (max-width: 600px) {
-    .lyrics-container { font-size: 1.05rem; line-height: 2.4; }
+    .line { font-size: 0.9rem; line-height: 2.8; }
+    .spacer-line { width: 3rem; }
   }
 </style>
 </head>
 <body>
 
 <div id="mv-stage">
-  <div class="lyrics-container" id="l1">これは、</div>
-  <div class="lyrics-container" id="l2">迷子になった私を助けてくれた彼と</div>
-  <div class="lyrics-container" id="l3">たくさん笑って、ふざけあって、</div>
-  <div class="lyrics-container" id="l4">恋人になった私たちが</div>
-  
-  <div class="lyrics-container" id="l5">また、他人に戻るまでのお話。</div>
-  
+  <div class="lyrics-wrapper">
+    <div class="line" id="l1">これは、</div>
+    <div class="line" id="l2">迷子になった私を助けてくれた彼と</div>
+    <div class="line" id="l3">たくさん笑って、ふざけあって、</div>
+    <div class="line" id="l4">恋人になった私たちが</div>
+    
+    <div class="spacer-line"></div>
+    
+    <div class="line" id="l5">また、他人に戻るまでのお話。</div>
+  </div>
+
   <a href="archive.html" id="to-archive">ENTER_ARCHIVE</a>
 </div>
 
 <script>
-  // テキストを `<span>` で囲んで一文字ずつ分解する関数
   function splitText(elementId) {
     const el = document.getElementById(elementId);
     const text = el.innerText;
@@ -115,56 +119,42 @@
     });
   }
 
-  // 分解した文字を、テンポよく、上から滲み出すように表示させる関数
-  async function showLine(elementId, charSpeed = 120, lineWait = 1200) {
+  async function animateLine(elementId, charSpeed = 90) {
     const el = document.getElementById(elementId);
     const chars = el.querySelectorAll('.char');
-    
-    // 一文全体をフェードイン
-    el.classList.add('is-active');
-    
-    // 一文字ずつの出現
     for (let char of chars) {
       char.classList.add('is-visible');
-      await new Promise(r => setTimeout(r, charSpeed)); // 1文字出す速度
+      await new Promise(r => setTimeout(r, charSpeed));
     }
-    
-    // 出し切った後の「間」
-    await new Promise(r => setTimeout(r, lineWait)); 
-    
-    // 一文全体をフェードアウト
-    el.classList.remove('is-active');
-    
-    // 消えてから次に行くまでの「間」
-    await new Promise(r => setTimeout(r, 600)); 
   }
 
-  const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-  async function startMV() {
-    // 1. 全テキストを分解
+  window.addEventListener('load', async () => {
+    // 初期化：全行を分解
     ['l1', 'l2', 'l3', 'l4', 'l5'].forEach(splitText);
     
-    await wait(1000); // 起動時の静寂（色の断絶を消す）
+    await new Promise(r => setTimeout(r, 1500)); // 最初の静寂
 
-    // テンポよくスルスルと流れるような速さ
-    await showLine('l1', 100, 800);
-    await showLine('l2', 80, 1000);
-    await showLine('l3', 80, 1000);
-    await showLine('l4', 80, 1500); // 「私たちが」
+    // 既に出た文字は残したまま、次々に現れる
+    await animateLine('l1', 100);
+    await new Promise(r => setTimeout(r, 500));
+    
+    await animateLine('l2', 80);
+    await new Promise(r => setTimeout(r, 500));
+    
+    await animateLine('l3', 80);
+    await new Promise(r => setTimeout(r, 500));
+    
+    await animateLine('l4', 80);
 
-    // 【重要】ここが二人の空白（テンポ感を優先し、4.5秒へ短縮）
-    // 物理的な距離はCSS（the-void）ではなく、この「時間」で表現
-    await new Promise(r => setTimeout(r, 4500)); 
+    // 「私たちが」のあとの、物語的な沈黙
+    await new Promise(r => setTimeout(r, 3000)); 
 
-    // 最後の一文：ここだけ少しゆっくり、弱々しく
-    await showLine('l5', 120, 3000); 
+    await animateLine('l5', 120);
 
-    // アーカイブへの導線が静かに現れる
+    // 余韻のあと、ボタンを表示
+    await new Promise(r => setTimeout(r, 2000));
     document.getElementById('to-archive').style.opacity = "1";
-  }
-
-  window.addEventListener('load', startMV);
+  });
 </script>
 
 </body>
