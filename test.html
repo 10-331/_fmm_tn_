@@ -3,158 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SASAI AYA - OFFICIAL ARCHIVE</title>
+    <title>AYA SASAI // ARCHIVE</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;600&family=Noto+Sans+JP:wght@300;600&display=swap');
+
         :root {
-            --color-bg: #fff;
-            --color-text: #333;
-            --color-accent: #FFD700; /* 現在の綾：イエロー */
-            --font-main: 'Helvetica Neue', Arial, sans-serif;
-            --transition: 0.5s ease;
+            --bg-gradient: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%);
+            --accent: #ffd700;
+            --text: #2c2c2c;
+            --glass: rgba(255, 255, 255, 0.7);
+            --blur: 15px;
         }
 
-        /* 過去（Filler）モードの変数 */
-        body.is-glitch {
-            --color-bg: #1a1a1a;
-            --color-text: #eee;
-            --color-accent: #B22222; /* フィラー：レッド */
-            --font-main: 'Courier New', monospace;
+        body.is-filler {
+            --bg-gradient: radial-gradient(circle at center, #1a0505 0%, #000000 100%);
+            --accent: #c71585;
+            --text: #e0e0e0;
+            --glass: rgba(0, 0, 0, 0.6);
+            --blur: 20px;
         }
 
         body {
             margin: 0;
-            background-color: var(--color-bg);
-            color: var(--color-text);
-            font-family: var(--font-main);
-            transition: background-color var(--transition), color var(--transition);
-            overflow-x: hidden;
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text);
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
         }
 
-        /* ヘッダー：サクサク移動できるナビ */
-        header {
-            padding: 20px;
+        /* 背景に溶け込む大きなタイポグラフィ */
+        .bg-text {
+            position: fixed;
+            font-size: 15vw;
+            font-weight: 900;
+            opacity: 0.03;
+            z-index: -1;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        /* グラスモルフィズムを採用したナビ */
+        nav {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass);
+            backdrop-filter: blur(var(--blur));
+            padding: 0.8rem 2.5rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 100;
             display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #ddd;
+            gap: 2rem;
         }
 
         nav a {
-            margin-left: 20px;
+            color: var(--text);
             text-decoration: none;
-            color: inherit;
-            font-weight: bold;
-            border-bottom: 2px solid transparent;
+            font-size: 0.9rem;
+            letter-spacing: 0.1rem;
+            transition: color 0.3s;
         }
-        nav a:hover { border-bottom-color: var(--color-accent); }
+        nav a:hover { color: var(--accent); }
 
-        /* メインビジュアル：立ち絵と情報の融合 */
-        main {
-            display: flex;
-            height: 80vh;
+        /* キャラクター配置：浮遊感 */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
             align-items: center;
-            justify-content: space-around;
-            padding: 0 5%;
+            padding: 0 10%;
         }
 
-        .chara-view {
+        .visual-area {
             position: relative;
-            width: 40%;
+            height: 85vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .standing-picture {
             height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.1));
+            transition: all 1s ease;
         }
 
-        .chara-img {
-            max-height: 100%;
-            position: absolute;
-            bottom: 0;
-            transition: opacity var(--transition), transform 0.3s ease;
-            cursor: pointer;
+        /* 情報エリア：サクサク読める整理されたレイアウト */
+        .content-area {
+            padding-left: 5%;
+            z-index: 10;
         }
 
-        /* 驚かせない程度のギミック：ホバーで視線や影が動く */
-        .chara-img:hover { transform: scale(1.02); }
-
-        #img-filler { opacity: 0; pointer-events: none; }
-        body.is-glitch #img-present { opacity: 0; }
-        body.is-glitch #img-filler { opacity: 1; pointer-events: auto; }
-
-        .info-panel {
-            width: 40%;
-            border-left: 4px solid var(--color-accent);
-            padding-left: 30px;
+        .content-area h1 {
+            font-size: 4rem;
+            margin: 0;
+            letter-spacing: -0.1rem;
         }
 
-        /* 隠しスイッチ：びっくりさせない小さなボタン */
-        .system-toggle {
+        .description {
+            font-size: 1rem;
+            line-height: 1.8;
+            max-width: 400px;
+            margin-top: 2rem;
+            font-weight: 300;
+        }
+
+        /* 状態切り替えスイッチ（さりげなく、でも意図的に） */
+        .world-shifter {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            font-size: 10px;
-            opacity: 0.3;
+            bottom: 3rem;
+            right: 3rem;
+            width: 50px;
+            height: 50px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
             cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
         }
-        .system-toggle:hover { opacity: 1; color: var(--color-accent); }
+        .world-shifter::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+        .world-shifter:hover { background: var(--accent); box-shadow: 0 0 20px var(--accent); }
 
-        /* ログ領域：静かに情報を出す */
-        #console-log {
+        /* ノイズエフェクト（Fillerモード時のみ） */
+        .noise-overlay {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            font-size: 12px;
-            color: var(--color-accent);
+            inset: 0;
+            background: url('https://loading.io/asset/521744') ; /* ダミー、実際はノイズ素材 */
+            opacity: 0;
+            pointer-events: none;
+            mix-blend-mode: overlay;
         }
+        body.is-filler .noise-overlay { opacity: 0.05; }
+
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">SASAI AYA</div>
-    <nav>
-        <a href="#profile">Profile</a>
-        <a href="#library">Library</a>
-        <a href="#games">Experience</a>
-    </nav>
-</header>
+<div class="bg-text" id="bg-name">SASAI AYA</div>
+<div class="noise-overlay"></div>
 
-<main>
-    <div class="chara-view">
-        <img src="assets/img/aya_22.png" id="img-present" class="chara-img" alt="笹井綾">
-        <img src="assets/img/aya_filler.png" id="img-filler" class="chara-img" alt="Filler">
+<nav>
+    <a href="#about">ABOUT</a>
+    <a href="#novel">NOVEL</a>
+    <a href="#game">GAME</a>
+    <a href="#data">DATA</a>
+</nav>
+
+<div class="main-container">
+    <div class="visual-area">
+        <img src="assets/img/aya_22.png" id="main-chara" class="standing-picture">
     </div>
 
-    <div class="info-panel">
-        <h1 id="disp-name">笹井 綾</h1>
-        <p id="disp-bio">HAMAで働く22歳のエンジニア。猪突猛進な性格で、新しい人生を謳歌中。極度の方向音痴。</p>
-        
-        <div id="status-area">
-            <h3>Recent Activities</h3>
-            <ul>
-                <li>添とのランチ（SS更新）</li>
-                <li>落露との共同作業（Feature更新）</li>
-            </ul>
-        </div>
+    <div class="content-area">
+        <div id="label" style="font-size: 0.8rem; color: var(--accent); font-weight: 600;">ACTIVE ENGINEER</div>
+        <h1 id="name">笹井 綾</h1>
+        <p class="description" id="bio">
+            「思い立ったが吉日！」を地で行く、HAMAの新人エンジニア。<br>
+            2055年の春、新しい名前と新しい人生を持って、この街にやってきた。
+        </p>
     </div>
-</main>
+</div>
 
-<div id="console-log">System: Ready...</div>
-<div class="system-toggle" onclick="toggleWorld()">[ ACCESS_ENCRYPTED_DATA ]</div>
+<div class="world-shifter" onclick="shiftWorld()"></div>
 
 <script>
-    function toggleWorld() {
+    function shiftWorld() {
         const body = document.body;
-        const name = document.getElementById('disp-name');
-        const bio = document.getElementById('disp-bio');
-        const log = document.getElementById('console-log');
+        const img = document.getElementById('main-chara');
+        const name = document.getElementById('name');
+        const bio = document.getElementById('bio');
+        const label = document.getElementById('label');
+        const bg = document.getElementById('bg-name');
 
-        body.classList.toggle('is-glitch');
+        body.classList.toggle('is-filler');
 
-        if (body.classList.contains('is-glitch')) {
-            name.innerText = "■■ / filler";
-            bio.innerText = "感情の異常発達を確認。回収対象。360名の村から消失。名前は、もうない。";
-            log.innerText = "Warning: Accessing restricted memory...";
+        if(body.classList.contains('is-filler')) {
+            img.src = 'assets/img/aya_filler.png';
+            name.innerText = 'filler';
+            label.innerText = 'RECOVERY TARGET';
+            bio.innerHTML = '感情の異常発達を確認。回収対象。<br>360名の村から消失。名前は、もうない。';
+            bg.innerText = '■■■■■■';
         } else {
-            name.innerText = "笹井 綾";
-            bio.innerText = "HAMAで働く22歳のエンジニア。猪突猛進な性格で、新しい人生を謳歌中。極度の方向音痴。";
-            log.innerText = "System: Status Normal.";
+            img.src = 'assets/img/aya_22.png';
+            name.innerText = '笹井 綾';
+            label.innerText = 'ACTIVE ENGINEER';
+            bio.innerHTML = '「思い立ったが吉日！」を地で行く、HAMAの新人エンジニア。<br>2055年の春、新しい名前と新しい人生を持って、この街にやってきた。';
+            bg.innerText = 'SASAI AYA';
         }
     }
 </script>
