@@ -3,13 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>#溶けてそのまま雲隠れ</title>
 <style>
-  /* 色の断絶を完全に排除するためのベースカラー */
   :root {
     --bg-color: #ffffff;
-    --text-color: #444; /* 少し薄くして儚さを出す */
-    --accent-blue: #a0c0e0; /* より淡い、儚い青 */
+    --text-color: #333;
+    --accent-blue: #a0c0e0;
   }
 
   html, body {
@@ -20,7 +18,6 @@
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
   }
 
-  /* 文字を静かに置くステージ */
   #mv-stage {
     position: relative;
     width: 100vw;
@@ -28,73 +25,60 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    box-sizing: border-box;
-    padding: 10vh 5vw;
   }
 
-  /* 縦書きの歌詞：モバイルでも「詰まり」を感じさせない大きさ */
   .lyrics-container {
     writing-mode: vertical-rl;
-    font-size: 1.1rem; /* 文字サイズを「儚く」小さく調整 */
-    letter-spacing: 0.4em; /* 字間を広げて呼吸を置く */
-    line-height: 3;        /* 行間を広げて「間」を作る */
-    height: 70vh;         /* 画面下部に余裕を持たせる */
+    font-size: 1.1rem;
+    letter-spacing: 0.35em;
+    line-height: 2.8;
+    height: 65vh;
     opacity: 0;
     position: absolute;
-    transition: opacity 1.5s ease-in-out; /* 現れる・消えるもゆっくり */
+    transition: opacity 0.8s ease-in-out; /* 消える時は少し早めに */
     white-space: nowrap;
+    pointer-events: none;
   }
 
-  /* アクティブな文字だけを表示 */
-  .is-active {
-    opacity: 1;
-  }
+  .is-active { opacity: 1; }
 
-  /* 【重要】一文字ずつのアニメーション */
+  /* 一文字ずつの出現アニメーション（速度向上） */
   .char {
     display: inline-block;
     opacity: 0;
-    filter: blur(8px); /* 滲んだ状態から */
-    transform: translateY(5px); /* 下からふわっと */
-    transition: opacity 2s cubic-bezier(0.22, 1, 0.36, 1), 
-                filter 3s cubic-bezier(0.22, 1, 0.36, 1),
-                transform 2s cubic-bezier(0.22, 1, 0.36, 1);
+    filter: blur(4px);
+    transform: translateY(3px);
+    transition: opacity 0.8s ease-out, filter 0.8s ease-out, transform 0.8s ease-out;
   }
 
-  /* 文字が現れた状態 */
   .char.is-visible {
     opacity: 1;
-    filter: blur(0px); /* 滲みが晴れる */
+    filter: blur(0px);
     transform: translateY(0);
   }
 
-  .tag {
-    position: absolute;
-    bottom: 8vh;
-    right: 5vw;
-    font-size: 0.75rem;
-    color: var(--accent-blue);
-    writing-mode: horizontal-tb;
-    opacity: 0;
-    transition: opacity 2s ease;
+  /* 「私たちが」の後の空白：物理的な距離 */
+  .the-void {
+    display: block;
+    height: 15rem; 
   }
 
-  /* アーカイブへの導線 */
   #to-archive {
     opacity: 0;
     text-decoration: none;
-    color: #bbb;
+    color: #ccc;
     font-size: 0.65rem;
     letter-spacing: 0.3em;
     border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-    transition: opacity 3s ease;
+    padding-bottom: 4px;
     position: absolute;
-    bottom: 5vh;
+    bottom: 8vh;
+    transition: opacity 2s ease;
+    font-family: sans-serif;
   }
 
   @media (max-width: 600px) {
-    .lyrics-container { font-size: 1.0rem; line-height: 2.5; }
+    .lyrics-container { font-size: 1.05rem; line-height: 2.4; }
   }
 </style>
 </head>
@@ -105,15 +89,11 @@
   <div class="lyrics-container" id="l2">迷子になった私を助けてくれた彼と</div>
   <div class="lyrics-container" id="l3">たくさん笑って、ふざけあって、</div>
   <div class="lyrics-container" id="l4">恋人になった私たちが</div>
-  
   <div class="lyrics-container" id="l5">また、他人に戻るまでのお話。</div>
-  
-  <div class="tag" id="tag">#溶けてそのまま雲隠れ</div>
   <a href="archive.html" id="to-archive">ENTER_ARCHIVE</a>
 </div>
 
 <script>
-  // テキストを `<span>` で囲んで一文字ずつ分解する関数
   function splitText(elementId) {
     const el = document.getElementById(elementId);
     const text = el.innerText;
@@ -126,70 +106,38 @@
     });
   }
 
-  // 分解した文字を、時間差で表示させる関数
-  async function showCharsOneByOne(elementId) {
+  async function showLine(elementId, charSpeed = 120, lineWait = 1200) {
     const el = document.getElementById(elementId);
     const chars = el.querySelectorAll('.char');
     el.classList.add('is-active');
+    
     for (let char of chars) {
       char.classList.add('is-visible');
-      // 一文字ずつの出現間隔：儚さを出すために少し長めに（350ms）
-      await new Promise(resolve => setTimeout(resolve, 350)); 
+      await new Promise(r => setTimeout(r, charSpeed)); // 1文字出す速度
     }
+    await new Promise(r => setTimeout(r, lineWait)); // 出し切った後の「間」
+    el.classList.remove('is-active');
+    await new Promise(r => setTimeout(r, 600)); // 消えてから次に行くまでの「間」
   }
 
-  const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-  async function startMV() {
-    // 1. 全テキストを分解
-    splitText('l1'); splitText('l2'); splitText('l3'); splitText('l4'); splitText('l5');
+  window.addEventListener('load', async () => {
+    ['l1', 'l2', 'l3', 'l4', 'l5'].forEach(splitText);
     
-    const tag = document.getElementById('tag');
-    const btn = document.getElementById('to-archive');
+    await new Promise(r => setTimeout(r, 1000)); // 起動時の静寂
 
-    // 演出スタート：最初の静寂（色の断絶を消す）
-    await wait(2000);
+    await showLine('l1', 100, 800);
+    await showLine('l2', 80, 1000);
+    await showLine('l3', 80, 1000);
+    await showLine('l4', 80, 1500); // 「私たちが」
 
-    // 一文目
-    await showCharsOneByOne('l1');
-    await wait(2500); // 読ませる間
-    document.getElementById('l1').classList.remove('is-active');
-    await wait(1500); // 消えたあとの余韻
+    // 【重要】ここが二人の空白
+    // 物理的な距離はCSS（the-void）ではなく、この「時間」で表現
+    await new Promise(r => setTimeout(r, 4500)); 
 
-    // 二文目
-    await showCharsOneByOne('l2');
-    await wait(3000);
-    document.getElementById('l2').classList.remove('is-active');
-    await wait(1500);
+    await showLine('l5', 120, 3000); // 最後は少しだけ丁寧に
 
-    // 三文目
-    await showCharsOneByOne('l3');
-    await wait(3000);
-    document.getElementById('l3').classList.remove('is-active');
-    await wait(1500);
-    
-    // 四文目：ここを一番強調（静かに）
-    await showCharsOneByOne('l4');
-    await wait(4000);
-    document.getElementById('l4').classList.remove('is-active');
-
-    // 【重要】圧倒的な空白（MV的な間、色の断絶なし）
-    // 何もない真っ白な画面が続く。
-    await wait(7000); 
-
-    // 最後の一文：ここだけ少しゆっくり、弱々しく
-    await showCharsOneByOne('l5'); 
-    tag.style.opacity = "0.5";
-    await wait(6000);
-    
-    // 文字が消え、アーカイブへの導線が静かに現れる
-    document.getElementById('l5').style.transition = "opacity 4s ease";
-    document.getElementById('l5').classList.remove('is-active');
-    await wait(3000);
-    btn.style.opacity = "1";
-  }
-
-  window.addEventListener('load', startMV);
+    document.getElementById('to-archive').style.opacity = "1";
+  });
 </script>
 
 </body>
