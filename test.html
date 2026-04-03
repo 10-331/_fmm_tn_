@@ -19,39 +19,39 @@
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
   }
 
+  /* 画面全体を小説の1ページのように扱う */
   #mv-stage {
     position: relative;
     width: 100vw;
     height: 100vh;
+    padding: 10vh 10vw;
     box-sizing: border-box;
+    /* 縦書き設定：右から左へ行が進む */
+    writing-mode: vertical-rl;
   }
 
-  /* 各行の配置：MVのように少しずつ位置をずらして「間」を作る */
   .line {
-    position: absolute;
-    font-size: 0.85rem; /* さらに一回り小さく */
-    letter-spacing: 0.2em;
-    line-height: 1.8;
+    display: inline-block;
+    font-size: 0.85rem; /* 小さく、儚く */
+    letter-spacing: 0.3em;
+    line-height: 3;    /* 行間を広げて余白を強調 */
     white-space: nowrap;
     color: var(--text-color);
+    margin-left: 2rem; /* 行同士の物理的な距離 */
   }
 
-  /* 配置の指定（MV的なレイアウト） */
-  #l1 { top: 20%; left: 15%; }
-  #l2 { top: 30%; left: 18%; }
-  #l3 { top: 40%; left: 21%; }
-  #l4 { top: 50%; left: 24%; }
-  
-  /* 最後の一文は少し離れた場所に、静かに */
-  #l5 { top: 70%; left: 30%; }
+  /* 特定の行にだけ特別な余白（「私たちが」の後の空白） */
+  #l5 {
+    margin-right: 4rem; /* 縦書きなので右側に余白を作る＝前の行との間を空ける */
+  }
 
-  /* 一文字ずつの出現（上から滲み落ちる） */
+  /* 一文字ずつの出現アニメーション（上から滲み落ちる） */
   .char {
     display: inline-block;
     opacity: 0;
     filter: blur(6px);
-    transform: translateY(-8px);
-    transition: opacity 1.2s ease-out, filter 1.5s ease-out, transform 1.2s ease-out;
+    transform: translateY(-10px);
+    transition: opacity 1.5s ease-out, filter 2s ease-out, transform 1.5s ease-out;
   }
 
   .char.is-visible {
@@ -61,6 +61,7 @@
   }
 
   #to-archive {
+    writing-mode: horizontal-tb; /* ボタンは横書き */
     opacity: 0;
     text-decoration: none;
     color: #ccc;
@@ -70,18 +71,15 @@
     padding-bottom: 4px;
     position: absolute;
     bottom: 8vh;
-    right: 15%;
+    left: 10vw; /* 縦書きの終わり（左側）に配置 */
     transition: opacity 3s ease;
     font-family: sans-serif;
   }
 
   @media (max-width: 600px) {
-    .line { font-size: 0.75rem; letter-spacing: 0.15em; }
-    #l1 { left: 10%; }
-    #l2 { left: 12%; }
-    #l3 { left: 14%; }
-    #l4 { left: 16%; }
-    #l5 { left: 20%; }
+    #mv-stage { padding: 12vh 8vw; }
+    .line { font-size: 0.8rem; line-height: 2.5; margin-left: 1.2rem; }
+    #l5 { margin-right: 2.5rem; }
   }
 </style>
 </head>
@@ -111,7 +109,7 @@
     });
   }
 
-  async function animateLine(elementId, charSpeed = 70) {
+  async function animateLine(elementId, charSpeed = 80) {
     const el = document.getElementById(elementId);
     const chars = el.querySelectorAll('.char');
     for (let char of chars) {
@@ -121,28 +119,32 @@
   }
 
   window.addEventListener('load', async () => {
+    // 1. テキスト分解
     ['l1', 'l2', 'l3', 'l4', 'l5'].forEach(splitText);
     
+    // 2. 最初の静寂
     await new Promise(r => setTimeout(r, 1500)); 
 
-    // 前の文章を残したまま、階段状に現れる
-    await animateLine('l1', 100);
-    await new Promise(r => setTimeout(r, 400));
+    // 3. 右上から順に、前の文字を残したまま現れる
+    await animateLine('l1', 120);
+    await new Promise(r => setTimeout(r, 600));
     
-    await animateLine('l2', 70);
-    await new Promise(r => setTimeout(r, 400));
+    await animateLine('l2', 90);
+    await new Promise(r => setTimeout(r, 600));
     
-    await animateLine('l3', 70);
-    await new Promise(r => setTimeout(r, 400));
+    await animateLine('l3', 90);
+    await new Promise(r => setTimeout(r, 600));
     
-    await animateLine('l4', 70);
+    await animateLine('l4', 90);
 
-    // 「私たちが」のあとの、ほどよい空白（MV的なテンポ）
-    await new Promise(r => setTimeout(r, 2500)); 
+    // 4. 「私たちが」のあとの、少しだけ長い沈黙
+    await new Promise(r => setTimeout(r, 2000)); 
 
-    await animateLine('l5', 100);
+    // 5. 左下（縦書きの終端）に向かって最後の一文
+    await animateLine('l5', 130);
 
-    await new Promise(r => setTimeout(r, 1500));
+    // 6. 余韻のあと、ボタンを表示
+    await new Promise(r => setTimeout(r, 2500));
     document.getElementById('to-archive').style.opacity = "1";
   });
 </script>
