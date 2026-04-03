@@ -2,65 +2,79 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
+  /* 色の断絶を完全に排除するためのベースカラー */
+  :root {
+    --bg-color: #fdfcf7;
+    --text-color: #333;
+    --sub-color: #b0b0b0;
+  }
+
   html, body {
     margin: 0; padding: 0;
     width: 100%; height: 100%;
     overflow: hidden;
-    background-color: #fdfcf7; /* すべてを包み込む単一の色 */
+    background-color: var(--bg-color);
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
-    color: #333;
+    color: var(--text-color);
+    -webkit-font-smoothing: antialiased;
   }
 
-  .mv-stage {
+  /* MVのカメラワーク（横移動）を制御するステージ */
+  .mv-viewport {
     display: flex;
-    flex-direction: row-reverse; /* 右（過去・導入）から左（未来・アーカイブ）へ */
-    width: 400vw; /* 圧倒的な余白のための広大な横幅 */
-    height: 100vh;
+    flex-direction: row-reverse;
+    width: 400vw; /* モバイルでも広大な「間」を維持 */
+    height: 100%;
     position: absolute;
     right: 0;
     will-change: transform;
   }
 
-  /* MVのカット（セクション） */
   section {
     width: 100vw;
-    height: 100vh;
+    height: 100%;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 20vh;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center; /* モバイルの横中央 */
+    padding-top: 15vh;
     box-sizing: border-box;
   }
 
+  /* 縦書きの歌詞：モバイルでも「詰まり」を感じさせない設定 */
   .vertical-lyrics {
     writing-mode: vertical-rl;
-    line-height: 4.5;      /* 歌詞のようなゆったりとした行間 */
-    letter-spacing: 0.4em; /* 一文字ずつを噛みしめる間隔 */
+    height: auto;
+    max-height: 70vh; /* 画面下部に余裕を持たせる */
+    line-height: 3.5; /* モバイルの幅に合わせた最適な行間 */
+    letter-spacing: 0.35em;
     font-size: 1.1rem;
+    white-space: nowrap;
   }
 
-  /* 「私たちが」の後にくる、物理的かつ絶望的な空白 */
+  /* 決定的な空白：vhではなくremで「物理的な距離」を確保 */
   .the-void {
-    height: 60vh; 
     display: block;
+    height: 12rem; 
   }
 
   .hashtag {
-    margin-top: 10em;
-    font-size: 0.8em;
-    color: #b0b0b0;
+    margin-top: 5rem;
+    font-size: 0.75rem;
+    color: var(--sub-color);
     font-family: sans-serif;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.15em;
     opacity: 0.6;
+    writing-mode: vertical-rl; /* タグも縦書きで統一 */
   }
 
-  /* 何も映らない、ただ時間が流れるだけの空間（MVの間の部分） */
-  .spacer-cloud {
-    width: 150vw; 
+  /* 1画面分まるごとの空白（MVの「間」） */
+  .spacer {
+    width: 150vw;
   }
 
-  /* 最後に辿り着く、他人に戻った後のデータ */
   .section-end {
     width: 100vw;
     display: flex;
@@ -68,30 +82,36 @@
     justify-content: center;
   }
 
-  /* フェードイン演出 */
-  .lyric-fade {
-    animation: lyricAppear 5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  .data-text {
+    font-family: sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--sub-color);
+    transform: rotate(90deg); /* モバイルなら縦に置くのもアリ */
+  }
+
+  /* 浮き上がるような出現 */
+  .fade-in {
+    animation: lyricAppear 4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     opacity: 0;
   }
 
   @keyframes lyricAppear {
-    0% { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+    0% { opacity: 0; transform: translateY(15px); filter: blur(4px); }
     100% { opacity: 1; transform: translateY(0); filter: blur(0); }
   }
 </style>
 </head>
 <body>
 
-<div class="mv-stage" id="camera">
+<div class="mv-viewport" id="camera">
   <section class="section-end">
-    <div style="letter-spacing: 0.5em; color: #ccc; font-size: 0.8em;">
-      AYA SASAI ARCHIVE // DATA LOADED.
-    </div>
+    <div class="data-text">ARCHIVE_LOADING...</div>
   </section>
 
-  <div class="spacer-cloud"></div>
+  <div class="spacer"></div>
 
-  <section class="lyric-fade">
+  <section class="fade-in">
     <div class="vertical-lyrics">
       <p>これは、</p>
       <p>迷子になった私を助けてくれた彼と</p>
@@ -110,11 +130,11 @@
   const camera = document.getElementById('camera');
 
   window.addEventListener('load', () => {
-    // 最初の「私たちが」を読み終え、余韻に浸るまでの5秒
+    // 最初の読み込み待機（5秒）
     setTimeout(() => {
-      // 20秒かけて、視界から文字がフェードアウトし、
-      // 長い空白を経て次のデータへ辿り着く「カメラワーク」
-      camera.style.transition = "transform 20s cubic-bezier(0.37, 0, 0.63, 1)"; 
+      // 25秒かけて、モバイルの狭い視界をゆっくりと通り過ぎる
+      // スピードをさらに落とし、微かな微動を感じさせる
+      camera.style.transition = "transform 25s cubic-bezier(0.4, 0, 0.2, 1)"; 
       camera.style.transform = "translateX(300vw)";
     }, 5000);
   });
