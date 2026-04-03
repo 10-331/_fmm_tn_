@@ -3,12 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>#溶けてそのまま雲隠れ</title>
 <style>
   :root {
     --bg-color: #ffffff;
     --text-color: #333;
-    --accent-blue: #a0c0e0;
   }
 
   html, body {
@@ -19,66 +17,87 @@
     font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
   }
 
-  /* 画面全体を小説の1ページのように扱う */
   #mv-stage {
     position: relative;
     width: 100vw;
     height: 100vh;
     padding: 10vh 10vw;
     box-sizing: border-box;
-    /* 縦書き設定：右から左へ行が進む */
     writing-mode: vertical-rl;
   }
 
   .line {
     display: inline-block;
-    font-size: 0.85rem; /* 小さく、儚く */
-    letter-spacing: 0.3em;
-    line-height: 3;    /* 行間を広げて余白を強調 */
+    font-size: 0.85rem;
+    letter-spacing: 0.35em;
+    line-height: 3.2;
     white-space: nowrap;
     color: var(--text-color);
-    margin-left: 2rem; /* 行同士の物理的な距離 */
+    margin-left: 2rem;
   }
 
-  /* 特定の行にだけ特別な余白（「私たちが」の後の空白） */
-  #l5 {
-    margin-right: 4rem; /* 縦書きなので右側に余白を作る＝前の行との間を空ける */
-  }
+  #l5 { margin-right: 4.5rem; }
 
-  /* 一文字ずつの出現アニメーション（上から滲み落ちる） */
+  /* 文字のアニメーション：出現と消失の両方に対応 */
   .char {
     display: inline-block;
     opacity: 0;
-    filter: blur(6px);
+    filter: blur(8px);
     transform: translateY(-10px);
-    transition: opacity 1.5s ease-out, filter 2s ease-out, transform 1.5s ease-out;
+    transition: 
+      opacity 2s ease, 
+      filter 2.5s ease, 
+      transform 2s ease;
   }
 
+  /* 出現時 */
   .char.is-visible {
     opacity: 1;
     filter: blur(0px);
     transform: translateY(0);
   }
 
-  #to-archive {
-    writing-mode: horizontal-tb; /* ボタンは横書き */
-    opacity: 0;
-    text-decoration: none;
-    color: #ccc;
-    font-size: 0.6rem;
-    letter-spacing: 0.3em;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 4px;
+  /* 消去時：さらに深く滲んで消える */
+  .char.is-dissolving {
+    opacity: 0 !important;
+    filter: blur(15px) !important;
+    transform: translateY(10px) !important;
+    transition: opacity 3s ease, filter 3.5s ease, transform 3s ease;
+  }
+
+  /* メニュー：最初は隠しておく */
+  #main-menu {
+    writing-mode: horizontal-tb;
     position: absolute;
-    bottom: 8vh;
-    left: 10vw; /* 縦書きの終わり（左側）に配置 */
-    transition: opacity 3s ease;
-    font-family: sans-serif;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 4s ease;
+    text-align: center;
+  }
+
+  .menu-item {
+    text-decoration: none;
+    color: #888;
+    font-size: 0.75rem;
+    letter-spacing: 0.4em;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 4px;
+    transition: all 0.5s;
+  }
+
+  .menu-item:hover {
+    color: #333;
+    border-bottom: 1px solid #eee;
   }
 
   @media (max-width: 600px) {
     #mv-stage { padding: 12vh 8vw; }
-    .line { font-size: 0.8rem; line-height: 2.5; margin-left: 1.2rem; }
+    .line { font-size: 0.8rem; line-height: 2.6; margin-left: 1.2rem; }
     #l5 { margin-right: 2.5rem; }
   }
 </style>
@@ -90,10 +109,13 @@
   <div class="line" id="l2">迷子になった私を助けてくれた彼と</div>
   <div class="line" id="l3">たくさん笑って、ふざけあって、</div>
   <div class="line" id="l4">恋人になった私たちが</div>
-  
   <div class="line" id="l5">また、他人に戻るまでのお話。</div>
 
-  <a href="archive.html" id="to-archive">ENTER_ARCHIVE</a>
+  <nav id="main-menu">
+    <a href="./novel.html" class="menu-item">NOVELS</a>
+    <a href="./profile.html" class="menu-item">ARCHIVE</a>
+    <a href="./gallery.html" class="menu-item">PICTURES</a>
+  </nav>
 </div>
 
 <script>
@@ -109,43 +131,50 @@
     });
   }
 
-  async function animateLine(elementId, charSpeed = 80) {
-    const el = document.getElementById(elementId);
-    const chars = el.querySelectorAll('.char');
+  async function animateLine(elementId, speed = 100) {
+    const chars = document.getElementById(elementId).querySelectorAll('.char');
     for (let char of chars) {
       char.classList.add('is-visible');
-      await new Promise(r => setTimeout(r, charSpeed));
+      await new Promise(r => setTimeout(r, speed));
+    }
+  }
+
+  async function dissolveAll() {
+    const allChars = Array.from(document.querySelectorAll('.char'));
+    // ランダムな順序で消していくことで「溶ける」感じを出す
+    const shuffled = allChars.sort(() => Math.random() - 0.5);
+    for (let char of shuffled) {
+      char.classList.add('is-dissolving');
+      await new Promise(r => setTimeout(r, 50)); // 消える速度
     }
   }
 
   window.addEventListener('load', async () => {
-    // 1. テキスト分解
     ['l1', 'l2', 'l3', 'l4', 'l5'].forEach(splitText);
     
-    // 2. 最初の静寂
-    await new Promise(r => setTimeout(r, 1500)); 
+    await new Promise(r => setTimeout(r, 1500));
 
-    // 3. 右上から順に、前の文字を残したまま現れる
-    await animateLine('l1', 120);
-    await new Promise(r => setTimeout(r, 600));
-    
-    await animateLine('l2', 90);
-    await new Promise(r => setTimeout(r, 600));
-    
-    await animateLine('l3', 90);
-    await new Promise(r => setTimeout(r, 600));
-    
+    // 1. 記憶の構築（右上から順に）
+    await animateLine('l1', 120); await new Promise(r => setTimeout(r, 500));
+    await animateLine('l2', 90);  await new Promise(r => setTimeout(r, 500));
+    await animateLine('l3', 90);  await new Promise(r => setTimeout(r, 500));
     await animateLine('l4', 90);
-
-    // 4. 「私たちが」のあとの、少しだけ長い沈黙
-    await new Promise(r => setTimeout(r, 2000)); 
-
-    // 5. 左下（縦書きの終端）に向かって最後の一文
+    
+    await new Promise(r => setTimeout(r, 2000)); // 「私たちが」の余韻
+    
     await animateLine('l5', 130);
 
-    // 6. 余韻のあと、ボタンを表示
-    await new Promise(r => setTimeout(r, 2500));
-    document.getElementById('to-archive').style.opacity = "1";
+    // 2. 全文が出揃った後の「最期の余韻」
+    await new Promise(r => setTimeout(r, 4000));
+
+    // 3. 溶けて消える（雲隠れ）
+    await dissolveAll();
+
+    // 4. メニューが静かに浮かび上がる
+    await new Promise(r => setTimeout(r, 1000));
+    const menu = document.getElementById('main-menu');
+    menu.style.opacity = "1";
+    menu.style.pointerEvents = "auto";
   });
 </script>
 
