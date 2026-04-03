@@ -1,145 +1,162 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>SPATIAL_SCAN // 0.0.1</title>
-<style>
-  :root { --bg: #fdfeff; --accent: #8eb8ff; }
-  body {
-    margin: 0; background: var(--bg); color: #4a5568;
-    font-family: "Hiragino Mincho ProN", serif;
-    height: 100dvh; width: 100vw; overflow: hidden; touch-action: none;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SASAI AYA - OFFICIAL ARCHIVE</title>
+    <style>
+        :root {
+            --color-bg: #fff;
+            --color-text: #333;
+            --color-accent: #FFD700; /* 現在の綾：イエロー */
+            --font-main: 'Helvetica Neue', Arial, sans-serif;
+            --transition: 0.5s ease;
+        }
 
-  /* 360度空間のコンテナ（ジャイロで動く） */
-  #stage {
-    position: fixed; width: 300vw; height: 300vh;
-    top: -100vh; left: -100vw;
-    display: flex; align-items: center; justify-content: center;
-    transition: transform 0.1s linear;
-    pointer-events: none;
-  }
+        /* 過去（Filler）モードの変数 */
+        body.is-glitch {
+            --color-bg: #1a1a1a;
+            --color-text: #eee;
+            --color-accent: #B22222; /* フィラー：レッド */
+            --font-main: 'Courier New', monospace;
+        }
 
-  /* 背景のノイズ層（遠景） */
-  .void-grid {
-    position: absolute; inset: 0;
-    background-image: 
-      radial-gradient(circle at 50% 50%, rgba(142, 184, 255, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: 0.5;
-  }
+        body {
+            margin: 0;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-main);
+            transition: background-color var(--transition), color var(--transition);
+            overflow-x: hidden;
+        }
 
-  /* 彼女の断片（中景：特定の位置にのみ存在） */
-  #subject-wrapper {
-    position: absolute;
-    transform: translate(60vw, -30vh); /* 初期位置を画面外にオフセット */
-    text-align: center;
-    filter: blur(15px); opacity: 0;
-    transition: filter 2s, opacity 2s;
-  }
+        /* ヘッダー：サクサク移動できるナビ */
+        header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+        }
 
-  #subject-img {
-    width: 280px; height: auto;
-    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-  }
+        nav a {
+            margin-left: 20px;
+            text-decoration: none;
+            color: inherit;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+        }
+        nav a:hover { border-bottom-color: var(--color-accent); }
 
-  /* UI演出 */
-  #reticle {
-    position: fixed; top: 50%; left: 50%;
-    width: 40px; height: 40px; border: 1px solid rgba(0,0,0,0.1);
-    transform: translate(-50%, -50%); border-radius: 50%;
-    z-index: 100; pointer-events: none;
-  }
+        /* メインビジュアル：立ち絵と情報の融合 */
+        main {
+            display: flex;
+            height: 80vh;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 5%;
+        }
 
-  #status-ui {
-    position: fixed; bottom: 40px; left: 0; width: 100%;
-    text-align: center; font-size: 0.65rem; letter-spacing: 0.3em;
-    opacity: 0.4; z-index: 100;
-  }
+        .chara-view {
+            position: relative;
+            width: 40%;
+            height: 100%;
+        }
 
-  /* 許可ボタン（iOS Safari用） */
-  #permission-overlay {
-    position: fixed; inset: 0; background: #fff; z-index: 1000;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-  }
-  .btn {
-    padding: 15px 30px; border: 1px solid var(--accent); color: var(--accent);
-    background: none; letter-spacing: 0.2em; font-size: 0.8rem;
-  }
-</style>
+        .chara-img {
+            max-height: 100%;
+            position: absolute;
+            bottom: 0;
+            transition: opacity var(--transition), transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* 驚かせない程度のギミック：ホバーで視線や影が動く */
+        .chara-img:hover { transform: scale(1.02); }
+
+        #img-filler { opacity: 0; pointer-events: none; }
+        body.is-glitch #img-present { opacity: 0; }
+        body.is-glitch #img-filler { opacity: 1; pointer-events: auto; }
+
+        .info-panel {
+            width: 40%;
+            border-left: 4px solid var(--color-accent);
+            padding-left: 30px;
+        }
+
+        /* 隠しスイッチ：びっくりさせない小さなボタン */
+        .system-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 10px;
+            opacity: 0.3;
+            cursor: pointer;
+        }
+        .system-toggle:hover { opacity: 1; color: var(--color-accent); }
+
+        /* ログ領域：静かに情報を出す */
+        #console-log {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 12px;
+            color: var(--color-accent);
+        }
+    </style>
 </head>
 <body>
 
-<div id="permission-overlay">
-  <div style="margin-bottom: 30px; font-size: 0.7rem; color: #999;">ENVIRONMENTAL_SCAN_START</div>
-  <button class="btn" onclick="requestAccess()">観測を開始する</button>
-</div>
+<header>
+    <div class="logo">SASAI AYA</div>
+    <nav>
+        <a href="#profile">Profile</a>
+        <a href="#library">Library</a>
+        <a href="#games">Experience</a>
+    </nav>
+</header>
 
-<div id="reticle"></div>
-<div id="status-ui">SEARCHING_FOR_SIGNALS... <span id="coords">0, 0</span></div>
-
-<div id="stage">
-  <div class="void-grid"></div>
-  <div id="subject-wrapper">
-    <img src="assets/profile/aya2.PNG" id="subject-img">
-    <div style="margin-top: 10px; font-size: 0.8rem; letter-spacing: 0.2em; color: var(--accent);">
-      DETECTED: AYA_SASAI
+<main>
+    <div class="chara-view">
+        <img src="assets/img/aya_22.png" id="img-present" class="chara-img" alt="笹井綾">
+        <img src="assets/img/aya_filler.png" id="img-filler" class="chara-img" alt="Filler">
     </div>
-  </div>
-</div>
+
+    <div class="info-panel">
+        <h1 id="disp-name">笹井 綾</h1>
+        <p id="disp-bio">HAMAで働く22歳のエンジニア。猪突猛進な性格で、新しい人生を謳歌中。極度の方向音痴。</p>
+        
+        <div id="status-area">
+            <h3>Recent Activities</h3>
+            <ul>
+                <li>添とのランチ（SS更新）</li>
+                <li>落露との共同作業（Feature更新）</li>
+            </ul>
+        </div>
+    </div>
+</main>
+
+<div id="console-log">System: Ready...</div>
+<div class="system-toggle" onclick="toggleWorld()">[ ACCESS_ENCRYPTED_DATA ]</div>
 
 <script>
-  const stage = document.getElementById('stage');
-  const wrapper = document.getElementById('subject-wrapper');
-  const coordText = document.getElementById('coords');
-  const statusText = document.getElementById('status-ui');
+    function toggleWorld() {
+        const body = document.body;
+        const name = document.getElementById('disp-name');
+        const bio = document.getElementById('disp-bio');
+        const log = document.getElementById('console-log');
 
-  function requestAccess() {
-    // iOS Safariでのジャイロ許可
-    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      DeviceOrientationEvent.requestPermission()
-        .then(permissionState => {
-          if (permissionState === 'granted') {
-            initSensor();
-          }
-        });
-    } else {
-      initSensor();
+        body.classList.toggle('is-glitch');
+
+        if (body.classList.contains('is-glitch')) {
+            name.innerText = "■■ / filler";
+            bio.innerText = "感情の異常発達を確認。回収対象。360名の村から消失。名前は、もうない。";
+            log.innerText = "Warning: Accessing restricted memory...";
+        } else {
+            name.innerText = "笹井 綾";
+            bio.innerText = "HAMAで働く22歳のエンジニア。猪突猛進な性格で、新しい人生を謳歌中。極度の方向音痴。";
+            log.innerText = "System: Status Normal.";
+        }
     }
-    document.getElementById('permission-overlay').style.display = 'none';
-  }
-
-  function initSensor() {
-    window.addEventListener('deviceorientation', (e) => {
-      // 端末の傾きを移動量に変換
-      const x = e.gamma; // 左右 (-90 to 90)
-      const y = e.beta;  // 前後 (-180 to 180)
-      
-      // ステージを動かす（感度調整）
-      const moveX = x * 10;
-      const moveY = (y - 45) * 10; // 45度くらいを水平の基準にする
-      
-      stage.style.transform = `translate(${-moveX}px, ${-moveY}px)`;
-      coordText.textContent = `${Math.floor(x)}, ${Math.floor(y)}`;
-
-      // 彼女のいる座標（60vw, -30vh周辺）に近づいたら「発見」演出
-      checkDetection(x, y);
-    });
-  }
-
-  function checkDetection(x, y) {
-    // 特定の角度範囲に入ったら
-    if (x > 15 && x < 40 && y > 10 && y < 35) {
-      wrapper.style.filter = "blur(0px)";
-      wrapper.style.opacity = "1";
-      statusText.innerHTML = "<span style='color:var(--accent)'>SIGNAL_LOCKED // 笹井 綾 を捕捉</span>";
-    } else {
-      wrapper.style.filter = "blur(15px)";
-      wrapper.style.opacity = "0.2";
-      statusText.textContent = "SEARCHING_FOR_SIGNALS...";
-    }
-  }
 </script>
 
 </body>
