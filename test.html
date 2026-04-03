@@ -7,7 +7,7 @@
   :root {
     --bg-color: #ffffff;
     --text-main: #333;
-    --text-sub: #aaa;
+    --text-sub: #888;
     --accent: #a0c0e0;
   }
 
@@ -17,108 +17,118 @@
     font-family: "Hiragino Mincho ProN", serif;
     width: 100vw; height: 100vh;
     overflow: hidden;
+    color: var(--text-main);
   }
 
-  /* 画面全体のステージ */
-  .profile-stage {
-    position: relative;
+  .container {
+    display: flex;
+    flex-direction: row-reverse; /* 右から左への視線誘導 */
     width: 100%; height: 100%;
-    writing-mode: vertical-rl;
-    padding: 10vh 5vw;
+    padding: 10vh 8vw;
     box-sizing: border-box;
+    writing-mode: vertical-rl;
   }
 
-  /* 【右】名前エリア */
-  .name-block {
-    position: absolute;
-    right: 8vw;
-    top: 15vh;
+  /* --- [1] 右端：シンボルエリア --- */
+  .section-symbol {
+    margin-left: 6rem;
+    flex-shrink: 0;
   }
-  .name-main { font-size: 2.2rem; letter-spacing: 0.5em; }
-  .name-id { font-family: sans-serif; font-size: 0.7rem; color: var(--text-sub); margin-top: 1rem; letter-spacing: 0.3em; }
+  .name-large { font-size: 2.4rem; letter-spacing: 0.6em; }
+  .name-en { font-family: sans-serif; font-size: 0.8rem; color: var(--text-sub); margin-top: 1.5rem; letter-spacing: 0.4em; }
 
-  /* 【中央】浮遊するステータス（断片） */
-  .status-fragment {
-    position: absolute;
-    font-size: 0.75rem;
-    color: var(--text-sub);
-    letter-spacing: 0.2em;
+  /* --- [2] 中央：ステータスエリア（整列させて見やすく） --- */
+  .section-status {
+    margin-left: 4rem;
+    padding-right: 2rem;
+    border-right: 1px solid #f0f0f0; /* 区切り線で情報の固まりを明示 */
+  }
+  .status-item {
+    margin-bottom: 2.5rem;
+    line-height: 1.5;
+  }
+  .status-label {
+    font-family: sans-serif;
+    font-size: 0.65rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: block;
+  }
+  .status-value { font-size: 0.9rem; letter-spacing: 0.1em; }
+
+  /* --- [3] 左側：ビジュアル＆ストーリーエリア --- */
+  .section-story {
+    margin-left: auto; /* 残りのスペースを埋める */
+    display: flex;
+    flex-direction: row; /* 縦書き内での並び */
+  }
+
+  .story-text {
+    width: 25vw;
+    font-size: 0.85rem;
+    line-height: 2.8;
+    letter-spacing: 0.15em;
+    padding-right: 2rem;
+  }
+
+  .illust-wrapper {
+    position: fixed;
+    left: 0; bottom: 0;
+    width: 40vw; height: 90vh;
+    z-index: -1;
+  }
+  .illust-image {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    opacity: 0.7;
+    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+  }
+
+  /* アニメーション（右上から順に） */
+  .fade {
+    animation: fadeAnim 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     opacity: 0;
   }
-  /* 座標を散らして配置 */
-  #stat-1 { top: 20vh; right: 25vw; }
-  #stat-2 { top: 55vh; right: 35vw; }
-  #stat-3 { top: 30vh; right: 45vw; }
-
-  /* 【左】立ち絵と詳細テキスト */
-  .visual-group {
-    position: absolute;
-    left: 5vw;
-    bottom: 0;
-    width: 45vw;
-    height: 90vh;
-    display: flex;
-    align-items: flex-start;
-  }
-
-  .character-illust {
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-    opacity: 0.8;
-  }
-
-  .observation-log {
-    margin-right: 2rem;
-    height: 60vh;
-    border-right: 1px solid #eee;
-    padding-right: 1.5rem;
-  }
-
-  .log-label { font-family: sans-serif; font-size: 0.6rem; color: var(--accent); margin-bottom: 2rem; }
-  .log-text { font-size: 0.85rem; line-height: 2.8; color: var(--text-main); }
-
-  /* アニメーション：プロローグの「滲み落ち」を継承 */
-  .fade-in-down {
-    animation: fadeInDown 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  @keyframes fadeInDown {
-    0% { opacity: 0; transform: translateY(-15px); filter: blur(8px); }
+  @keyframes fadeAnim {
+    0% { opacity: 0; transform: translateY(-10px); filter: blur(4px); }
     100% { opacity: 1; transform: translateY(0); filter: blur(0); }
   }
 </style>
 </head>
 <body>
 
-<div class="profile-stage">
-  <div class="name-block fade-in-down" style="animation-delay: 0.5s;">
-    <div class="name-main">笹井 綾</div>
-    <div class="name-id">SUBJECT_AYA_0814</div>
-  </div>
+<div class="container">
+  <header class="section-symbol fade" style="animation-delay: 0.5s;">
+    <h1 class="name-large">笹井 綾</h1>
+    <div class="name-en">SASAI AYA</div>
+  </header>
 
-  <div class="status-fragment fade-in-down" id="stat-1" style="animation-delay: 1.2s;">
-    <span style="color:var(--accent)">●</span> AGE: 19 / HEIGHT: 158cm
-  </div>
-  <div class="status-fragment fade-in-down" id="stat-2" style="animation-delay: 1.5s;">
-    <span style="color:var(--accent)">●</span> HOBBY: CLOUD_WATCHING
-  </div>
-  <div class="status-fragment fade-in-down" id="stat-3" style="animation-delay: 1.8s;">
-    <span style="color:var(--accent)">●</span> BIRTH: AUGUST_14
-  </div>
-
-  <div class="visual-group">
-    <div class="observation-log fade-in-down" style="animation-delay: 2.2s;">
-      <div class="log-label">OBSERVATION_RECORD</div>
-      <div class="log-text">
-        彼女は、自分を「溶けかけのアイスクリーム」に例えたことがある。<br>
-        形を失っていくことを、恐怖ではなく、<br>
-        ある種の救いのように感じているフシがある。
-      </div>
+  <div class="section-status fade" style="animation-delay: 1s;">
+    <div class="status-item">
+      <span class="status-label">AGE / BIRTH</span>
+      <span class="status-value">19 / 08.14</span>
     </div>
-    
-    <img src="aya_stand_illust.png" class="character-illust fade-in-down" style="animation-delay: 1s;" alt="笹井綾 立ち絵">
+    <div class="status-item">
+      <span class="status-label">HEIGHT</span>
+      <span class="status-value">158cm</span>
+    </div>
+    <div class="status-item">
+      <span class="status-label">FAVORITE</span>
+      <span class="status-value">雲の観察、微炭酸</span>
+    </div>
+  </div>
+
+  <div class="section-story fade" style="animation-delay: 1.5s;">
+    <div class="story-text">
+      「逃げ場は、いつだって白紙の中にあった」<br><br>
+      彼女の言葉は、いつもどこか遠い場所を指している。<br>
+      2055年の熱気から逃れるように、<br>
+      彼女はただ、空の色が溶けるのを待っていた。
+    </div>
+  </div>
+
+  <div class="illust-wrapper fade" style="animation-delay: 0.8s;">
+    <img src="aya_stand_illust.png" class="illust-image" alt="笹井綾 立ち絵">
   </div>
 </div>
 
