@@ -19,40 +19,52 @@
     overflow: hidden;
   }
 
-  /* 画面全体のコンテナ：ここは横並び(flex) */
-  .main-wrapper {
+  /* 1. 画面を左右に割るためのコンテナ */
+  .profile-wrapper {
     display: flex;
-    flex-direction: row-reverse; /* 右から順に並べる */
+    flex-direction: row-reverse; /* 右から順に配置 */
     width: 100%;
     height: 100%;
   }
 
-  /* 【右側〜中央】テキストエリア：ここだけ縦書き */
+  /* 2. 右側のテキストエリア：ここだけ「縦書き」にする */
   .text-content-area {
     writing-mode: vertical-rl;
     height: 100%;
-    padding: 12vh 0; /* 上下の余白 */
+    padding: 12vh 4vw;
     display: flex;
-    flex-direction: row; /* 行を右から左へ並べる */
-    flex-grow: 1; /* 余ったスペースを埋める */
+    flex-direction: row; /* 行を右から順に並べる */
+    flex-grow: 1; /* 余白を埋める */
   }
 
-  /* 各テキストブロックの調整 */
-  .section-symbol { margin-left: 4rem; margin-right: 5vw; }
-  .name-large { font-size: 2.2rem; letter-spacing: 0.5em; }
-  .name-en { font-family: sans-serif; font-size: 0.7rem; color: var(--text-sub); margin-top: 1rem; letter-spacing: 0.3em; writing-mode: horizontal-tb; }
+  /* 各セクションの調整 */
+  .section-symbol {
+    margin-left: 5rem;
+  }
+  .name-large { font-size: 2.2rem; letter-spacing: 0.5em; line-height: 1.2; }
+  .name-en { 
+    writing-mode: horizontal-tb; /* 英字は横書き */
+    font-family: sans-serif; font-size: 0.7rem; color: var(--text-sub); 
+    margin-top: 1.5rem; letter-spacing: 0.4em; 
+  }
 
-  .section-status { margin-left: 3rem; border-right: 1px solid #eee; padding-right: 2rem; }
+  .section-status {
+    margin-left: 4rem;
+    padding-right: 2rem;
+    border-right: 1px solid #eee;
+  }
   .status-item { margin-bottom: 2.5rem; }
-  .status-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 1rem; display: block; }
+  .status-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 1.2rem; display: block; }
   .status-value { font-size: 0.85rem; }
 
-  .section-story { margin-left: 2rem; padding-right: 2rem; }
-  .story-text { font-size: 0.85rem; line-height: 2.8; letter-spacing: 0.1em; }
+  .section-story {
+    margin-left: 3rem;
+  }
+  .story-text { font-size: 0.85rem; line-height: 3; letter-spacing: 0.15em; }
 
-  /* 【左側】立ち絵エリア：縦書きのルールから完全に独立させる */
+  /* 3. 左側の立ち絵エリア：縦書きの影響を受けない「聖域」 */
   .illust-area {
-    width: 45vw; /* 画面の左45%を立ち絵専用にする */
+    width: 45vw; /* 左側の45%をキープ */
     height: 100%;
     position: relative;
     flex-shrink: 0;
@@ -64,33 +76,32 @@
     left: 0;
     width: 100%;
     height: 90vh;
-    object-fit: contain; /* アスペクト比を維持して収める */
-    object-position: bottom left; /* 左下に固定 */
-    /* 足元だけを白に溶け込ませる */
+    object-fit: contain; /* 顔が切れないように収める */
+    object-position: bottom left;
     mask-image: linear-gradient(to top, transparent, black 15%);
   }
 
-  /* フェードアニメーション */
+  /* アニメーション */
   .fade {
-    animation: fadeAnim 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: fadeAnim 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     opacity: 0;
   }
   @keyframes fadeAnim {
-    0% { opacity: 0; transform: translateY(-10px); filter: blur(4px); }
+    0% { opacity: 0; transform: translateY(-15px); filter: blur(5px); }
     100% { opacity: 1; transform: translateY(0); filter: blur(0); }
   }
 </style>
 </head>
 <body>
 
-<div class="main-wrapper">
+<div class="profile-wrapper">
   <div class="text-content-area">
-    <header class="section-symbol fade" style="animation-delay: 0.3s;">
+    <header class="section-symbol fade" style="animation-delay: 0.5s;">
       <h1 class="name-large">笹井 綾</h1>
       <div class="name-en">SASAI AYA</div>
     </header>
 
-    <div class="section-status fade" style="animation-delay: 0.6s;">
+    <div class="section-status fade" style="animation-delay: 1.2s;">
       <div class="status-item">
         <span class="status-label">AGE / BIRTH</span>
         <span class="status-value">19 / 08.14</span>
@@ -105,7 +116,7 @@
       </div>
     </div>
 
-    <div class="section-story fade" style="animation-delay: 0.9s;">
+    <div class="section-story fade" style="animation-delay: 1.8s;">
       <div class="story-text">
         「逃げ場は、いつだって白紙の中にあった」<br><br>
         彼女の言葉は、いつもどこか遠い場所を指している。<br>
@@ -116,7 +127,7 @@
   </div>
 
   <div class="illust-area">
-    <img src="aya_stand_illust.png" class="illust-image fade" style="animation-delay: 0.5s;" alt="立ち絵">
+    <img src="aya_stand_illust.png" class="illust-image fade" style="animation-delay: 0.8s;" alt="立ち絵">
   </div>
 </div>
 
