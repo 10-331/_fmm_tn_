@@ -19,7 +19,7 @@
     overflow: hidden;
   }
 
-  /* 画面全体のFlexコンテナ */
+  /* 画面を左右に分ける */
   .profile-wrapper {
     display: flex;
     flex-direction: row-reverse;
@@ -27,70 +27,39 @@
     height: 100%;
   }
 
-  /* 右側：テキストエリア（縦書き） */
+  /* 右：テキストエリア（縦書き） */
   .text-content-area {
     writing-mode: vertical-rl;
     height: 100%;
-    padding: 12vh 4vw;
+    padding: 10vh 4vw;
     display: flex;
     flex-direction: row;
     flex-grow: 1;
   }
 
-  /* 名前・キャッチコピー */
-  .section-symbol {
-    margin-left: 5rem;
-    flex-shrink: 0;
-  }
-  .name-large { font-size: 2.2rem; letter-spacing: 0.6em; line-height: 1.2; }
+  .section-symbol { margin-left: 4rem; flex-shrink: 0; }
+  .name-large { font-size: 2.2rem; letter-spacing: 0.5em; line-height: 1.2; }
   .name-en { 
     writing-mode: horizontal-tb;
     font-family: sans-serif; font-size: 0.7rem; color: var(--text-sub); 
-    margin-top: 1.5rem; letter-spacing: 0.4em; 
+    margin-top: 1rem; letter-spacing: 0.3em; 
   }
-  .catch-copy {
-    margin-top: 2rem;
-    font-size: 0.85rem;
-    color: var(--text-sub);
-    letter-spacing: 0.2em;
-  }
+  .catch-copy { margin-top: 2rem; font-size: 0.8rem; color: var(--text-sub); }
 
-  /* ステータス（整理されたアーカイブ） */
-  .section-status {
-    margin-left: 4rem;
-    padding-right: 2rem;
-    border-right: 1px solid #f0f0f0;
-  }
-  .status-item { margin-bottom: 2.5rem; }
-  .status-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 1.2rem; display: block; font-family: sans-serif; }
-  .status-value { font-size: 0.9rem; letter-spacing: 0.1em; }
+  .section-status { margin-left: 4rem; border-right: 1px solid #f0f0f0; padding-right: 2rem; }
+  .status-item { margin-bottom: 2rem; }
+  .status-label { font-size: 0.6rem; color: var(--accent); margin-bottom: 1rem; display: block; font-family: sans-serif; }
+  .status-value { font-size: 0.85rem; }
 
-  /* 観測記録（詳細文章） */
-  .section-story {
-    margin-left: 3rem;
-    max-width: 30vw;
-  }
-  .story-text { 
-    font-size: 0.85rem; 
-    line-height: 2.8; 
-    letter-spacing: 0.12em;
-    text-align: justify;
-  }
-  .memory-link {
-    color: var(--accent);
-    text-decoration: underline;
-    cursor: pointer;
-    transition: opacity 0.3s;
-  }
-  .memory-link:hover { opacity: 0.6; }
+  .section-story { margin-left: 2rem; max-width: 35vw; }
+  .story-text { font-size: 0.85rem; line-height: 2.8; letter-spacing: 0.1em; }
 
-  /* 左側：立ち絵エリア（聖域） */
+  /* 左：立ち絵エリア（聖域） */
   .illust-area {
-    width: 42vw;
+    width: 45vw; /* 確実に領域を確保 */
     height: 100%;
     position: relative;
     flex-shrink: 0;
-    overflow: hidden;
   }
 
   .illust-image {
@@ -98,31 +67,29 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 92vh;
+    height: 95vh; /* 画面下から大きく表示 */
     object-fit: contain;
     object-position: bottom left;
-    mask-image: linear-gradient(to top, transparent, black 12%);
-    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.03));
+    /* 読み込み失敗時に枠線が出ないように設定 */
+    border: none;
+    outline: none;
+    /* 足元を溶け込ませる */
+    mask-image: linear-gradient(to top, transparent, black 15%);
+    z-index: 10;
   }
 
-  /* アニメーション */
   .fade {
-    animation: fadeAnim 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: fadeAnim 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     opacity: 0;
   }
   @keyframes fadeAnim {
-    0% { opacity: 0; transform: translateY(-15px); filter: blur(6px); }
-    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
   }
 
   footer {
-    position: fixed;
-    bottom: 20px;
-    right: 30px;
-    font-size: 0.7rem;
-    color: #ccc;
-    letter-spacing: 0.2em;
-    writing-mode: horizontal-tb;
+    position: fixed; bottom: 20px; right: 30px;
+    font-size: 0.7rem; color: #ddd; letter-spacing: 0.2em;
   }
 </style>
 </head>
@@ -130,7 +97,7 @@
 
 <div class="profile-wrapper">
   <div class="text-content-area">
-    <header class="section-symbol fade" style="animation-delay: 0.3s;">
+    <header class="section-symbol fade" style="animation-delay: 0.4s;">
       <h1 class="name-large">笹井 綾</h1>
       <div class="name-en">SUBJECT_AYA_0814</div>
       <p class="catch-copy">今がすべての方向音痴なムードメーカー</p>
@@ -157,17 +124,16 @@
 
     <div class="section-story fade" style="animation-delay: 1.6s;">
       <div class="story-text">
-        転職に伴い、2054年の冬が終わる頃にHAMAへやってきた。
-        メタバース企業に勤めているが、自部署は業務内容が異なるため、関連知識は皆無に近い。<br><br>
-        極度の方向音痴で、よく街中で途方に暮れている。
-        箱入り娘ゆえに一般常識も怪しいが、なぜかAIについては異様に博識。<br><br>
-        <span class="memory-link" onclick="location.href='Secret.html'">一部の記憶が曖昧</span>だが、本人は「身軽でいい」と特に気にしていない様子。
+        2054年の冬が終わる頃にHAMAへやってきた。<br>
+        メタバース企業に勤めるが、AI以外の知識は怪しい。<br><br>
+        極度の方向音痴で、街中でよく途方に暮れている。<br>
+        一部の記憶が曖昧だが、本人は「身軽でいい」と笑っている。
       </div>
     </div>
   </div>
 
   <div class="illust-area">
-    <img src="assets/profile/aya2.PNG" class="illust-image fade" style="animation-delay: 0.7s;" alt="笹井 綾">
+    <img src="assets/profile/aya2.PNG" class="illust-image fade" style="animation-delay: 0.8s;" alt="笹井 綾">
   </div>
 </div>
 
