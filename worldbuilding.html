@@ -1,448 +1,114 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Worldbuilding</title>
-<style>
-:root{
-  --bg1:#f7f8fa;
-  --bg2:#eef1f6;
-  --bg3:#e8edf4;
-
-  --card:rgba(255,255,255,0.82);
-  --card2:rgba(255,255,255,0.60);
-
-  --shadow:0 10px 30px rgba(0,0,0,.06);
-
-  --line:rgba(120,130,160,.12);
-  --line2:rgba(120,130,160,.22);
-
-  --text:#2a2d33;
-  --muted:#6f7684;
-
-  --accent:#8a90a3;
-  --accent-soft:rgba(138,144,163,.12);
-}
-
-  html,body{
-    margin:0;
-    padding:0;
-    font-family:"Hiragino Mincho ProN","Yu Mincho",serif;
-    color:var(--text);
-    background:    linear-gradient(180deg, var(--bg1), var(--bg2) 50%, var(--bg3));
-    overflow-x:hidden;
-  }
-
-  .page{
-    min-height:100vh;
-    padding:72px 16px 60px;
-    display:grid;
-    place-items:center;
-  }
-
-  .wrap{
-    width:min(1100px, 94vw);
-    display:grid;
-    grid-template-columns: 320px 1fr;
-    gap:24px;
-    align-items:start;
-  }
-
-  .panel,
-  .detail{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:18px;
-    box-shadow:var(--shadow);
-    overflow:hidden;
-  }
-
-  .panel-head,
-  .detail-head{
-    padding:16px 18px 14px;
-    border-bottom:1px solid var(--line2);
-    background:rgba(255,255,255,.36);
-  }
-
-  .panel-head h1,
-  .detail-head h2{
-    margin:0;
-    font-size:1rem;
-    letter-spacing:.14em;
-    font-weight:600;
-  }
-
-  .panel-head p,
-  .detail-head p{
-    margin:.5em 0 0;
-    color:var(--muted);
-    font-size:.82rem;
-    line-height:1.8;
-    letter-spacing:.04em;
-  }
-
-  .list{
-    display:flex;
-    flex-direction:column;
-    padding:10px;
-    gap:8px;
-  }
-
-  .item-btn{
-    width:100%;
-    text-align:left;
-    border:1px solid transparent;
-    background:var(--card2);
-    color:var(--text);
-    border-radius:12px;
-    padding:14px 14px 12px;
-    cursor:pointer;
-    transition:background .2s ease, border-color .2s ease, transform .2s ease;
-  }
-
-  .item-btn:hover{
-    background:rgba(255,255,255,.76);
-    border-color:var(--line2);
-    transform:translateY(-1px);
-  }
-
-  .item-btn.is-active{
-    background:rgba(255,255,255,.90);
-    border-color:rgba(125,116,141,.34);
-    box-shadow: inset 0 0 0 1px rgba(125,116,141,.10);
-  }
-
-  .item-title{
-    display:block;
-    font-size:.95rem;
-    letter-spacing:.08em;
-    margin-bottom:.3em;
-  }
-
-  .item-sub{
-    display:block;
-    color:var(--muted);
-    font-size:.76rem;
-    line-height:1.7;
-    letter-spacing:.03em;
-  }
-
-  .detail-body{
-    padding:22px 22px 26px;
-  }
-
-  .entry{
-    display:none;
-    animation:fade .22s ease;
-  }
-
-  .entry.is-active{
-    display:block;
-  }
-
-  .entry-meta{
-    display:inline-block;
-    margin-bottom:12px;
-    font-size:.72rem;
-    letter-spacing:.12em;
-    color:var(--accent);
-    background:var(--accent-soft);
-    border:1px solid rgba(125,116,141,.16);
-    border-radius:999px;
-    padding:6px 10px;
-  }
-
-  .entry h3{
-    margin:0 0 12px;
-    font-size:1.1rem;
-    letter-spacing:.08em;
-    font-weight:600;
-  }
-
-  .entry p{
-    margin:0;
-    font-size:.92rem;
-    line-height:2;
-    letter-spacing:.03em;
-    white-space:pre-line;
-  }
-
-  .entry .note{
-    margin-top:18px;
-    padding-top:14px;
-    border-top:1px solid var(--line2);
-    color:var(--muted);
-    font-size:.8rem;
-    line-height:1.9;
-  }
-
-  footer{
-    text-align:center;
-    font-size:.8rem;
-    color:#888;
-    margin-top:22px;
-    letter-spacing:.1em;
-  }
-
-  .menu-button{
-    position:fixed;
-    top:18px; right:22px;
-    width:30px; height:22px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    cursor:pointer;
-    z-index:1001;
-  }
-
-  .menu-button span{
-    height:3px;
-    width:100%;
-    background:rgba(70,70,70,0.6);
-    border-radius:2px;
-    transition:all .3s ease;
-  }
-
-  .menu-button:hover span{
-    background:rgba(70,70,70,0.9);
-  }
-
-  .menu-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(240,240,240,0.4);
-    backdrop-filter:blur(10px);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:1000;
-  }
-
-  .menu-content{
-    background:rgba(255,255,255,0.85);
-    border-radius:12px;
-    padding:30px 50px;
-    box-shadow:0 0 25px rgba(180,180,180,0.3);
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-    gap:1em;
-    animation:fadeIn .3s ease;
-  }
-
-  .menu-content a{
-    text-decoration:none;
-    color:#444;
-    font-size:.95em;
-    letter-spacing:.05em;
-    transition:.3s;
-  }
-
-  .menu-content a:hover{
-    color:#666;
-    text-shadow:0 0 8px rgba(200,200,200,0.6);
-  }
-
-  @keyframes fade{
-    from{ opacity:0; transform:translateY(4px); }
-    to{ opacity:1; transform:translateY(0); }
-  }
-
-  @keyframes fadeIn{
-    from{ opacity:0; transform:scale(.95); }
-    to{ opacity:1; transform:scale(1); }
-  }
-
-  @media (max-width: 860px){
-    .wrap{
-      grid-template-columns:1fr;
-      gap:16px;
-    }
-
-    .panel-head h1,
-    .detail-head h2{
-      font-size:.95rem;
-    }
-
-    .detail-body{
-      padding:18px 16px 22px;
-    }
-
-    .entry h3{
-      font-size:1rem;
-    }
-
-    .entry p{
-      font-size:.9rem;
-      line-height:1.95;
-    }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>World Archive | HAMA 18-DISTRICT</title>
+  <link rel="stylesheet" href="./shared/header.css" />
+  <link rel="stylesheet" href="./world.css" />
 </head>
-
 <body>
-  <div class="page">
-    <div class="wrap">
+  <div id="commonHeaderMount"></div>
 
-      <!-- 左：一覧 -->
-      <section class="panel">
-        <div class="panel-head">
-          <h1>WORLDBUILDING</h1>
-          <p>気になる項目を選択してください。<br>各記録は一部不完全な可能性があります。</p>
+  <main class="world-page">
+    <div class="world-shell">
+
+      <nav class="world-topnav" aria-label="section navigation">
+        <a href="#section-current">HAMA / D18</a>
+        <a href="#section-bureau">S-BUREAU</a>
+        <a href="#section-origin">ORIGIN</a>
+      </nav>
+
+      <header class="world-hero">
+        <h1>HAMA</h1>
+        <div class="hero-copy">
+          <p>誰もが旅に焦がれる近未来。</p>
+          <p>観光業の競争が熾烈を極めるJPNでは、</p>
+          <p>人気観光地は”独立観光特区”として</p>
+          <p>活躍していた。</p>
+          <p>めくるめく色づいていくHAMA18区と、</p>
+          <p>その地に身を置いたばかりの彼女。</p>
+          <p>未知の出会いと、ほんの少しの違和感。</p>
+          <p>──ずっと、何かを忘れているような気がしていた。</p>
+          <p>ぼんやりとした違和感を探すために、彼女は外へ足を運ぶ。</p>
+          <p>祭囃子の鳴る方へ、呼ばれた場所へと往くために。</p>
+        </div>
+      </header>
+
+      <nav class="world-index" aria-label="chapter index">
+        <a href="#section-current">CURRENT</a>
+        <a href="#section-bureau">S-BUREAU</a>
+        <a href="#section-origin">ORIGIN</a>
+      </nav>
+
+      <section class="world-section" id="section-current">
+        <div class="section-no">01</div>
+        <div class="section-meta">Current: HAMA</div>
+        <h2>光と観光の街で、<br>彼女は今を生きている。</h2>
+
+        <div class="section-copy">
+          <p>昼は洗練された商業区、夜は雑多で鮮やかな歓楽街。HAMA18区は、JPNの中でも高い集客力を誇る独立観光特区のひとつだ。</p>
+          <p>観光のために整えられた都市でありながら、その隙間には古い気配や説明しきれない余白が残されている。彼女がいま暮らしているのも、この街の一角である。</p>
         </div>
 
-        <div class="list">
-          <button class="item-btn is-active" data-target="hama18">
-            <span class="item-title">HAMA18区</span>
-            <span class="item-sub">綾が最近引っ越してきた、観光特区の一角。</span>
-          </button>
+        <div class="world-keywords">
+          <button class="world-keyword" data-term="hama18">HAMA18区</button>
+          <button class="world-keyword" data-term="tourist-zone">独立観光特区</button>
+          <button class="world-keyword" data-term="discomfort">違和感</button>
+        </div>
+      </section>
 
-          <button class="item-btn" data-target="starducks">
-            <span class="item-title">スターダックス</span>
-            <span class="item-sub">綾と添が初めて出会ったコーヒーショップ。</span>
-          </button>
+      <section class="world-section" id="section-bureau">
+        <div class="section-no">02</div>
+        <div class="section-meta">Archive: S-Log</div>
+        <h2>記録することと、<br>隠すことは、<br>ときどき同じ意味になる。</h2>
 
-          <button class="item-btn" data-target="mutant">
-            <span class="item-title">変異体</span>
-            <span class="item-sub">自我と感情を持った、例外的なアンドロイド個体。</span>
-          </button>
+        <div class="section-copy">
+          <p>S局。一般社会の表層からは見えにくい機関。異常事案や秘匿記録を管理するその場所は、真実を保存し、同時に隔離する場所でもある。</p>
+          <p>彼女もまた、かつてこの組織と無関係ではいられなかった。任務、記録、そして秘匿。断片的な記憶の輪郭は、いつもこの無機質な場所を指し示している。</p>
+        </div>
 
-          <button class="item-btn" data-target="s-kyoku">
-            <span class="item-title">防衛省 地方支分部局</span>
-            <span class="item-sub">通称S局。対アンドロイド任務を行う新生部隊。</span>
-          </button>
-
-          <button class="item-btn" data-target="missing">
-            <span class="item-title">■■村集団失踪事件</span>
-            <span class="item-sub">2051年1月、とある集落が消失した未解決事件。</span>
-          </button>
-
-          <button class="item-btn" data-target="kami-sama">
-            <span class="item-title">かみさま</span>
-            <span class="item-sub">■■村が信仰していたとされる■■■。</span>
-          </button>
+        <div class="world-keywords">
+          <button class="world-keyword" data-term="deviant">変異体</button>
+          <button class="world-keyword" data-term="local-bureau">防衛省 地方支分部局</button>
+          <button class="world-keyword" data-term="s-bureau">S局</button>
+          <button class="world-keyword" data-term="classified">秘匿記録</button>
         </div>
       </section>
 
-      <!-- 右：詳細 -->
-      <section class="detail">
-        <div class="detail-head">
-          <h2>RECORD VIEW</h2>
-          <p>選択中の項目に対応する記録を表示しています。</p>
+      <section class="world-section" id="section-origin">
+        <div class="section-no">03</div>
+        <div class="section-meta">Origin: Root</div>
+        <h2>祭囃子の鳴る方へ。</h2>
+
+        <div class="section-copy">
+          <p>地図から消えた共同体。長く引き継がれてきた風習。彼女を呼ぶ鈴の音。すべての違和感の根源は、この閉ざされた「お里」へと遡っていく。</p>
+          <p>地図の上では小さな共同体でしかなかったはずのその場所は、彼女の記憶と感覚の奥底に、今も消えない影を残している。</p>
         </div>
 
-        <div class="detail-body">
-
-          <article class="entry is-active" id="hama18">
-            <span class="entry-meta">LOCATION RECORD</span>
-            <h3>HAMA18区</h3>
-            <p>かつて国内有数の観光地だったが、現在は残念な状態にある観光特区。
-近年は再開発の噂もあるものの、表通りの華やかさに比べ、少し奥へ入れば古びた建物や人の気配の薄い通りも残っている。
-
-最近、綾が引っ越してきた地域でもある。</p>
-            <div class="note">NOTE：生活圏としての顔と、衰退した観光地としての顔を併せ持つ。</div>
-          </article>
-
-          <article class="entry" id="starducks">
-            <span class="entry-meta">FACILITY RECORD</span>
-            <h3>スターダックス</h3>
-            <p>綾と添が初めて出会ったコーヒーショップ。
-全国展開している有名チェーン店だが、地域によって店舗数にかなり差がある。
-
-HAMA18区周辺では、街の賑わいに対してやや不釣り合いなほど静かな空気を保っている店舗もある。</p>
-            <div class="note">NOTE：日常の起点であり、関係性の始点でもある場所。</div>
-          </article>
-
-          <article class="entry" id="mutant">
-            <span class="entry-meta">ENTITY RECORD</span>
-            <h3>変異体</h3>
-            <p>何らかの理由により、本来アンドロイドが持ちえない自我と感情が芽生えた個体。
-近年、人間に容姿を寄せた違法アンドロイドの増加とあわせ、業界内でも深刻な課題とされている。
-
-単なる機械故障として処理できない例もあり、その定義や危険性は未だ揺れている。</p>
-            <div class="note">NOTE：技術の逸脱か、生命の発生か。その解釈は立場によって異なる。</div>
-          </article>
-
-          <article class="entry" id="s-kyoku">
-            <span class="entry-meta">ORGANIZATION RECORD</span>
-            <h3>防衛省 地方支分部局</h3>
-            <p>対アンドロイドに特化した新生部隊。通称S局（Security Bureau）。
-変異体の回収および初期化を行い、危険因子の排除と平穏の維持を掲げている。
-
-全国各地に基地を構えており、国家が数億円を投下したと囁かれている。</p>
-            <div class="note">NOTE：表向きは治安維持組織だが、その実態には不明点も多い。</div>
-          </article>
-
-          <article class="entry" id="missing">
-            <span class="entry-meta">INCIDENT RECORD</span>
-            <h3>■■村集団失踪事件</h3>
-            <p>2051年1月、■■のとある集落が■■ごと■■してしまった事件。
-当時の詳細を知る者は■■いことから、その■■を証明する■はない。
-
-一部では都市伝説として語られ、オカルトマニアの間でだけ断片的に知られているともされる。</p>
-            <div class="note">NOTE：記録そのものが欠けているため、事件の存在自体を疑う声もある。</div>
-          </article>
-
-          <article class="entry" id="kami-sama">
-            <span class="entry-meta">FAITH RECORD</span>
-            <h3>かみさま</h3>
-            <p>■■村が信仰していたとされる■■■。
-■の■■期、■■に■■を■えたことで■を手にした。
-
-現存する資料は少なく、信仰対象そのものが実在したかどうかも明確ではない。</p>
-            <div class="note">NOTE：信仰、伝承、現象。そのどこまでが現実に属するのか判別が難しい。</div>
-          </article>
-
+        <div class="world-keywords">
+          <button class="world-keyword" data-term="kamikakushi">神隠し</button>
+          <button class="world-keyword" data-term="village">お里</button>
+          <button class="world-keyword" data-term="bell">鈴の音</button>
         </div>
       </section>
+
+      <footer class="world-footer">WAITING FOR NEXT DEPARTURE</footer>
     </div>
+  </main>
 
-    <footer>#溶けて、そのまま雲隠れ</footer>
-  </div>
+  <div class="term-modal" id="termModal" aria-hidden="true">
+    <div class="term-modal-backdrop" id="termModalBackdrop"></div>
 
-  <!-- メニューUI -->
-  <div class="menu-button" id="menuButton" aria-label="menu">
-    <span></span><span></span><span></span>
-  </div>
-
-  <div class="menu-overlay" id="menuOverlay">
-    <div class="menu-content">
-      <a href="home.html">home</a>
-      <a href="Character.html">Character</a>
-      <a href="works/select.html">Story</a>
-      <a href="Media.html">Media</a>
+    <div class="term-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="termModalTitle">
+      <button class="term-modal-close" id="termModalClose" type="button" aria-label="閉じる">×</button>
+      <p class="term-modal-label">WORLD NOTE</p>
+      <h3 class="term-modal-title" id="termModalTitle">用語名</h3>
+      <p class="term-modal-body" id="termModalBody">ここに説明文が入ります。</p>
     </div>
   </div>
 
-  <script>
-    const buttons = document.querySelectorAll('.item-btn');
-    const entries = document.querySelectorAll('.entry');
-
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const target = btn.dataset.target;
-
-        buttons.forEach(b => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
-
-        entries.forEach(entry => {
-          entry.classList.toggle('is-active', entry.id === target);
-        });
-      });
-    });
-
-    const menuBtn = document.getElementById('menuButton');
-    const overlay = document.getElementById('menuOverlay');
-
-    menuBtn.addEventListener('click', () => {
-      overlay.style.display = (overlay.style.display === 'flex') ? 'none' : 'flex';
-      if (overlay.style.display !== 'none') overlay.style.display = 'flex';
-    });
-
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) overlay.style.display = 'none';
-    });
-  </script>
+  <script src="./shared/header.js"></script>
+  <script src="./world-popup.js"></script>
 </body>
 </html>
