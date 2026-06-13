@@ -1,0 +1,52 @@
+{
+  "settings": {
+    "appName": "You & Me",
+    "subtitle": "a small record of ordinary days",
+    "icons": {
+      "summary": "⚖️",
+      "meals": "🍴",
+      "memo": "📝",
+      "review": "🤖"
+    }
+  },
+  "records": [
+    {
+      "date": "2026-05-01",
+      "headline": "まだ知らない部屋のことを考えていた",
+      "weights": [
+        { "time": "08:00", "value": 57.0, "memo": "" }
+      ],
+      "steps": "",
+      "distanceKm": "",
+      "meals": {
+        "breakfast": "—",
+        "lunch": "—",
+        "dinner": "—",
+        "snack": "—",
+        "other": "—"
+      },
+      "lifeMemo": "5月のはじめ。まだ引越しも新しい生活も具体的には始まっていなかった頃。",
+      "chatgptSummary": "",
+      "aiReview": ""
+    },
+    {
+      "date": "2026-06-13",
+      "headline": "夜風が気持ちよかった",
+      "weights": [
+        { "time": "22:00", "value": 51.2, "memo": "" }
+      ],
+      "steps": "16000",
+      "distanceKm": "10.4",
+      "meals": {
+        "breakfast": "—",
+        "lunch": "ミニトマト15個くらい",
+        "dinner": "えび餃子4個\nミニトマト7個",
+        "snack": "—",
+        "other": "ブラックコーヒー2杯"
+      },
+      "lifeMemo": "チークとハイライトを購入。ニトリでキッチンマットを購入。ソファのある暮らしに憧れた。夜風が気持ちよかった。",
+      "chatgptSummary": "・モールとニトリへ行った\n・チークとハイライトを購入\n・おにぎりケースとキッチンマットを購入\n・16,000歩歩いた\n・You & Me の構想が生まれた",
+      "aiReview": "活動量が非常に多い日。食事は軽め。翌日は脚の疲れやむくみの可能性あり。"
+    }
+  ]
+}
