@@ -173,6 +173,29 @@
       "lifeMemo": "",
       "chatgptSummary": "",
       "aiReview": ""
+    },
+    {
+      "date": "2026-06-19",
+      "headline": "",
+      "weights": [
+        {
+          "time": "06:18",
+          "value": 50.9,
+          "memo": ""
+        }
+      ],
+      "steps": "",
+      "distanceKm": "",
+      "meals": {
+        "breakfast": "",
+        "lunch": "",
+        "dinner": "",
+        "snack": "",
+        "other": ""
+      },
+      "lifeMemo": "",
+      "chatgptSummary": "",
+      "aiReview": ""
     }
   ]
 }
